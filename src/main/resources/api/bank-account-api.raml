@@ -1,0 +1,170 @@
+#%RAML 1.0
+title: Bank Account API
+version: v1
+
+protocols:
+  - HTTP
+  - HTTPS
+
+    
+/accounts:
+  post:
+    description: Create a new bank account using customer details. A unique account number will be generated.
+    queryParameters:
+      adharNumber:
+        type: string
+        required: true
+        minLength: 12
+        maxLength: 12
+      bankName:
+        required: true
+        type: string
+        enum:
+          - HDFC
+          - SBI
+          - APGIVB
+          - AXIS
+          - ICICI
+    body:
+      application/json:
+        type: object
+        example:
+          {
+            "FullName": "Narsingarao Beesetti",
+            "dateOfBirth": "2000-06-06",
+            "mobileNumber": "9874561230",
+            "email": "narsingbeesetti@gmail.com",
+            "address": "Chowduvada, 123/5"
+          }
+        properties:
+          FullName:
+            type: string
+            required: true
+          dateOfBirth:
+            type: date-only
+            required: true
+          mobileNumber:
+            type: string
+            required: true
+          email:
+            type: string
+            required: true
+          address:
+            type: string
+            required: true
+          adharNumber:
+            type: string
+            required: false
+    responses:
+      201:
+        description: Account successfully created
+        body:
+          application/json:
+            example:
+              {
+                "message": "Account created successfully",
+                "accountNumber": "63412021212"
+              }
+      400:
+        description: Bad request due to missing or invalid data
+        body:
+          application/json:
+            example:
+              {
+                "message": "Invalid input.Please provide all required fields."
+              }
+      500:
+        description: Internal server error
+        body:
+          application/json:
+            example:
+              {
+                "message": "An unexpected error occurred. Please try again later."
+              }
+  /{accountNumber}:
+    get:
+      description: Get account details by account number.
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                {
+                  "accountNumber": "63412021212",
+                  "FullName": "Narsingarao Beesetti",
+                  "dateOfBirth": "2000-06-06",
+                  "mobileNumber": "9874561230",
+                  "email": "narsingbeesetti@gmail.com",
+                  "address": "chowduvada, 256/3"
+                }
+        404:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Account not found"
+                }
+    patch:
+      description: Update details of an existing bank account using account number.
+      body:
+        application/json:
+          type: object
+          example:
+            {
+              "FullName": "Updated Name",
+              "address": "New Address",
+              "mobileNumber": "9856742613"
+            }
+          properties:
+            FullName?: string
+            "mobileNumber?": string
+            "email?": string
+      responses:
+        200:
+          description: Account updated successfully
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Account details updated successfully",
+                  "accountNumber": "63412021212"
+                }
+        404:
+          description: Account not found
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Account not found"
+                }
+        400:
+          description: Invalid update request
+          body:
+            application/json:
+              example:
+                {
+                  "message": "No valid fileds provided for update"
+                }
+    delete:
+      description: Deactivate a bank account by account number.
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Account deactivated successfully",
+                  "accountNumber": "63412021212"
+                }
+        404:
+          body:
+            application/json:
+              example:
+                {
+                  "message": "Account not found"
+                }
+
+
+
+          
+
