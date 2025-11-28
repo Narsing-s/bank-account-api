@@ -1,0 +1,130 @@
+/* App.css */
+ 
+/* General body */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #e0f2fe; /* light sky blue */
+  margin: 0;
+  padding: 0;
+}
+ 
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+ 
+/* Header */
+header {
+  background-color: #1d4ed8; /* blue-700 */
+  color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+ 
+header h1 {
+  font-size: 28px;
+  margin: 0 0 5px 0;
+}
+ 
+header p {
+  font-size: 14px;
+  opacity: 0.9;
+}
+ 
+/* Notification boxes */
+.notification {
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+ 
+.notification.success {
+  background-color: #dcfce7; /* green-100 */
+  border: 1px solid #bbf7d0; /* green-300 */
+}
+ 
+.notification.error {
+  background-color: #fee2e2; /* red-100 */
+  border: 1px solid #fecaca; /* red-300 */
+}
+ 
+/* Forms */
+form, .box {
+  background-color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+}
+ 
+form h2, .box h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+ 
+/* Inputs */
+input[type="text"], input[type="date"], input[type="email"], input[type="number"] {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #cbd5e1; /* gray-300 */
+  font-size: 14px;
+}
+ 
+/* Buttons */
+button {
+  padding: 10px 15px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+}
+ 
+button.bg-blue {
+  background-color: #2563eb; /* blue-600 */
+}
+ 
+button.bg-amber {
+  background-color: #d97706; /* amber-600 */
+}
+ 
+button.bg-red {
+  background-color: #dc2626; /* red-600 */
+}
+ 
+button.bg-indigo {
+  background-color: #4f46e5; /* indigo-600 */
+}
+ 
+/* Fetch display */
+pre {
+  background-color: #f1f5f9; /* slate-50 */
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  overflow-x: auto;
+}
+ 
+/* Grid layout */
+.grid {
+  display: grid;
+  gap: 20px;
+}
+ 
+.grid-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+ 
+/* Footer */
+footer {
+  text-align: center;
+  font-size: 12px;
+  color: #64748b; /* slate-500 */
+  margin-top: 20px;
+}
+ 
