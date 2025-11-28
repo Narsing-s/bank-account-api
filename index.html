@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bank-Account-Portal</title>
+ 
+  <style>
+    body{
+      background:#eef3ff;
+      font-family:calibri;
+      margin:0;
+    }
+    header{
+      background:#0047ab; color:white;
+      padding:20px; text-align:center;
+      font-size:28px; letter-spacing:1px;
+    }
+    .box{
+      width:450px; background:white;
+      margin:25px auto; padding:25px;
+      border-radius:12px;
+      box-shadow:0 0 15px rgba(0,0,0,.1);
+    }
+    .box h2{margin:0;text-align:center;}
+    input,button,select{
+      width:100%;padding:11px;margin-top:10px;
+      border-radius:6px;font-size:15px;
+      border:1px solid #bbb;
+    }
+    button{
+      background:#0047ab;color:white;font-weight:bold;
+      cursor:pointer;
+    }
+    button:hover{
+      background:#002f77;
+    }
+    .result{
+      background:#d9ffda;border-left:5px solid green;
+      padding:10px;margin-top:10px;display:none;
+    }
+  </style>
+ 
+</head>
+<body>
+ 
+<header>🏦 Bank Account Management Portal</header>
+ 
+ 
+<!-- CREATE ACCOUNT -->
+<div class="box">
+<h2>Create Account</h2>
+<input id="cName" placeholder="Full Name">
+<input id="cDob" type="date" placeholder="DOB">
+<input id="cMobile" placeholder="Mobile Number">
+<input id="cBank" placeholder="Bank Name">
+<input id="cEmail" placeholder="Email">
+<input id="cAddress" placeholder="Address">
+<input id="cAdhar" placeholder="Aadhar Number">
+ 
+<button onclick="createAccount()">Create Account</button>
+<div id="createResult" class="result"></div>
+</div>
+ 
+ 
+ 
+<!-- SEARCH ACCOUNT -->
+<div class="box">
+<h2>Get Account</h2>
+<input id="getAcc" placeholder="Enter Account Number">
+<button onclick="getAccount()">Fetch</button>
+<div id="getResult" class="result"></div>
+</div>
+ 
+ 
+ 
+<!-- UPDATE ACCOUNT -->
+<div class="box">
+<h2>Update Account</h2>
+<input id="uAcc" placeholder="Account Number">
+<input id="uName" placeholder="Full Name">
+<input id="uAddr" placeholder="Address">
+<input id="uMob" placeholder="Mobile Number">
+ 
+<button onclick="updateAccount()">Update</button>
+<div id="updateResult" class="result"></div>
+</div>
+ 
+ 
+ 
+<!-- DELETE ACCOUNT -->
+<div class="box">
+<h2>Delete Account</h2>
+<input id="dAcc" placeholder="Enter Account Number">
+<button onclick="deleteAccount()">Delete</button>
+<div id="deleteResult" class="result"></div>
+</div>
+ 
+ 
+ 
+<script>
+const API = "http://localhost:8051/api";  // change if deployed
+ 
+async function createAccount(){
+ let body = {
+   FullName : cName.value,
+   dateOfBirth : cDob.value,
+   mobileNumber : cMobile.value,
+   bankName : cBank.value,
+   email : cEmail.value,
+   address : cAddress.value
+ };
+ let res = await fetch(`${API}/accounts?adharNumber=${cAdhar.value}&bankName=${cBank.value}`,{
+   method:"POST",
+   headers:{ "Content-Type":"application/json" },
+   body: JSON.stringify(body)
+ });
+ let data = await res.json();
+ createResult.style.display="block";
+ createResult.innerHTML = JSON.stringify(data,null,2);
+}
+ 
+async function getAccount(){
+ let id = getAcc.value;
+ let res = await fetch(`${API}/accounts/${id}`);
+ let data = await res.json();
+ getResult.style.display="block";
+ getResult.innerHTML = JSON.stringify(data,null,2);
+}
+ 
+async function updateAccount(){
+ let id = uAcc.value;
+ let body = {
+   FULLNAME:uName.value,
+   ADDRESS:uAddr.value,
+   MOBILENUMBER:uMob.value
+ };
+ let res = await fetch(`${API}/accounts/${id}`,{
+   method:"PATCH",
+   headers:{ "Content-Type":"application/json" },
+   body:JSON.stringify(body)
+ });
+ let data = await res.json();
+ updateResult.style.display="block";
+ updateResult.innerHTML = JSON.stringify(data,null,2);
+}
+ 
+async function deleteAccount(){
+ let id = dAcc.value;
+ let res = await fetch(`${API}/accounts/${id}`,{ method:"DELETE" });
+ let data = await res.json();
+ deleteResult.style.display="block";
+ deleteResult.innerHTML = JSON.stringify(data,null,2);
+}
+</script>
+ 
+</body>
+</html>
+ 
