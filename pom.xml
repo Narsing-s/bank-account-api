@@ -40,6 +40,20 @@
 				</configuration>
 			</plugin>
 			<plugin>
+			  <groupId>org.mule.tools.maven</groupId>
+			  <artifactId>mule-maven-plugin</artifactId>
+			  <version>3.6.2</version>
+			  <extensions>true</extensions>
+			  <configuration>
+				<cloudHubDeployment>
+				  <applicationName>bank-account-api</applicationName>
+				  <runtimeVersion>4.4.0</runtimeVersion>
+				  <workers>1</workers>
+				  <workerType>MICRO</workerType>
+				</cloudHubDeployment>
+			  </configuration>
+			</plugin>
+			<plugin>
 				<groupId>com.mulesoft.munit.tools</groupId>
 				<artifactId>munit-maven-plugin</artifactId>
 				<version>${munit.version}</version>
