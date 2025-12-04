@@ -47,7 +47,7 @@
 			  <configuration>
 				<cloudHubDeployment>
 				  <applicationName>bank-account-api</applicationName>
-				  <runtimeVersion>4.4.0</runtimeVersion>
+				  <runtimeVersion>4.10.1</runtimeVersion>
 				  <workers>1</workers>
 				  <workerType>MICRO</workerType>
 				</cloudHubDeployment>
