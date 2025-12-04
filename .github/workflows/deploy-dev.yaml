@@ -2,35 +2,29 @@ name: Deploy to DEV
  
 on:
   workflow_dispatch:
-  push:
-    branches: [ develop ]
  
 jobs:
-  deploy:
+  build-deploy:
     runs-on: ubuntu-latest
  
     steps:
-      - name: Trigger deploy-dev workflow
-        id: dispatch
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GH_TOKEN }}
-          script: |
-            try {
-              const result = await github.rest.actions.createWorkflowDispatch({
-                owner: 'Narsing-s',
-                repo: 'bank-account-api',
-                workflow_id: 'deploy-dev.yaml',
-                ref: 'main',
-                inputs: {}
-              });
-              console.log(result);
-            } catch (error) {
-              console.error(error);
-              core.setFailed(error);
-            }
+      - uses: actions/checkout@v3
  
-      - name: Build
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+ 
+      - name: Build Mule Application
+        run: mvn clean package
+ 
+      - name: Deploy to Anypoint CloudHub
         run: |
-          echo "Build triggered. Please check corresponding CI-CD repo for build status"
+          mvn -DmuleDeploy deploy \
+            -Danypoint.clientId=${{ secrets.ANYPOINT_CLIENT_ID }} \
+            -Danypoint.clientSecret=${{ secrets.ANYPOINT_CLIENT_SECRET }} \
+            -Danypoint.org=${{ secrets.ANYPOINT_ORG_ID }} \
+            -Danypoint.env=${{ secrets.ANYPOINT_ENV_ID }} \
+            -Danypoint.region=${{ secrets.ANYPOINT_REGION }}
  
