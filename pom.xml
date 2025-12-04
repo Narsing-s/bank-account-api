@@ -26,20 +26,6 @@
 				<version>3.2.0</version>
 			</plugin>
 			<plugin>
-				<groupId>org.mule.tools.maven</groupId>
-				<artifactId>mule-maven-plugin</artifactId>
-				<version>${mule.maven.plugin.version}</version>
-				<extensions>true</extensions>
-				<configuration>
-					<sharedLibraries>
-						<sharedLibrary>
-							<groupId>net.snowflake</groupId>
-							<artifactId>snowflake-jdbc</artifactId>
-						</sharedLibrary>
-					</sharedLibraries>
-				</configuration>
-			</plugin>
-			<plugin>
 			  <groupId>org.mule.tools.maven</groupId>
 			  <artifactId>mule-maven-plugin</artifactId>
 			  <version>3.7.1</version>
@@ -49,35 +35,11 @@
 				  <applicationName>bank-account-api</applicationName>
 				  <region>us-east-1</region>
 				  <runtimeVersion>4.10.1</runtimeVersion>
-				  <workers>1</workers>
+				  <workers>2</workers>
 				  <workerType>MICRO</workerType>
 				</cloudHubDeployment>
 			  </configuration>
 			</plugin>
-			<plugin>
-				<groupId>com.mulesoft.munit.tools</groupId>
-				<artifactId>munit-maven-plugin</artifactId>
-				<version>${munit.version}</version>
-				<executions>
-					<execution>
-						<id>test</id>
-						<phase>test</phase>
-						<goals>
-							<goal>test</goal>
-							<goal>coverage-report</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<coverage>
-						<runCoverage>true</runCoverage>
-						<formats>
-							<format>html</format>
-						</formats>
-					</coverage>
-				</configuration>
-			</plugin>
-		</plugins>
 	</build>
 
 	<dependencies>
