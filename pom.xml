@@ -39,9 +39,9 @@
 				  <workerType>MICRO</workerType>
 				</cloudHubDeployment>
 			  </configuration>
-			</plugin>
+		 	</plugin>
+		</plugins>
 	</build>
-
 	<dependencies>
 		<dependency>
 			<groupId>com.mulesoft.connectors</groupId>
