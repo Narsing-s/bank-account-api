@@ -42,11 +42,12 @@
 			<plugin>
 			  <groupId>org.mule.tools.maven</groupId>
 			  <artifactId>mule-maven-plugin</artifactId>
-			  <version>3.6.2</version>
+			  <version>3.7.1</version>
 			  <extensions>true</extensions>
 			  <configuration>
 				<cloudHubDeployment>
 				  <applicationName>bank-account-api</applicationName>
+				  <region>us-east-1</region>
 				  <runtimeVersion>4.10.1</runtimeVersion>
 				  <workers>1</workers>
 				  <workerType>MICRO</workerType>
