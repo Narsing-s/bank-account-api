@@ -20,7 +20,7 @@ jobs:
               const result = await github.rest.actions.createWorkflowDispatch({
                 owner: 'Narsing-s',
                 repo: 'bank-account-api',
-                workflow_id: 'deploy-dev.yml',
+                workflow_id: 'deploy-dev.yaml',
                 ref: 'main',
                 inputs: {}
               });
