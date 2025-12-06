@@ -1,4 +1,4 @@
-const apiBase = "http://localhost:8081/api";
+const apiBase = "	https://bank-account-api-x4gnke.5sc6y6-3.usa-e2.cloudhub.io";
 
 // ---------- Helper to Handle API Calls ----------
 async function apiRequest(url, options = {}) {
