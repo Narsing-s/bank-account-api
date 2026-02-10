@@ -1,4 +1,0 @@
-{
-  "generatedKeys": {},
-  "affectedRows": 1
-}
