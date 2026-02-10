@@ -1,0 +1,74 @@
+#
+
+# This action is run upon a merge to the develop branch (it can also be triggered manually).
+
+# The artifact is built and deployed to the DEV environment.
+
+#
+ 
+name: "Deploy to prod"
+
+# Controls when the action will run.
+
+on:
+
+  workflow_dispatch:
+
+  push:
+
+    branches: [main]
+ 
+# call the ci-cd workflow 
+
+jobs:
+
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: dispatch
+
+        id: dispatch
+
+        uses: actions/github-script@v6
+
+        with:
+
+          github-token: ${{ secrets.BOT_USER_TOKEN }}
+
+          script: |
+
+            try {
+
+              const result = await github.rest.actions.createWorkflowDispatch({
+
+                owner: 'Narsing-s',
+
+                repo: 'bank-account-api-ci-cd',
+
+                workflow_id: 'deploy-prod.yml',
+
+                ref: 'main',
+
+                inputs :{},
+
+              })
+
+              console.log(result);
+
+            } catch(error) {
+
+              console.error(error);
+
+              core.setFailed(error);
+
+            }
+
+      - name: build
+
+        run: |
+
+          echo "Build triggered.Please check corresponding ci-cd repo for build status"
+ 
