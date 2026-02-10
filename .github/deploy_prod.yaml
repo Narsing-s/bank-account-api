@@ -39,8 +39,46 @@ on:
       app_replicas:
         type: string
         required: true
-    # optional: define required secrets here or rely on secrets: inherit
+    # If you want to force specific secrets, uncomment and list them here,
+    # otherwise rely on `secrets: inherit` in the caller.
     # secrets:
     #   AZURE_CREDENTIALS:
     #     required: true
-``
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show inputs (sanity check)
+        run: |
+          echo "release_version=${{ inputs.release_version }}"
+          echo "repoName=${{ inputs.repoName }}"
+          echo "ref=${{ inputs.ref }}"
+          echo "regions=${{ inputs.regions }}"
+          echo "business_group_name=${{ inputs.business_group_name }}"
+          echo "app_mule_environment=${{ inputs.app_mule_environment }}"
+          echo "secrets_environment=${{ inputs.secrets_environment }}"
+          echo "api_name=${{ inputs.api_name }}"
+          echo "root_context=${{ inputs.root_context }}"
+          echo "api_type=${{ inputs.api_type }}"
+          echo "cicd_enabled=${{ inputs.cicd_enabled }}"
+          echo "app_replicas=${{ inputs.app_replicas }}"
+
+      # TODO: Add your real deploy logic here, e.g.:
+      # - name: Checkout repo to deploy
+      #   uses: actions/checkout@v4
+      #   with:
+      #     repository: ${{ inputs.repoName }}
+      #     ref: ${{ inputs.ref }}
+      #
+      # - name: Azure login (example)
+      #   uses: azure/login@v2
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+      #
+      # - name: Deploy ...
+      #   run: |
+      #     ./scripts/deploy.sh \
+      #       --env prod \
+      #       --regions "${{ inputs.regions }}" \
+      #       --replicas "${{ inputs.app_replicas }}"
