@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bank Account Management</title>
+
+  <!-- Use relative path because server.js serves from /src -->
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Bank Account Management</h1>
+
+    <!-- Create Account -->
+    <section>
+      <h2>Create Account</h2>
+      <form id="createAccountForm" novalidate>
+        <input type="text" id="fullName" placeholder="Full Name" autocomplete="name" required />
+        <input type="email" id="email" placeholder="Email" autocomplete="email" required />
+        <input type="date" id="dob" placeholder="Date of Birth" required />
+        <input type="tel" id="mobileNumber" placeholder="Mobile Number" inputmode="numeric" pattern="[0-9]*" required />
+        <input type="text" id="address" placeholder="Address" autocomplete="street-address" required />
+        <input type="text" id="bankName" placeholder="Bank Name" required />
+        <input type="text" id="adharNumber" placeholder="Aadhar Number" inputmode="numeric" pattern="[0-9]*" required />
+        <button type="submit">Create Account</button>
+      </form>
+      <div id="createAccountResponse" role="status" aria-live="polite"></div>
+    </section>
+
+    <!-- Get Account -->
+    <section>
+      <h2>Get Account</h2>
+      <div class="row">
+        <input type="text" id="getAccountNumber" placeholder="Account Number" />
+        <button id="getAccountBtn" type="button">Get Account</button>
+      </div>
+      <pre id="getAccountResponse" aria-live="polite"></pre>
+    </section>
+
+    <!-- Update Account -->
+    <section>
+      <h2>Update Account</h2>
+      <div class="row">
+        <input type="text" id="updateAccountNumber" placeholder="Account Number" />
+      </div>
+      <div class="row">
+        <input type="text" id="updateFullName" placeholder="Full Name (optional)" />
+        <input type="text" id="updateAddress" placeholder="Address (optional)" />
+        <input type="tel" id="updateMobile" placeholder="Mobile Number (optional)" inputmode="numeric" pattern="[0-9]*" />
+      </div>
+      <button id="updateAccountBtn" type="button">Update Account</button>
+      <pre id="updateAccountResponse" aria-live="polite"></pre>
+    </section>
+
+    <!-- Delete Account -->
+    <section>
+      <h2>Delete Account</h2>
+      <div class="row">
+        <input type="text" id="deleteAccountNumber" placeholder="Account Number" />
+        <button id="deleteAccountBtn" type="button">Delete Account</button>
+      </div>
+      <pre id="deleteAccountResponse" aria-live="polite"></pre>
+    </section>
+  </div>
+
+  <!-- Optional: configure API base at runtime. Adjust to your backend URL. -->
+  <!-- <script>window.API_BASE = 'http://localhost:8080';</script> -->
+
+  <!-- Use relative script path; server.js serves /src as static root -->
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
