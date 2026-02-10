@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bank Account Management</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Bank Account Management</h1>
+
+    <!-- Create Account -->
+    <section>
+      <h2>Create Account</h2>
+      <form id="createAccountForm">
+        <input type="text" placeholder="Full Name" id="fullName" required />
+        <input type="email" placeholder="Email" id="email" required />
+        <input type="date" placeholder="Date of Birth" id="dob" required />
+        <input type="text" placeholder="Mobile Number" id="mobileNumber" required />
+        <input type="text" placeholder="Address" id="address" required />
+        <input type="text" placeholder="Bank Name" id="bankName" required />
+        <input type="text" placeholder="Aadhar Number" id="adharNumber" required />
+        <button type="submit">Create Account</button>
+      </form>
+      <div id="createAccountResponse"></div>
+    </section>
+
+    <!-- Get Account -->
+    <section>
+      <h2>Get Account</h2>
+      <input type="text" placeholder="Account Number" id="getAccountNumber" />
+      <button id="getAccountBtn">Get Account</button>
+      <pre id="getAccountResponse"></pre>
+    </section>
+
+    <!-- Update Account -->
+    <section>
+      <h2>Update Account</h2>
+      <input type="text" placeholder="Account Number" id="updateAccountNumber" />
+      <input type="text" placeholder="Full Name" id="updateFullName" />
+      <input type="text" placeholder="Address" id="updateAddress" />
+      <input type="text" placeholder="Mobile Number" id="updateMobile" />
+      <button id="updateAccountBtn">Update Account</button>
+      <pre id="updateAccountResponse"></pre>
+    </section>
+
+    <!-- Delete Account -->
+    <section>
+      <h2>Delete Account</h2>
+      <input type="text" placeholder="Account Number" id="deleteAccountNumber" />
+      <button id="deleteAccountBtn">Delete Account</button>
+      <pre id="deleteAccountResponse"></pre>
+    </section>
+  </div>
+
+  <!-- FIXED SCRIPT PATH -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
