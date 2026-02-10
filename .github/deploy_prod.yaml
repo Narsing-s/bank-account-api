@@ -48,7 +48,7 @@ jobs:
 
                 repo: 'bank-account-api-ci-cd',
 
-                workflow_id: 'deploy-prod.yml',
+                workflow_id: 'deploy_prod.yml',
 
                 ref: 'main',
 
