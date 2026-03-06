@@ -1,64 +1,62 @@
 const express = require("express");
-const fetch = require("node-fetch");
-const path = require("path");
+const fetch = (...args) =>
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 const app = express();
-
 app.use(express.json());
 app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 
+// MuleSoft API Base URL
 const BASE_URL =
-  "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io";
+  "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api";
 
 // CREATE ACCOUNT
 app.post("/createAccount", async (req, res) => {
   try {
-    const response = await fetch(`${BASE_URL}/accounts`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(req.body)
-    });
+    const { adharNumber, bankName, body } = req.body;
 
-    const data = await response.text();
+    const response = await fetch(
+      `${BASE_URL}/accounts?adharNumber=${adharNumber}&bankName=${bankName}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }
+    );
 
-    res.status(response.status).send(data);
-  } catch (error) {
-    res.status(500).json({
-      error: "Server Error",
-      details: error.message
-    });
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
 // GET ACCOUNT
-app.get("/accounts/:id", async (req, res) => {
+app.get("/getAccount/:id", async (req, res) => {
   try {
     const response = await fetch(`${BASE_URL}/accounts/${req.params.id}`);
-
-    const data = await response.text();
-
-    res.status(response.status).send(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
-// DELETE ACCOUNT
-app.delete("/accounts/:id", async (req, res) => {
+// UPDATE ACCOUNT
+app.put("/updateAccount/:id", async (req, res) => {
   try {
     const response = await fetch(`${BASE_URL}/accounts/${req.params.id}`, {
-      method: "DELETE"
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req.body),
     });
 
-    const data = await response.text();
-
-    res.status(response.status).send(data);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
