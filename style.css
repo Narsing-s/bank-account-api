@@ -1,175 +1,96 @@
 :root {
-  --bg: #0f172a;           /* base (dark by default; system mode will override) */
-  --bg-soft: #131c36;
-  --surface: #1f2a44;
-  --text: #e5e7eb;
-  --muted: #a1a1aa;
-  --border: #2b3553;
-  --accent: #0ea5e9;       /* change via settings */
-  --danger: #ef4444;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 
-  --radius: 12px;
-  --shadow: 0 10px 30px rgba(0,0,0,.35);
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
 
-  --space-1: .5rem;
-  --space-2: .75rem;
-  --space-3: 1rem;
-  --space-4: 1.5rem;
-
-  --font-scale: 1;         /* sm=.9, md=1, lg=1.1 */
-  --density: 1;            /* comfortable=1, compact=.85 */
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Light preset (used for explicit light or when system=light) */
-:root.light {
-  --bg: #f7fafc;
-  --bg-soft: #eef2f7;
-  --surface: #ffffff;
-  --text: #111827;
-  --muted: #6b7280;
-  --border: #e5e7eb;
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
 }
 
-/* High contrast tweak */
-:root.hc {
-  --text: #ffffff;
-  --border: #ffffff;
-}
-
-/* Base layout */
-html, body {
-  height: 100%;
-}
 body {
   margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans";
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-  /* fallback to a flat bg using tokens for high contrast modes */
-  background-color: var(--bg);
-  color: var(--text);
-  font-size: calc(16px * var(--font-scale));
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
 }
 
-/* Header */
-.app-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
-  backdrop-filter: blur(6px);
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
 }
-.brand { display: flex; align-items: center; gap: var(--space-2); }
-.brand h1 { margin: 0; font-size: 1.5rem; }
-.icon { font-size: 1.2rem; }
 
-/* Container */
-.container {
-  max-width: 980px;
+#app {
+  max-width: 1280px;
   margin: 0 auto;
-  padding: var(--space-4);
-  display: grid;
-  gap: calc(var(--space-4) * var(--density));
+  padding: 2rem;
+  text-align: center;
 }
 
-/* Cards */
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.vanilla:hover {
+  filter: drop-shadow(0 0 2em #f7df1eaa);
+}
+
 .card {
-  background: color-mix(in oklab, var(--surface) 85%, transparent);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: calc(var(--space-4) * var(--density));
-}
-.card h2 { margin-top: 0; }
-
-/* Inputs and layout */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0,1fr));
-  gap: calc(var(--space-3) * var(--density));
-}
-.grid input { grid-column: span 1; }
-.grid input#address { grid-column: span 2; }
-
-.inline { display: grid; grid-template-columns: 1fr auto; gap: var(--space-2); }
-
-input, select, button {
-  font: inherit;
-  padding: calc(.65rem * var(--density)) calc(.8rem * var(--density));
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  outline: none;
-}
-input::placeholder { color: var(--muted); }
-input:focus-visible, select:focus-visible, button:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 40%, transparent);
-  border-color: var(--accent);
+  padding: 2em;
 }
 
-/* Buttons */
-.btn { cursor: pointer; }
-.btn.primary {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-}
-.btn.danger {
-  background: var(--danger);
-  color: #fff;
-  border: none;
-}
-.btn.ghost {
-  background: transparent;
-  color: var(--text);
+.read-the-docs {
+  color: #888;
 }
 
-/* Settings Panel */
-.panel {
-  border: none;
-  padding: 0;
-  width: min(680px, 92vw);
-  max-height: 90vh;
-  border-radius: var(--radius);
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: var(--shadow);
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
 }
-.panel::backdrop { background: rgba(0,0,0,.5); }
-.panel-content { display: grid; grid-template-rows: auto 1fr auto; }
-.panel-header, .panel-footer {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--border);
+button:hover {
+  border-color: #646cff;
 }
-.panel-footer { border-top: 1px solid var(--border); border-bottom: none; }
-.panel-body {
-  display: grid; gap: var(--space-4);
-  padding: var(--space-4);
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
 }
-fieldset { border: 1px dashed var(--border); border-radius: var(--radius); padding: var(--space-3); }
-legend { padding: 0 .5rem; color: var(--muted); }
-.row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
 
-/* Toast */
-.toast {
-  position: fixed; right: 20px; bottom: 20px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: .75rem 1rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  opacity: 0; transform: translateY(10px);
-  transition: opacity .25s ease, transform .25s ease;
-}
-.toast.show { opacity: 1; transform: translateY(0); }
-
-/* Respect user OS preference if mode=system */
 @media (prefers-color-scheme: light) {
-  :root.system { /* on system mode we toggle this class in JS */
-    --bg: #f7fafc;
-    --bg-soft: #eef2f7;
-    --surface: #ffffff;
-    --text: #111827;
-    --muted: #6b7280;
-    --border: #e5e7eb;
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
   }
 }
