@@ -1,151 +1,114 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Bank Account Management</title>
+<!-- Top bar -->
+<header class="app-header">
+  <div class="brand">
+    <span class="icon">🏦</span>
+    <h1>Bank Account Management</h1>
+  </div>
+  <button id="openSettingsBtn" class="btn ghost" aria-haspopup="dialog" aria-controls="settingsPanel">
+    ⚙ Settings
+  </button>
+</header>
 
-<style>
+<!-- Your existing content -->
+<main class="container">
+  <!-- Create Account -->
+  <section class="card">
+    <h2>Create Account</h2>
+    <form id="createForm" autocomplete="off">
+      <div class="grid">
+        <input id="fullName" placeholder="Full Name" required />
+        <input id="email" type="email" placeholder="Email" required />
+        <input id="dob" type="date" placeholder="Date of Birth" required />
+        <input id="mobile" inputmode="numeric" placeholder="Mobile" maxlength="10" required />
+        <input id="address" placeholder="Address" />
+        <input id="aadhaar" inputmode="numeric" placeholder="Aadhaar (12 digits)" maxlength="12" />
+      </div>
+      <button type="submit" class="btn primary">Create Account</button>
+    </form>
+  </section>
 
-body{
-font-family: Arial;
-background: linear-gradient(135deg,#1d2671,#c33764);
-color:white;
-padding:40px;
-}
+  <!-- Get Account -->
+  <section class="card">
+    <h2>Get Account</h2>
+    <div class="inline">
+      <input id="acctGet" placeholder="Account Number" />
+      <button id="getBtn" class="btn primary">Get Account</button>
+    </div>
+  </section>
 
-.container{
-background:rgba(255,255,255,0.08);
-backdrop-filter:blur(10px);
-padding:30px;
-border-radius:15px;
-width:800px;
-margin:auto;
-box-shadow:0 10px 30px rgba(0,0,0,0.3);
-}
+  <!-- Delete Account -->
+  <section class="card">
+    <h2>Delete Account</h2>
+    <div class="inline">
+      <input id="acctDel" placeholder="Account Number" />
+      <button id="delBtn" class="btn danger">Delete</button>
+    </div>
+  </section>
+</main>
 
-h1{
-text-align:center;
-margin-bottom:30px;
-}
+<!-- Settings Panel -->
+<dialog id="settingsPanel" class="panel" aria-label="Application Settings">
+  <form method="dialog" class="panel-content">
+    <header class="panel-header">
+      <h3>Settings</h3>
+      <button id="closeSettingsBtn" class="btn ghost" value="cancel" aria-label="Close">✕</button>
+    </header>
 
-.section{
-margin-bottom:35px;
-}
+    <div class="panel-body">
+      <fieldset>
+        <legend>Theme</legend>
+        <label class="row">
+          <span>Mode</span>
+          <select id="themeMode">
+            <option value="system">System</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </label>
 
-input{
-padding:10px;
-margin:5px;
-border:none;
-border-radius:5px;
-}
+        <label class="row">
+          <span>Accent Color</span>
+          <input id="accentColor" type="color" value="#0ea5e9" />
+        </label>
 
-button{
-padding:10px 18px;
-border:none;
-border-radius:8px;
-background:#00c9ff;
-color:black;
-font-weight:bold;
-cursor:pointer;
-}
+        <label class="row">
+          <span>High Contrast</span>
+          <input id="highContrast" type="checkbox" />
+        </label>
+      </fieldset>
 
-button:hover{
-background:#92fe9d;
-}
+      <fieldset>
+        <legend>Layout & Accessibility</legend>
+        <label class="row">
+          <span>Density</span>
+          <select id="density">
+            <option value="comfortable">Comfortable</option>
+            <option value="compact">Compact</option>
+          </select>
+        </label>
 
-.result{
-margin-top:10px;
-font-weight:bold;
-}
+        <label class="row">
+          <span>Font Size</span>
+          <select id="fontSize">
+            <option value="sm">Small</option>
+            <option value="md" selected>Medium</option>
+            <option value="lg">Large</option>
+          </select>
+        </label>
 
-</style>
-</head>
+        <label class="row">
+          <span>Reduce Motion</span>
+          <input id="reduceMotion" type="checkbox" />
+        </label>
+      </fieldset>
+    </div>
 
-<body>
+    <footer class="panel-footer">
+      <button class="btn" value="cancel">Cancel</button>
+      <button id="saveSettingsBtn" class="btn primary" value="default">Save</button>
+    </footer>
+  </form>
+</dialog>
 
-<div class="container">
-
-<h1>🏦 Bank Account Management</h1>
-
-<div class="section">
-<h2>Create Account</h2>
-
-<input id="name" placeholder="Full Name">
-<input id="email" placeholder="Email">
-<input id="dob" type="date">
-<input id="mobile" placeholder="Mobile">
-<input id="address" placeholder="Address">
-<input id="aadhar" placeholder="Aadhar">
-
-<button onclick="createAccount()">Create Account</button>
-
-<div class="result" id="createResult"></div>
-
-</div>
-
-
-<div class="section">
-<h2>Get Account</h2>
-
-<input id="getAccountNumber" placeholder="Account Number">
-
-<button onclick="getAccount()">Get Account</button>
-
-<div class="result" id="getResult"></div>
-
-</div>
-
-
-<div class="section">
-<h2>Delete Account</h2>
-
-<input id="deleteAccountNumber" placeholder="Account Number">
-
-<button onclick="deleteAccount()">Delete</button>
-
-<div class="result" id="deleteResult"></div>
-
-</div>
-
-
-</div>
-
-<script>
-
-const API="YOUR_NODE_API_URL";
-
-async function createAccount(){
-
-const body={
-fullName:document.getElementById("name").value,
-email:document.getElementById("email").value,
-dateOfBirth:document.getElementById("dob").value,
-mobileNumber:document.getElementById("mobile").value,
-address:document.getElementById("address").value,
-aadharNumber:document.getElementById("aadhar").value
-}
-
-try{
-
-const res=await fetch(API+"/accounts",{
-method:"POST",
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify(body)
-})
-
-const data=await res.json()
-
-document.getElementById("createResult").innerText=
-JSON.stringify(data,null,2)
-
-}catch(err){
-
-document.getElementById("createResult").innerText="Error: "+err
-
-}
-
-}
-
-</script>
-
-</body>
-</html>
+<!-- Toast -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
