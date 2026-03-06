@@ -6,12 +6,11 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
-// ✅ Your Mule API URL
-const BASE_URL = "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api";
+const BASE_URL = "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io";
 
+// CREATE ACCOUNT
 app.post("/createAccount", async (req, res) => {
   try {
-
     const response = await fetch(`${BASE_URL}/accounts`, {
       method: "POST",
       headers: {
@@ -20,19 +19,43 @@ app.post("/createAccount", async (req, res) => {
       body: JSON.stringify(req.body)
     });
 
-    const data = await response.json();
-
-    res.json(data);
+    const data = await response.text();
+    res.status(response.status).send(data);
 
   } catch (error) {
     res.status(500).json({
       error: "Server Error",
-      message: error.message
+      details: error.message
     });
+  }
+});
+
+// GET ACCOUNT
+app.get("/accounts/:id", async (req, res) => {
+  try {
+    const response = await fetch(`${BASE_URL}/accounts/${req.params.id}`);
+    const data = await response.text();
+
+    res.status(response.status).send(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE ACCOUNT
+app.delete("/accounts/:id", async (req, res) => {
+  try {
+    const response = await fetch(`${BASE_URL}/accounts/${req.params.id}`, {
+      method: "DELETE"
+    });
+
+    const data = await response.text();
+    res.status(response.status).send(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
