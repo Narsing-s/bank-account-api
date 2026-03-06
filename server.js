@@ -1,13 +1,11 @@
 const express = require("express");
-const fetch = require("node-fetch");
 
 const app = express();
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
-// ✅ Correct MuleSoft CloudHub API URL
-const BASE_URL = "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api";
+const BASE_URL = "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io";
 
 app.post("/createAccount", async (req, res) => {
   try {
@@ -19,7 +17,7 @@ app.post("/createAccount", async (req, res) => {
       body: JSON.stringify(req.body)
     });
 
-    const data = await response.text(); // safer than json()
+    const data = await response.text();
 
     res.status(response.status).send(data);
   } catch (error) {
@@ -33,4 +31,3 @@ app.post("/createAccount", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
