@@ -1,114 +1,704 @@
-<!-- Top bar -->
-<header class="app-header">
-  <div class="brand">
-    <span class="icon">🏦</span>
-    <h1>Bank Account Management</h1>
-  </div>
-  <button id="openSettingsBtn" class="btn ghost" aria-haspopup="dialog" aria-controls="settingsPanel">
-    ⚙ Settings
-  </button>
-</header>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Bank Account Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* ====== DESIGN TOKENS ====== */
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #131c36;
+      --surface: #1f2a44;
+      --text: #e5e7eb;
+      --muted: #a1a1aa;
+      --border: #2b3553;
+      --accent: #0ea5e9;
+      --danger: #ef4444;
 
-<!-- Your existing content -->
-<main class="container">
-  <!-- Create Account -->
-  <section class="card">
-    <h2>Create Account</h2>
-    <form id="createForm" autocomplete="off">
-      <div class="grid">
-        <input id="fullName" placeholder="Full Name" required />
-        <input id="email" type="email" placeholder="Email" required />
-        <input id="dob" type="date" placeholder="Date of Birth" required />
-        <input id="mobile" inputmode="numeric" placeholder="Mobile" maxlength="10" required />
-        <input id="address" placeholder="Address" />
-        <input id="aadhaar" inputmode="numeric" placeholder="Aadhaar (12 digits)" maxlength="12" />
+      --radius: 12px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+
+      --space-1: .5rem;
+      --space-2: .75rem;
+      --space-3: 1rem;
+      --space-4: 1.5rem;
+
+      --font-scale: 1;
+      --density: 1;
+    }
+    :root.light {
+      --bg: #f7fafc;
+      --bg-soft: #eef2f7;
+      --surface: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+    }
+    :root.hc {
+      --text: #ffffff;
+      --border: #ffffff;
+    }
+
+    /* ====== LAYOUT ====== */
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans";
+      color: var(--text);
+      font-size: calc(16px * var(--font-scale));
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      background-color: var(--bg);
+    }
+
+    .app-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-3) var(--space-4);
+      backdrop-filter: blur(6px);
+    }
+    .brand { display: flex; align-items: center; gap: var(--space-2); }
+    .brand h1 { margin: 0; font-size: 1.5rem; }
+    .icon { font-size: 1.2rem; }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: var(--space-4);
+      display: grid;
+      gap: calc(var(--space-4) * var(--density));
+    }
+
+    .card {
+      background: color-mix(in oklab, var(--surface) 85%, transparent);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: calc(var(--space-4) * var(--density));
+    }
+    .card h2 { margin-top: 0; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: calc(var(--space-3) * var(--density));
+    }
+    .grid input { grid-column: span 1; }
+    .grid input#address { grid-column: span 2; }
+
+    .inline { display: grid; grid-template-columns: 1fr auto; gap: var(--space-2); align-items: center; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+
+    input, select, button, textarea {
+      font: inherit;
+      padding: calc(.65rem * var(--density)) calc(.8rem * var(--density));
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+    }
+    input::placeholder { color: var(--muted); }
+    input:focus-visible, select:focus-visible, button:focus-visible, textarea:focus-visible {
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 40%, transparent);
+      border-color: var(--accent);
+    }
+
+    .btn { cursor: pointer; }
+    .btn.primary { background: var(--accent); color: #fff; border: none; }
+    .btn.danger  { background: var(--danger); color: #fff; border: none; }
+    .btn.ghost   { background: transparent; color: var(--text); }
+
+    /* Settings Panel */
+    dialog.panel { border: none; padding: 0; width: min(720px, 92vw); max-height: 90vh;
+      border-radius: var(--radius); background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+    dialog.panel::backdrop { background: rgba(0,0,0,.5); }
+    .panel-content { display: grid; grid-template-rows: auto 1fr auto; }
+    .panel-header, .panel-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border);
+    }
+    .panel-footer { border-top: 1px solid var(--border); border-bottom: none; }
+    .panel-body { display: grid; gap: var(--space-4); padding: var(--space-4); }
+    fieldset { border: 1px dashed var(--border); border-radius: var(--radius); padding: var(--space-3); }
+    legend { padding: 0 .5rem; color: var(--muted); }
+
+    /* Toast */
+    .toast {
+      position: fixed; right: 20px; bottom: 20px;
+      background: var(--surface); border: 1px solid var(--border);
+      padding: .75rem 1rem; border-radius: var(--radius);
+      box-shadow: var(--shadow); opacity: 0; transform: translateY(10px);
+      transition: opacity .25s ease, transform .25s ease;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* Result view */
+    pre.result {
+      background: #00000030;
+      padding: .75rem;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      overflow: auto;
+      max-height: 240px;
+      margin-top: .75rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root.system {
+        --bg: #f7fafc;
+        --bg-soft: #eef2f7;
+        --surface: #ffffff;
+        --text: #111827;
+        --muted: #6b7280;
+        --border: #e5e7eb;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ====== HEADER ====== -->
+  <header class="app-header">
+    <div class="brand">
+      <span class="icon">🏦</span>
+      <h1 data-i18n="title">Bank Account Management</h1>
+    </div>
+    <button id="openSettingsBtn" class="btn ghost" aria-haspopup="dialog" aria-controls="settingsPanel" data-i18n="settings">Settings</button>
+  </header>
+
+  <!-- ====== MAIN ====== -->
+  <main class="container" role="main">
+    <!-- Create Account -->
+    <section class="card" aria-labelledby="createTitle">
+      <h2 id="createTitle" data-i18n="createTitle">Create Account</h2>
+      <form id="createForm" autocomplete="off">
+        <div class="grid">
+          <input id="fullName" data-i18n-placeholder="ph_fullName" placeholder="Full Name" required />
+          <input id="email" type="email" data-i18n-placeholder="ph_email" placeholder="Email" required />
+          <input id="dob" type="date" data-i18n-placeholder="ph_dob" placeholder="Date of Birth" required />
+          <input id="mobile" inputmode="numeric" maxlength="10" data-i18n-placeholder="ph_mobile" placeholder="Mobile" required />
+          <input id="address" data-i18n-placeholder="ph_address" placeholder="Address" />
+          <input id="aadhaar" inputmode="numeric" maxlength="12" data-i18n-placeholder="ph_aadhaar" placeholder="Aadhaar (12 digits)" />
+        </div>
+        <div style="margin-top: .75rem;">
+          <button type="submit" class="btn primary" data-i18n="btn_create">Create Account</button>
+        </div>
+      </form>
+      <pre id="createResult" class="result" aria-live="polite"></pre>
+    </section>
+
+    <!-- Get Account -->
+    <section class="card" aria-labelledby="getTitle">
+      <h2 id="getTitle" data-i18n="getTitle">Get Account</h2>
+      <div class="inline">
+        <input id="acctGet" data-i18n-placeholder="ph_acctNumber" placeholder="Account Number" />
+        <button id="getBtn" class="btn primary" data-i18n="btn_get">Get Account</button>
       </div>
-      <button type="submit" class="btn primary">Create Account</button>
+      <pre id="getResult" class="result" aria-live="polite"></pre>
+    </section>
+
+    <!-- Delete Account -->
+    <section class="card" aria-labelledby="deleteTitle">
+      <h2 id="deleteTitle" data-i18n="deleteTitle">Delete Account</h2>
+      <div class="inline">
+        <input id="acctDel" data-i18n-placeholder="ph_acctNumber" placeholder="Account Number" />
+        <button id="delBtn" class="btn danger" data-i18n="btn_delete">Delete</button>
+      </div>
+      <pre id="delResult" class="result" aria-live="polite"></pre>
+    </section>
+  </main>
+
+  <!-- ====== SETTINGS PANEL ====== -->
+  <dialog id="settingsPanel" class="panel" aria-label="Application Settings">
+    <form method="dialog" class="panel-content">
+      <header class="panel-header">
+        <h3>Settings</h3>
+        <button id="closeSettingsBtn" class="btn ghost" value="cancel" aria-label="Close">✕</button>
+      </header>
+
+      <div class="panel-body">
+        <fieldset>
+          <legend>Theme</legend>
+          <label class="row">
+            <span>Mode</span>
+            <select id="themeMode">
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
+          <label class="row">
+            <span>Accent Color</span>
+            <input id="accentColor" type="color" value="#0ea5e9" />
+          </label>
+          <label class="row">
+            <span>High Contrast</span>
+            <input id="highContrast" type="checkbox" />
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Layout & Accessibility</legend>
+          <label class="row">
+            <span>Density</span>
+            <select id="density">
+              <option value="comfortable">Comfortable</option>
+              <option value="compact">Compact</option>
+            </select>
+          </label>
+          <label class="row">
+            <span>Font Size</span>
+            <select id="fontSize">
+              <option value="sm">Small</option>
+              <option value="md" selected>Medium</option>
+              <option value="lg">Large</option>
+            </select>
+          </label>
+          <label class="row">
+            <span>Reduce Motion</span>
+            <input id="reduceMotion" type="checkbox" />
+          </label>
+          <label class="row">
+            <span>Language</span>
+            <select id="language">
+              <option value="en">English</option>
+              <option value="te">తెలుగు</option>
+              <option value="hi">हिन्दी</option>
+            </select>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>API</legend>
+          <label class="row">
+            <span>Base URL</span>
+            <input id="apiBase" placeholder="https://api.example.com" />
+          </label>
+          <label class="row">
+            <span>Use Credentials (cookies)</span>
+            <input id="useCreds" type="checkbox" />
+          </label>
+          <label class="row">
+            <span>Client ID header</span>
+            <input id="clientIdHeader" placeholder="X-Client-Id" />
+          </label>
+          <label class="row">
+            <span>Client ID value</span>
+            <input id="clientIdValue" placeholder="" />
+          </label>
+          <label class="row">
+            <span>Client Secret header</span>
+            <input id="clientSecretHeader" placeholder="X-Client-Secret" />
+          </label>
+          <label class="row">
+            <span>Client Secret value</span>
+            <input id="clientSecretValue" placeholder="" />
+          </label>
+          <label class="row">
+            <span>Bearer Token (optional)</span>
+            <input id="bearerToken" placeholder="eyJ..." />
+          </label>
+          <div class="row">
+            <button id="testApiBtn" type="button" class="btn">Test API</button>
+            <small style="opacity:.8">Calls <code>/health</code> on the Base URL</small>
+          </div>
+        </fieldset>
+      </div>
+
+      <footer class="panel-footer">
+        <button class="btn" value="cancel">Cancel</button>
+        <button id="saveSettingsBtn" class="btn primary" value="default">Save</button>
+      </footer>
     </form>
-  </section>
+  </dialog>
 
-  <!-- Get Account -->
-  <section class="card">
-    <h2>Get Account</h2>
-    <div class="inline">
-      <input id="acctGet" placeholder="Account Number" />
-      <button id="getBtn" class="btn primary">Get Account</button>
-    </div>
-  </section>
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <!-- Delete Account -->
-  <section class="card">
-    <h2>Delete Account</h2>
-    <div class="inline">
-      <input id="acctDel" placeholder="Account Number" />
-      <button id="delBtn" class="btn danger">Delete</button>
-    </div>
-  </section>
-</main>
+  <script>
+    /* =========================
+       SETTINGS + I18N + THEME
+       ========================= */
 
-<!-- Settings Panel -->
-<dialog id="settingsPanel" class="panel" aria-label="Application Settings">
-  <form method="dialog" class="panel-content">
-    <header class="panel-header">
-      <h3>Settings</h3>
-      <button id="closeSettingsBtn" class="btn ghost" value="cancel" aria-label="Close">✕</button>
-    </header>
+    const defaultSettings = {
+      themeMode: 'system',           // 'system' | 'light' | 'dark'
+      accentColor: '#0ea5e9',
+      highContrast: false,
+      density: 'comfortable',        // 'comfortable' | 'compact'
+      fontSize: 'md',                // 'sm' | 'md' | 'lg'
+      reduceMotion: false,
+      language: detectLang(),        // 'en' | 'te' | 'hi'
+      api: {
+        base: '',                    // e.g., https://your-gateway.example.com
+        useCreds: false,
+        clientIdHeader: '',
+        clientIdValue: '',
+        clientSecretHeader: '',
+        clientSecretValue: '',
+        bearerToken: ''
+      }
+    };
+    const SETTINGS_KEY = 'bankapp:settings';
 
-    <div class="panel-body">
-      <fieldset>
-        <legend>Theme</legend>
-        <label class="row">
-          <span>Mode</span>
-          <select id="themeMode">
-            <option value="system">System</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-          </select>
-        </label>
+    function detectLang() {
+      const n = (navigator.language || 'en').toLowerCase();
+      if (n.startsWith('te')) return 'te';
+      if (n.startsWith('hi')) return 'hi';
+      return 'en';
+    }
 
-        <label class="row">
-          <span>Accent Color</span>
-          <input id="accentColor" type="color" value="#0ea5e9" />
-        </label>
+    function loadSettings() {
+      try {
+        const fromLS = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+        return deepMerge(defaultSettings, fromLS);
+      } catch {
+        return structuredClone(defaultSettings);
+      }
+    }
+    function saveSettings(s) {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+    }
+    function deepMerge(base, add) {
+      const out = structuredClone(base);
+      for (const k in add) {
+        if (add[k] && typeof add[k] === 'object' && !Array.isArray(add[k])) {
+          out[k] = deepMerge(out[k] || {}, add[k]);
+        } else {
+          out[k] = add[k];
+        }
+      }
+      return out;
+    }
 
-        <label class="row">
-          <span>High Contrast</span>
-          <input id="highContrast" type="checkbox" />
-        </label>
-      </fieldset>
+    // ---- Apply settings to CSS / DOM ----
+    function applySettings(s) {
+      const root = document.documentElement;
+      root.classList.remove('light', 'hc', 'system');
 
-      <fieldset>
-        <legend>Layout & Accessibility</legend>
-        <label class="row">
-          <span>Density</span>
-          <select id="density">
-            <option value="comfortable">Comfortable</option>
-            <option value="compact">Compact</option>
-          </select>
-        </label>
+      if (s.themeMode === 'light') root.classList.add('light');
+      if (s.themeMode === 'system') root.classList.add('system');
+      if (s.highContrast) root.classList.add('hc');
 
-        <label class="row">
-          <span>Font Size</span>
-          <select id="fontSize">
-            <option value="sm">Small</option>
-            <option value="md" selected>Medium</option>
-            <option value="lg">Large</option>
-          </select>
-        </label>
+      root.style.setProperty('--accent', s.accentColor);
+      root.style.setProperty('--density', s.density === 'compact' ? 0.85 : 1);
+      const scale = s.fontSize === 'sm' ? 0.9 : s.fontSize === 'lg' ? 1.1 : 1;
+      root.style.setProperty('--font-scale', scale);
+      document.body.style.setProperty('transition', s.reduceMotion ? 'none' : '');
 
-        <label class="row">
-          <span>Reduce Motion</span>
-          <input id="reduceMotion" type="checkbox" />
-        </label>
-      </fieldset>
-    </div>
+      applyLanguage(s.language || 'en');
+      bindSettingsControls(s);
+    }
 
-    <footer class="panel-footer">
-      <button class="btn" value="cancel">Cancel</button>
-      <button id="saveSettingsBtn" class="btn primary" value="default">Save</button>
-    </footer>
-  </form>
-</dialog>
+    // ---- I18N ----
+    const I18N = {
+      en: {
+        title: "Bank Account Management",
+        settings: "Settings",
+        createTitle: "Create Account",
+        getTitle: "Get Account",
+        deleteTitle: "Delete Account",
+        ph_fullName: "Full Name",
+        ph_email: "Email",
+        ph_dob: "Date of Birth",
+        ph_mobile: "Mobile",
+        ph_address: "Address",
+        ph_aadhaar: "Aadhaar (12 digits)",
+        ph_acctNumber: "Account Number",
+        btn_create: "Create Account",
+        btn_get: "Get Account",
+        btn_delete: "Delete",
+        toast_created: "Account created ✔",
+        toast_create_fail: "Failed to create account",
+        toast_get: "Get account (demo)",
+        toast_delete: "Delete account (demo)",
+        toast_settings_saved: "Settings saved",
+        v_mobile: "Mobile must be 10 digits",
+        v_aadhaar: "Aadhaar must be 12 digits"
+      },
+      te: {
+        title: "బ్యాంక్ ఖాతా నిర్వహణ",
+        settings: "సెట్టింగ్స్",
+        createTitle: "ఖాతా సృష్టించండి",
+        getTitle: "ఖాతా పొందండి",
+        deleteTitle: "ఖాతాను తొలగించండి",
+        ph_fullName: "పూర్తి పేరు",
+        ph_email: "ఈమెయిల్",
+        ph_dob: "పుట్టిన తేదీ",
+        ph_mobile: "మొబైల్",
+        ph_address: "చిరునామా",
+        ph_aadhaar: "ఆధార్ (12 అంకెలు)",
+        ph_acctNumber: "ఖాతా సంఖ్య",
+        btn_create: "ఖాతా సృష్టించండి",
+        btn_get: "ఖాతా పొందండి",
+        btn_delete: "తొలగించండి",
+        toast_created: "ఖాతా సృష్టించబడింది ✔",
+        toast_create_fail: "ఖాతా సృష్టించడంలో విఫలమైంది",
+        toast_get: "ఖాతా పొందడం (డెమో)",
+        toast_delete: "ఖాతా తొలగించడం (డెమో)",
+        toast_settings_saved: "సెట్టింగ్స్ సేవ్ అయ్యాయి",
+        v_mobile: "మొబైల్ 10 అంకెలు ఉండాలి",
+        v_aadhaar: "ఆధార్ 12 అంకెలు ఉండాలి"
+      },
+      hi: {
+        title: "बैंक खाता प्रबंधन",
+        settings: "सेटिंग्स",
+        createTitle: "खाता बनाएँ",
+        getTitle: "खाता प्राप्त करें",
+        deleteTitle: "खाता हटाएँ",
+        ph_fullName: "पूरा नाम",
+        ph_email: "ईमेल",
+        ph_dob: "जन्म तिथि",
+        ph_mobile: "मोबाइल",
+        ph_address: "पता",
+        ph_aadhaar: "आधार (12 अंक)",
+        ph_acctNumber: "खाता संख्या",
+        btn_create: "खाता बनाएँ",
+        btn_get: "खाता प्राप्त करें",
+        btn_delete: "हटाएँ",
+        toast_created: "खाता बनाया गया ✔",
+        toast_create_fail: "खाता बनाना असफल",
+        toast_get: "खाता प्राप्त (डेमो)",
+        toast_delete: "खाता हटाना (डेमो)",
+        toast_settings_saved: "सेटिंग्स सहेजी गईं",
+        v_mobile: "मोबाइल 10 अंकों का होना चाहिए",
+        v_aadhaar: "आधार 12 अंकों का होना चाहिए"
+      }
+    };
+    const rtlLangs = new Set(["ar","ur","fa","he"]);
 
-<!-- Toast -->
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+    function applyLanguage(lang) {
+      const dict = I18N[lang] || I18N.en;
+
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) el.textContent = dict[key];
+      });
+
+      document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        if (dict[key]) el.setAttribute("placeholder", dict[key]);
+      });
+
+      document.documentElement.lang = lang;
+      document.documentElement.dir = rtlLangs.has(lang) ? "rtl" : "ltr";
+    }
+
+    // ---- Toast helper ----
+    const toastEl = document.getElementById('toast');
+    function toast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 2200);
+    }
+
+    // ---- Bind settings controls ----
+    function bindSettingsControls(s) {
+      const $ = id => document.getElementById(id);
+      $('themeMode').value = s.themeMode;
+      $('accentColor').value = s.accentColor;
+      $('highContrast').checked = s.highContrast;
+      $('density').value = s.density;
+      $('fontSize').value = s.fontSize;
+      $('reduceMotion').checked = s.reduceMotion;
+      $('language').value = s.language;
+
+      $('apiBase').value = s.api.base;
+      $('useCreds').checked = s.api.useCreds;
+      $('clientIdHeader').value = s.api.clientIdHeader;
+      $('clientIdValue').value = s.api.clientIdValue;
+      $('clientSecretHeader').value = s.api.clientSecretHeader;
+      $('clientSecretValue').value = s.api.clientSecretValue;
+      $('bearerToken').value = s.api.bearerToken;
+    }
+
+    // Startup
+    let settings = loadSettings();
+    applySettings(settings);
+
+    const dlg = document.getElementById('settingsPanel');
+    document.getElementById('openSettingsBtn').addEventListener('click', () => dlg.showModal());
+    document.getElementById('closeSettingsBtn').addEventListener('click', () => dlg.close());
+    document.getElementById('language').addEventListener('change', (e) => {
+      settings = loadSettings();
+      settings.language = e.target.value;
+      saveSettings(settings);
+      applySettings(settings);
+      toast(I18N[settings.language]?.toast_settings_saved || I18N.en.toast_settings_saved);
+    });
+    document.getElementById('saveSettingsBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      const $ = id => document.getElementById(id);
+      const newS = loadSettings();
+      newS.themeMode = $('themeMode').value;
+      newS.accentColor = $('accentColor').value;
+      newS.highContrast = $('highContrast').checked;
+      newS.density = $('density').value;
+      newS.fontSize = $('fontSize').value;
+      newS.reduceMotion = $('reduceMotion').checked;
+      newS.language = $('language').value;
+
+      newS.api.base = $('apiBase').value.trim();
+      newS.api.useCreds = $('useCreds').checked;
+      newS.api.clientIdHeader = $('clientIdHeader').value.trim();
+      newS.api.clientIdValue = $('clientIdValue').value.trim();
+      newS.api.clientSecretHeader = $('clientSecretHeader').value.trim();
+      newS.api.clientSecretValue = $('clientSecretValue').value.trim();
+      newS.api.bearerToken = $('bearerToken').value.trim();
+
+      saveSettings(newS);
+      settings = newS;
+      applySettings(settings);
+      toast(I18N[settings.language]?.toast_settings_saved || I18N.en.toast_settings_saved);
+      dlg.close();
+    });
+
+    // Test API /health
+    document.getElementById('testApiBtn').addEventListener('click', async () => {
+      const s = loadSettings();
+      if (!s.api.base) { alert('Set API Base URL'); return; }
+      try {
+        const res = await withTimeout(apiFetch('/health', { method: 'GET' }), 8000);
+        const js = await res.json().catch(() => ({}));
+        alert('Health OK\n' + JSON.stringify(js, null, 2));
+      } catch (e) {
+        alert('Health ERROR:\n' + (e.message || e));
+      }
+    });
+
+    /* =========================
+           API HELPERS
+       ========================= */
+
+    function buildHeaders() {
+      const s = loadSettings();
+      const h = { 'Content-Type': 'application/json' };
+
+      // Client-ID/Secret if provided (Mule Client ID Enforcement policy)
+      if (s.api.clientIdHeader && s.api.clientIdValue) {
+        h[s.api.clientIdHeader] = s.api.clientIdValue;
+      }
+      if (s.api.clientSecretHeader && s.api.clientSecretValue) {
+        h[s.api.clientSecretHeader] = s.api.clientSecretValue;
+      }
+      if (s.api.bearerToken) {
+        h['Authorization'] = `Bearer ${s.api.bearerToken}`;
+      }
+      return h;
+    }
+
+    function apiFetch(path, options = {}) {
+      const s = loadSettings();
+      if (!s.api.base) throw new Error('API Base URL not set in Settings');
+      const url = s.api.base.replace(/\/+$/, '') + path;
+
+      const opts = {
+        mode: 'cors',
+        credentials: s.api.useCreds ? 'include' : 'same-origin',
+        ...options
+      };
+      opts.headers = { ...(buildHeaders()), ...(options.headers || {}) };
+
+      // If body object is provided and header is json, stringify
+      if (opts.body && typeof opts.body === 'object' && !(opts.body instanceof FormData)) {
+        opts.body = JSON.stringify(opts.body);
+      }
+      return fetch(url, opts).then(async (res) => {
+        if (!res.ok) {
+          const txt = await res.text().catch(() => '');
+          throw new Error(`HTTP ${res.status}: ${txt || res.statusText}`);
+        }
+        return res;
+      });
+    }
+
+    function withTimeout(promise, ms = 12000) {
+      let t;
+      const timer = new Promise((_, reject) => t = setTimeout(() => reject(new Error(`Timeout after ${ms}ms`)), ms));
+      return Promise.race([promise, timer]).finally(() => clearTimeout(t));
+    }
+
+    /* =========================
+           UI HANDLERS
+       ========================= */
+
+    const $ = (id) => document.getElementById(id);
+
+    // Input masks
+    $('mobile').addEventListener('input', () => {
+      $('mobile').value = $('mobile').value.replace(/\D/g, '').slice(0, 10);
+    });
+    $('aadhaar').addEventListener('input', () => {
+      $('aadhaar').value = $('aadhaar').value.replace(/\D/g, '').slice(0, 12);
+    });
+
+    // Create
+    $('createForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const dict = I18N[(loadSettings()?.language) || 'en'] || I18N.en;
+      const payload = {
+        fullName: $('fullName').value.trim(),
+        email: $('email').value.trim(),
+        dob: $('dob').value,
+        mobile: $('mobile').value,
+        address: $('address').value.trim(),
+        aadhaar: $('aadhaar').value
+      };
+      if (!/^\d{10}$/.test(payload.mobile)) { toast(dict.v_mobile); return; }
+      if (payload.aadhaar && !/^\d{12}$/.test(payload.aadhaar)) { toast(dict.v_aadhaar); return; }
+
+      try {
+        const res = await withTimeout(apiFetch('/accounts', { method: 'POST', body: payload }), 12000);
+        const js = await res.json().catch(() => ({}));
+        showJSON('createResult', js);
+        toast(dict.toast_created);
+        e.target.reset();
+      } catch (err) {
+        console.error(err);
+        showJSON('createResult', { error: err.message });
+        toast(dict.toast_create_fail);
+      }
+    });
+
+    // Get
+    $('getBtn').addEventListener('click', async () => {
+      const acct = $('acctGet').value.trim();
+      if (!acct) { showJSON('getResult', { error: 'Account number required' }); return; }
+      try {
+        const res = await withTimeout(apiFetch(`/accounts/${encodeURIComponent(acct)}`, { method: 'GET' }), 10000);
+        const js = await res.json().catch(() => ({}));
+        showJSON('getResult', js);
+      } catch (err) {
+        console.error(err);
+        showJSON('getResult', { error: err.message });
+      }
+    });
+
+    // Delete
+    $('delBtn').addEventListener('click', async () => {
+      const acct = $('acctDel').value.trim();
+      if (!acct) { showJSON('delResult', { error: 'Account number required' }); return; }
+      try {
+        const res = await withTimeout(apiFetch(`/accounts/${encodeURIComponent(acct)}`, { method: 'DELETE' }), 10000);
+        const text = await res.text().catch(() => '');
+        showJSON('delResult', text ? tryJson(text) : { status: 'deleted' });
+      } catch (err) {
+        console.error(err);
+        showJSON('delResult', { error: err.message });
+      }
+    });
+
+    function showJSON(id, obj) {
+      const el = document.getElementById(id);
+      try {
+        el.textContent = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2);
+      } catch {
+        el.textContent = String(obj);
+      }
+    }
+    function tryJson(s) {
+      try { return JSON.parse(s); } catch { return { text: s }; }
+    }
+  </script>
+</body>
+</html>
