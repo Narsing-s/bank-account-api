@@ -1,0 +1,132 @@
+<script>
+let API_BASE_URL = "";
+
+// Save API Base URL from settings
+function saveApiUrl() {
+  const url = document.getElementById("apiUrl").value.trim();
+  if (!url) {
+    alert("Enter API URL");
+    return;
+  }
+  API_BASE_URL = url;
+  alert("API URL saved successfully");
+}
+
+// Generic API call
+async function apiFetch(endpoint, options = {}) {
+  if (!API_BASE_URL) {
+    throw new Error("API Base URL not set in Settings");
+  }
+
+  const response = await fetch(API_BASE_URL + endpoint, {
+    method: options.method || "GET",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined
+  });
+
+  const text = await response.text();
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
+}
+
+//
+// CREATE ACCOUNT
+//
+async function createAccount() {
+  const payload = {
+    FullName: document.getElementById("fullName").value,
+    dateOfBirth: document.getElementById("dob").value,
+    mobileNumber: document.getElementById("mobile").value,
+    email: document.getElementById("email").value,
+    address: document.getElementById("address").value,
+    totalbalance: "100"
+  };
+
+  const aadhaar = document.getElementById("aadhaar").value;
+  const bankName = document.getElementById("bankName").value;
+
+  try {
+    const result = await apiFetch(
+      `/api/accounts?adharNumber=${aadhaar}&bankName=${bankName}`,
+      {
+        method: "POST",
+        body: payload
+      }
+    );
+
+    document.getElementById("createResult").innerText =
+      JSON.stringify(result, null, 2);
+
+  } catch (err) {
+    document.getElementById("createResult").innerText = err.message;
+  }
+}
+
+//
+// GET ACCOUNT
+//
+async function getAccount() {
+  const accountNumber = document.getElementById("searchAccount").value;
+
+  try {
+    const result = await apiFetch(`/api/accounts/${accountNumber}`);
+
+    document.getElementById("getResult").innerText =
+      JSON.stringify(result, null, 2);
+
+  } catch (err) {
+    document.getElementById("getResult").innerText = err.message;
+  }
+}
+
+//
+// UPDATE ACCOUNT
+//
+async function updateAccount() {
+  const accountNumber = document.getElementById("updateAccount").value;
+
+  const payload = {
+    FullName: document.getElementById("updateName").value,
+    email: document.getElementById("updateEmail").value,
+    mobileNumber: document.getElementById("updateMobile").value
+  };
+
+  try {
+    const result = await apiFetch(`/api/accounts/${accountNumber}`, {
+      method: "PATCH",
+      body: payload
+    });
+
+    document.getElementById("updateResult").innerText =
+      JSON.stringify(result, null, 2);
+
+  } catch (err) {
+    document.getElementById("updateResult").innerText = err.message;
+  }
+}
+
+//
+// DELETE ACCOUNT
+//
+async function deleteAccount() {
+  const accountNumber = document.getElementById("deleteAccount").value;
+
+  try {
+    const result = await apiFetch(`/api/accounts/${accountNumber}`, {
+      method: "DELETE"
+    });
+
+    document.getElementById("deleteResult").innerText =
+      JSON.stringify(result, null, 2);
+
+  } catch (err) {
+    document.getElementById("deleteResult").innerText = err.message;
+  }
+}
+</script>
