@@ -4,7 +4,8 @@
   "description": "Bank Account UI with MuleSoft API",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "echo build completed"
   },
   "dependencies": {
     "express": "^4.18.2",
