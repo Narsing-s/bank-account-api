@@ -7,7 +7,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 // ✅ Your Mule API URL
-const BASE_URL = "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io";
+const BASE_URL = "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api";
 
 app.post("/createAccount", async (req, res) => {
   try {
@@ -35,3 +35,4 @@ app.post("/createAccount", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
