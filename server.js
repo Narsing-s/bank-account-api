@@ -8,14 +8,14 @@ app.use(express.static("public"));
 
 const PORT = process.env.PORT || 3000;
 
-// MuleSoft API Base URL
 const BASE_URL =
   "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api";
 
+
 // CREATE ACCOUNT
-app.post("/createAccount", async (req, res) => {
+app.post("/accounts", async (req, res) => {
   try {
-    const { adharNumber, bankName, body } = req.body;
+    const { adharNumber, bankName, ...body } = req.body;
 
     const response = await fetch(
       `${BASE_URL}/accounts?adharNumber=${adharNumber}&bankName=${bankName}`,
@@ -27,25 +27,28 @@ app.post("/createAccount", async (req, res) => {
     );
 
     const data = await response.json();
-    res.json(data);
+    res.status(response.status).json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
+
 // GET ACCOUNT
-app.get("/getAccount/:id", async (req, res) => {
+app.get("/accounts/:id", async (req, res) => {
   try {
     const response = await fetch(`${BASE_URL}/accounts/${req.params.id}`);
     const data = await response.json();
-    res.json(data);
+
+    res.status(response.status).json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
+
 // UPDATE ACCOUNT
-app.put("/updateAccount/:id", async (req, res) => {
+app.put("/accounts/:id", async (req, res) => {
   try {
     const response = await fetch(`${BASE_URL}/accounts/${req.params.id}`, {
       method: "PUT",
@@ -54,11 +57,27 @@ app.put("/updateAccount/:id", async (req, res) => {
     });
 
     const data = await response.json();
-    res.json(data);
+    res.status(response.status).json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+// DELETE ACCOUNT
+app.delete("/accounts/:id", async (req, res) => {
+  try {
+    const response = await fetch(`${BASE_URL}/accounts/${req.params.id}`, {
+      method: "DELETE",
+    });
+
+    const text = await response.text();
+    res.status(response.status).send(text);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
