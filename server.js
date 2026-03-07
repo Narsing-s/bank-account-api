@@ -9,7 +9,7 @@ app.use(express.static("public"));
 const PORT = process.env.PORT || 3000;
 
 const BASE_URL =
-  "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api";
+  "https://bank-account-proxy-api-jik9pb.5sc6y6-4.usa-e2.cloudhub.io";
 
 
 // CREATE ACCOUNT
@@ -82,3 +82,4 @@ app.delete("/accounts/:id", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
