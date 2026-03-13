@@ -1,42 +1,43 @@
 // server.js
 // Bank Account UI + Proxy + WebAuthn (Passkeys)
-// Node 18+ recommended (global fetch)
+// Node 18+ (global fetch). Start: node server.js
 
 const path = require("path");
 const express = require("express");
 const crypto = require("crypto");
 
-// ---------- Config ----------
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Base URL of your MuleSoft proxy API (CloudHub)
-const BASE_URL = process.env.BASE_URL ||
-  "https://bank-account-proxy-api-jik9pb.5sc6y6-4.usa-e2.cloudhub.io";
+// ===== Config (env vars on Render/host) =====
+const BASE_URL =
+  process.env.BASE_URL ||
+  "https://bank-account-proxy-api-jik9pb.5sc6y6-4.usa-e2.cloudhub.io"; // MuleSoft proxy or API gateway
 
-// RP (Relying Party) & Origin for WebAuthn
-// IMPORTANT: RP_ID must be the domain hosting your UI (e.g., narsing-s.github.io or your custom domain)
-// ORIGIN must be exact scheme+host (and port if any), e.g., https://narsing-s.github.io
-const RP_ID = process.env.RP_ID || "narsing-s.github.io";
-const ORIGIN = process.env.ORIGIN || "https://narsing-s.github.io";
+// WebAuthn domain binding
+const RP_ID = process.env.RP_ID || "narsing-s.github.io";          // domain used to run WebAuthn UI
+const ORIGIN = process.env.ORIGIN || "https://narsing-s.github.io"; // exact origin of the UI
 
-// Allowed front-end origins (CORS)
+// CORS whitelist (if UI is hosted on a different domain)
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "")
   .split(",")
-  .map(s => s.trim())
+  .map((s) => s.trim())
   .filter(Boolean);
 
-// ---------- Middleware ----------
+// ===== Middleware =====
 app.use(express.json());
 
 // CORS (multi-origin)
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (!ALLOWED_ORIGINS.length || ALLOWED_ORIGINS.includes(origin)) {
+  if (!ALLOWED_ORIGINS.length || (origin && ALLOWED_ORIGINS.includes(origin))) {
     if (origin) res.setHeader("Access-Control-Allow-Origin", origin);
   }
   res.setHeader("Vary", "Origin");
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+  );
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, X-Requested-With"
@@ -53,82 +54,101 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static UI
+// Static UI
 app.use(express.static(path.join(__dirname, "public"), { maxAge: "1h" }));
 
-// ---------- Health ----------
-app.get("/health", async (req, res) => {
+// ===== Health =====
+app.get("/health", (req, res) => {
   res.json({
     status: "ok",
     node: process.version,
     baseUrl: BASE_URL,
     rpId: RP_ID,
     origin: ORIGIN,
-    allowedOrigins: ALLOWED_ORIGINS
+    allowedOrigins: ALLOWED_ORIGINS,
   });
 });
 
-// ---------- Bank Accounts Proxy Endpoints ----------
-// CREATE
+// ===== Bank Accounts Proxy =====
+
+// CREATE (POST /accounts)
 app.post("/accounts", async (req, res) => {
   try {
     const { adharNumber, bankName, ...body } = req.body || {};
-    const url = `${BASE_URL}/accounts?adharNumber=${encodeURIComponent(adharNumber || "")}&bankName=${encodeURIComponent(bankName || "")}`;
+    const url = `${BASE_URL}/accounts?adharNumber=${encodeURIComponent(
+      adharNumber || ""
+    )}&bankName=${encodeURIComponent(bankName || "")}`;
 
     const upstream = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify(body || {}),
     });
 
     const text = await upstream.text();
     let data;
-    try { data = JSON.parse(text); } catch { data = { raw: text }; }
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { raw: text };
+    }
     res.status(upstream.status).json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// GET
+// GET (GET /accounts/:id)
 app.get("/accounts/:id", async (req, res) => {
   try {
-    const upstream = await fetch(`${BASE_URL}/accounts/${encodeURIComponent(req.params.id)}`, {
-      headers: { "Accept": "application/json" }
-    });
+    const upstream = await fetch(
+      `${BASE_URL}/accounts/${encodeURIComponent(req.params.id)}`,
+      { headers: { Accept: "application/json" } }
+    );
     const text = await upstream.text();
     let data;
-    try { data = JSON.parse(text); } catch { data = { raw: text }; }
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { raw: text };
+    }
     res.status(upstream.status).json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// UPDATE (PUT)
+// UPDATE (PUT /accounts/:id)
 app.put("/accounts/:id", async (req, res) => {
   try {
-    const upstream = await fetch(`${BASE_URL}/accounts/${encodeURIComponent(req.params.id)}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify(req.body || {}),
-    });
+    const upstream = await fetch(
+      `${BASE_URL}/accounts/${encodeURIComponent(req.params.id)}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(req.body || {}),
+      }
+    );
     const text = await upstream.text();
     let data;
-    try { data = JSON.parse(text); } catch { data = { raw: text }; }
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { raw: text };
+    }
     res.status(upstream.status).json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// DELETE
+// DELETE (DELETE /accounts/:id)
 app.delete("/accounts/:id", async (req, res) => {
   try {
-    const upstream = await fetch(`${BASE_URL}/accounts/${encodeURIComponent(req.params.id)}`, {
-      method: "DELETE",
-      headers: { "Accept": "application/json" }
-    });
+    const upstream = await fetch(
+      `${BASE_URL}/accounts/${encodeURIComponent(req.params.id)}`,
+      { method: "DELETE", headers: { Accept: "application/json" } }
+    );
     const text = await upstream.text();
     res.status(upstream.status).send(text);
   } catch (err) {
@@ -136,7 +156,7 @@ app.delete("/accounts/:id", async (req, res) => {
   }
 });
 
-// ---------- WebAuthn (Passkeys) ----------
+// ===== WebAuthn (Passkeys) =====
 const session = require("cookie-session");
 const {
   generateRegistrationOptions,
@@ -145,20 +165,22 @@ const {
   verifyAuthenticationResponse,
 } = require("@simplewebauthn/server");
 
-// Session cookie to hold challenges between ceremonies
-app.use(session({
-  name: "session",
-  keys: [process.env.SESSION_SECRET || "dev-secret-change-me"],
-  httpOnly: true,
-  secure: true,
-  sameSite: "lax",
-}));
+// cookie-session for challenge state
+app.use(
+  session({
+    name: "session",
+    keys: [process.env.SESSION_SECRET || "dev-secret-change-me"],
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+  })
+);
 
-// In-memory store (replace with DB in production)
+// In-memory user store (replace with DB for prod)
 const users = new Map(); // Map<username, { id, credentials: [{id, publicKey, counter, transports?}] }>
 const toB64U = (buf) => Buffer.from(buf).toString("base64url");
 
-// REGISTER (start)
+// Start registration
 app.post("/webauthn/register/start", async (req, res) => {
   try {
     const { username, displayName } = req.body || {};
@@ -177,12 +199,12 @@ app.post("/webauthn/register/start", async (req, res) => {
       userName: username,
       userDisplayName: displayName || username,
       authenticatorSelection: {
-        authenticatorAttachment: "platform", // use biometrics on device
+        authenticatorAttachment: "platform", // biometric on this device
         residentKey: "preferred",
         userVerification: "required",
       },
       attestationType: "none",
-      excludeCredentials: user.credentials.map(c => ({
+      excludeCredentials: user.credentials.map((c) => ({
         id: Buffer.from(c.id, "base64url"),
         type: "public-key",
         transports: c.transports || ["internal"],
@@ -191,21 +213,21 @@ app.post("/webauthn/register/start", async (req, res) => {
 
     req.session.currentChallenge = options.challenge;
     req.session.username = username;
-
     res.json(options);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-// REGISTER (finish)
+// Finish registration
 app.post("/webauthn/register/finish", async (req, res) => {
   try {
     const { username, ...registrationResponse } = req.body || {};
     if (!username) return res.status(400).json({ error: "username required" });
 
     const expectedChallenge = req.session.currentChallenge;
-    if (!expectedChallenge) return res.status(400).json({ error: "no challenge in session" });
+    if (!expectedChallenge)
+      return res.status(400).json({ error: "no challenge in session" });
 
     const verification = await verifyRegistrationResponse({
       response: registrationResponse,
@@ -216,12 +238,16 @@ app.post("/webauthn/register/finish", async (req, res) => {
     });
 
     const { verified, registrationInfo } = verification;
-    if (!verified || !registrationInfo) {
+    if (!verified || !registrationInfo)
       return res.status(400).json({ error: "registration not verified" });
-    }
 
-    const { credentialPublicKey, credentialID, counter, credentialDeviceType, credentialBackedUp } =
-      registrationInfo;
+    const {
+      credentialPublicKey,
+      credentialID,
+      counter,
+      credentialDeviceType,
+      credentialBackedUp,
+    } = registrationInfo;
 
     const user = users.get(username);
     const newCred = {
@@ -231,9 +257,9 @@ app.post("/webauthn/register/finish", async (req, res) => {
       deviceType: credentialDeviceType,
       backedUp: credentialBackedUp,
     };
-
-    const exists = user.credentials.find(c => c.id === newCred.id);
-    if (!exists) user.credentials.push(newCred);
+    if (!user.credentials.find((c) => c.id === newCred.id)) {
+      user.credentials.push(newCred);
+    }
 
     req.session.currentChallenge = undefined;
     res.json({ verified: true, credentials: user.credentials.length });
@@ -242,21 +268,20 @@ app.post("/webauthn/register/finish", async (req, res) => {
   }
 });
 
-// AUTHENTICATE (start)
+// Start authentication
 app.post("/webauthn/authenticate/start", async (req, res) => {
   try {
     const { username } = req.body || {};
     if (!username) return res.status(400).json({ error: "username required" });
 
     const user = users.get(username);
-    if (!user || !user.credentials.length) {
+    if (!user || !user.credentials.length)
       return res.status(404).json({ error: "user or credentials not found" });
-    }
 
     const options = await generateAuthenticationOptions({
       rpID: RP_ID,
       userVerification: "required",
-      allowCredentials: user.credentials.map(c => ({
+      allowCredentials: user.credentials.map((c) => ({
         id: Buffer.from(c.id, "base64url"),
         type: "public-key",
         transports: ["internal"],
@@ -265,14 +290,13 @@ app.post("/webauthn/authenticate/start", async (req, res) => {
 
     req.session.currentChallenge = options.challenge;
     req.session.username = username;
-
     res.json(options);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-// AUTHENTICATE (finish)
+// Finish authentication
 app.post("/webauthn/authenticate/finish", async (req, res) => {
   try {
     const { username, ...authenticationResponse } = req.body || {};
@@ -280,10 +304,11 @@ app.post("/webauthn/authenticate/finish", async (req, res) => {
 
     const expectedChallenge = req.session.currentChallenge;
     const user = users.get(username);
-    if (!expectedChallenge || !user) return res.status(400).json({ error: "bad session" });
+    if (!expectedChallenge || !user)
+      return res.status(400).json({ error: "bad session" });
 
     const credID = authenticationResponse.rawId || authenticationResponse.id;
-    const cred = user.credentials.find(c => c.id === credID);
+    const cred = user.credentials.find((c) => c.id === credID);
     if (!cred) return res.status(404).json({ error: "credential not found" });
 
     const verification = await verifyAuthenticationResponse({
@@ -300,9 +325,8 @@ app.post("/webauthn/authenticate/finish", async (req, res) => {
     });
 
     const { verified, authenticationInfo } = verification;
-    if (!verified || !authenticationInfo) {
+    if (!verified || !authenticationInfo)
       return res.status(401).json({ error: "authentication not verified" });
-    }
 
     cred.counter = authenticationInfo.newCounter;
 
@@ -322,7 +346,7 @@ app.post("/logout", (req, res) => {
   res.json({ ok: true });
 });
 
-// Root serves UI
+// Root → UI
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
@@ -333,3 +357,4 @@ app.use((req, res) => res.status(404).json({ error: "Not Found", path: req.path 
 app.listen(PORT, () => {
   console.log(`Bank Account UI running on port ${PORT}`);
 });
+``
