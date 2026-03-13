@@ -2,52 +2,85 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
-  <title>Bank Account Management</title>
+  <title>Bank Account — Android‑Style Web UI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="robots" content="index,follow" />
-  <meta name="description" content="Create, get, update, and delete bank accounts with an Android-like, multilingual web UI. Voice input/output, JSON panels, network settings, and biometric login (Passkeys/WebAuthn)." />
-  <!-- PWA hooks -->
-  <link rel="manifest" href="/manifest.webmanifest">
-  <meta name="theme-color" content="#0f172a" />
-  <link rel="icon" href="/icons/icon-192.png">
-
+  <meta name="description" content="Android-style web UI for Bank Account API with languages, voice input/output, and PWA install. Fast, responsive, and privacy-friendly." />
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#0b1225" />
+  <link rel="icon" href="/icons/icon-192.png" sizes="192x192" />
   <style>
-    :root {
-      --bg: #0f172a; --surface: #1f2a44; --text: #e5e7eb; --muted: #a1a1aa;
-      --border: #2b3553; --accent: #0ea5e9; --danger: #ef4444;
-      --radius: 12px; --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --gap: 14px; --field-h: 48px; --font-scale: 1; --density: 1;
+    /* ======= Design Tokens (Android-inspired) ======= */
+    :root{
+      /* Unique dual-tone palette */
+      --bg:#0b1225; --surface:#111a33; --surface-2:#0f1530;
+      --text:#eef3ff; --muted:#9ea8c8;
+      --primary:#4ae387; --primary-2:#5aa1ff;   /* accent gradient */
+      --danger:#ff7a7a; --border:#1e2a4a;
+      --radius:16px; --r-sm:12px;
+      --shadow:0 18px 40px rgba(0,0,0,.45);
+      --ring:0 0 0 3px rgba(74,227,135,.22);
+      --gap:14px; --h:48px;
+      --font-scale:1; --density:1;
     }
     [data-theme="light"]{
-      --bg:#f7fafc; --surface:#ffffff; --text:#111827; --muted:#6b7280; --border:#e5e7eb;
+      --bg:#eef2ff; --surface:#ffffff; --surface-2:#f2f6ff;
+      --text:#0e1440; --muted:#5f6a91;
+      --border:#e7eaf5;
+      --primary:#2fb171; --primary-2:#2a62ff;
+      --shadow:0 14px 26px rgba(0,0,0,.10);
+      --ring:0 0 0 3px rgba(42,98,255,.18);
     }
-    .hc { --text: #fff; --border: #fff; }
+    .hc{ --text:#fff; --border:#fff; }
+
     html,body{height:100%}
     body{
-      margin:0; color:var(--text); font: calc(16px * var(--font-scale))/1.5 system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans";
-      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); background-color: var(--bg);
+      margin:0; color:var(--text);
+      font: calc(16px * var(--font-scale))/1.5 system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans";
+      background:
+        radial-gradient(1200px 600px at -10% -40%, #1b2b65 0%, transparent 55%),
+        radial-gradient(900px 500px at 110% -20%, #142b52 0%, transparent 55%),
+        linear-gradient(180deg, var(--bg) 0%, var(--surface-2) 100%);
     }
 
-    .app-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;backdrop-filter:blur(6px)}
+    /* ======= Appbar ======= */
+    .appbar{
+      position:sticky; top:0; z-index:50;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:14px 16px; background:rgba(0,0,0,.25); backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
     .brand{display:flex;align-items:center;gap:10px}
-    .brand h1{margin:0;font-size:1.25rem}
-    .icon{font-size:1.2rem}
-    .btn{padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer}
-    .btn.primary{background:var(--accent); color:#fff; border:none}
-    .btn.danger{background:var(--danger); color:#fff; border:none}
-    .btn.ghost{background:transparent}
+    .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--primary-2));box-shadow:0 6px 16px rgba(0,0,0,.3)}
+    .brand h1{margin:0;font-size:18px}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px; padding:8px 12px;
+      border:1px solid rgba(255,255,255,.12); border-radius:999px; background:rgba(255,255,255,.07); cursor:pointer; color:var(--text)
+    }
+    .switch{display:inline-flex;align-items:center;gap:10px}
+    .knob{width:44px;height:24px;border-radius:999px;background:#172048;border:1px solid rgba(255,255,255,.16);position:relative}
+    .knob::after{content:"";position:absolute;top:50%;left:3px;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;background:var(--primary);transition:left .22s ease;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+    input[type="checkbox"].theme:checked + .knob::after{left:23px}
 
-    .container{max-width: 980px; margin:0 auto; padding:20px; display:grid; gap:16px}
-    .card{background:color-mix(in oklab, var(--surface) 85%, transparent); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px}
-    .tabs{display:flex;gap:8px;flex-wrap:wrap}
-    .tab{padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer}
-    .tab.active{background:linear-gradient(135deg, var(--accent), #5aa1ff);color:#081226;border:none}
+    /* ======= Card / Layout ======= */
+    .wrap{max-width:1000px; margin:16px auto; padding:0 16px; display:grid; gap:16px}
+    .card{
+      background:color-mix(in oklab, var(--surface) 85%, transparent);
+      border:1px solid rgba(255,255,255,.08); border-radius:var(--radius);
+      box-shadow:var(--shadow); padding:16px; min-width:0;
+    }
+
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+    .tab{padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.06); color:var(--text); cursor:pointer; user-select:none}
+    .tab.active{background:linear-gradient(135deg,var(--primary),var(--primary-2)); color:#071225; border:none}
 
     .panel{display:none}
     .panel.active{display:block}
 
-    .grid{display:grid;gap:var(--gap);grid-template-columns:repeat(12,minmax(0,1fr))}
-    .field{grid-column:span 4;min-width:0}
+    .grid{display:grid; gap:var(--gap); grid-template-columns:repeat(12,minmax(0,1fr))}
+    .field{grid-column:span 4; min-width:0}
     .field-6{grid-column:span 6}
     .field-12{grid-column:span 12}
     @media (max-width:1024px){.field,.field-6{grid-column:span 6}}
@@ -55,38 +88,60 @@
 
     label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     .inwrap{position:relative}
-    input,select,textarea{width:100%;height:var(--field-h);padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);outline:none}
-    textarea{height:auto;min-height:calc(var(--field-h)*2);resize:vertical}
-    input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 35%, transparent); border-color:var(--accent)}
+    input,select,textarea{
+      width:100%;height:var(--h); padding:12px 44px 12px 14px; border-radius:12px;
+      color:var(--text); background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.18); outline:none; min-width:0
+    }
+    textarea{height:auto; min-height:calc(var(--h)*2); padding-right:14px; resize:vertical}
+    input:focus,select:focus,textarea:focus{box-shadow:var(--ring); border-color:transparent}
+    .mic{position:absolute; right:8px; top:50%; transform:translateY(-50%); width:28px; height:28px; border-radius:50%;
+      display:grid; place-items:center; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); cursor:pointer}
+    .mic.recording{background:rgba(255,0,0,.25); border-color:rgba(255,0,0,.35)}
 
-    .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .result{margin-top:10px;border:1px dashed var(--border);background:rgba(0,0,0,.2);padding:12px;border-radius:12px;white-space:pre-wrap;word-break:break-word;min-height:44px}
-    .result.err{color:#ffb3b3;background:rgba(255,0,0,.08);border-color:rgba(255,0,0,.25)}
+    .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .btn{padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:var(--text); cursor:pointer}
+    .btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary-2)); border:none; color:#071225}
+    .btn.ghost{background:transparent}
+    .btn.danger{background:var(--danger); border:none; color:#071225}
 
-    .jsonbox{margin-top:10px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
-    .jsonhdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(255,255,255,.06);cursor:pointer}
-    .jsonbody{display:none;max-height:320px;overflow:auto;background:rgba(0,0,0,.25)}
-    .jsonbody pre{margin:0;padding:12px;font-family:ui-monospace,Menlo,Consolas,Monaco,"Courier New",monospace;color:#d7eaff}
-    .jsontools{display:flex;gap:6px}
+    .result{margin-top:10px; border:1px dashed rgba(255,255,255,.16); background:rgba(255,255,255,.05);
+      border-radius:12px; padding:12px; white-space:pre-wrap; word-break:break-word; min-height:44px}
+    .result.err{color:#ffd3d3; border-color:rgba(255,0,0,.25); background:rgba(255,0,0,.08)}
 
-    .toast{position:fixed;right:20px;bottom:20px;background:var(--surface);border:1px solid var(--border);padding:.75rem 1rem;border-radius:var(--radius);box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:opacity .25s ease,transform .25s ease}
-    .toast.show{opacity:1;transform:translateY(0)}
+    .jsonbox{margin-top:10px; border:1px solid rgba(255,255,255,.14); border-radius:12px; overflow:hidden}
+    .jsonhdr{display:flex; align-items:center; justify-content:space-between; gap:8px; background:rgba(255,255,255,.07); padding:8px 12px; cursor:pointer}
+    .jsonhdr b{font-size:13px}
+    .jsonbody{display:none; max-height:320px; overflow:auto; background:rgba(0,0,0,.25)}
+    .jsonbody pre{margin:0; padding:12px; font-family:ui-monospace,Menlo,Consolas,Monaco,"Courier New",monospace; color:#d7eaff}
+    .jsontools{display:flex; gap:6px}
+
+    .foot{display:flex; align-items:center; justify-content:space-between; margin-top:6px; color:var(--muted); font-size:13px; gap:8px; flex-wrap:wrap}
+
+    /* Toast */
+    .toast{position:fixed; right:20px; bottom:20px; background:var(--surface);
+      border:1px solid rgba(255,255,255,.18); padding:.75rem 1rem; border-radius:12px; box-shadow:var(--shadow);
+      opacity:0; transform:translateY(10px); transition:opacity .25s ease, transform .25s ease}
+    .toast.show{opacity:1; transform:translateY(0)}
   </style>
 </head>
 <body>
-  <!-- Header -->
-  <header class="app-header">
+  <!-- Appbar -->
+  <header class="appbar">
     <div class="brand">
-      <span class="icon">🏦</span>
-      <h1>Bank Account Management</h1>
+      <div class="logo"></div>
+      <div>
+        <h1 id="title">Bank Account</h1>
+        <small id="subtitle" style="color:var(--muted)">Create • Get • Update • Delete</small>
+      </div>
     </div>
-    <div style="display:flex;gap:8px">
-      <button id="openSettings" class="btn ghost">Settings</button>
+    <div class="switch">
+      <span>Theme</span>
+      <input id="themeToggle" class="theme" type="checkbox" hidden />
+      <label for="themeToggle" class="knob" title="Toggle theme"></label>
     </div>
   </header>
 
-  <!-- Main -->
-  <main class="container">
+  <main class="wrap">
     <section class="card">
       <div class="tabs">
         <button id="tabCreate" class="tab active">Create</button>
@@ -99,23 +154,62 @@
       <!-- Create -->
       <div id="panelCreate" class="panel active">
         <div class="grid">
-          <div class="field"><label>Full Name</label><input id="fullName" placeholder="John Doe"/></div>
-          <div class="field"><label>Email</label><input id="email" type="email" placeholder="john@example.com"/></div>
-          <div class="field"><label>Date of Birth</label><input id="dob" type="date"/></div>
-          <div class="field"><label>Mobile (10 digits)</label><input id="mobile" inputmode="numeric" maxlength="10" placeholder="9876543210"/></div>
-          <div class="field-6"><label>Address</label><input id="address" placeholder="Street, City"/></div>
-          <div class="field"><label>Aadhaar (12 digits)</label><input id="aadhaar" inputmode="numeric" maxlength="12" placeholder="123456789012"/></div>
-          <div class="field-6"><label>Bank</label>
+          <div class="field">
+            <label id="lbl_fullName">Full Name</label>
+            <div class="inwrap">
+              <input id="fullName" placeholder="John Doe" />
+              <button class="mic" data-mic="fullName" title="Speak">🎤</button>
+            </div>
+          </div>
+          <div class="field">
+            <label id="lbl_email">Email</label>
+            <div class="inwrap">
+              <input id="email" type="email" placeholder="john@example.com" />
+              <button class="mic" data-mic="email" title="Speak">🎤</button>
+            </div>
+          </div>
+          <div class="field">
+            <label id="lbl_dob">Date of Birth</label>
+            <div class="inwrap">
+              <input id="dob" type="date" />
+            </div>
+          </div>
+          <div class="field">
+            <label id="lbl_mobile">Mobile (10 digits)</label>
+            <div class="inwrap">
+              <input id="mobile" inputmode="numeric" maxlength="10" placeholder="9876543210" />
+            </div>
+          </div>
+          <div class="field-6">
+            <label id="lbl_address">Address</label>
+            <div class="inwrap">
+              <input id="address" placeholder="Street, City" />
+              <button class="mic" data-mic="address" title="Speak">🎤</button>
+            </div>
+          </div>
+          <div class="field">
+            <label id="lbl_aadhaar">Aadhaar (12 digits)</label>
+            <div class="inwrap">
+              <input id="aadhaar" inputmode="numeric" maxlength="12" placeholder="123456789012" />
+            </div>
+          </div>
+          <div class="field-6">
+            <label id="lbl_bank">Bank</label>
             <select id="bankName">
-              <option>HDFC</option><option>SBI</option><option>APGIVB</option><option>AXIS</option><option>ICICI</option>
+              <option>HDFC</option>
+              <option>SBI</option>
+              <option>APGIVB</option>
+              <option>AXIS</option>
+              <option>ICICI</option>
             </select>
           </div>
         </div>
 
         <div class="actions">
           <button id="createBtn" class="btn primary">Create Account</button>
+          <button id="speakCreate" class="btn" title="Speak result">🔊</button>
         </div>
-        <div id="createOut" class="result" aria-live="polite"></div>
+        <div id="createOut" class="result">Result will appear here.</div>
 
         <div class="jsonbox">
           <div class="jsonhdr"><b>Raw JSON</b>
@@ -132,10 +226,19 @@
       <!-- Get -->
       <div id="panelGet" class="panel">
         <div class="grid">
-          <div class="field-6"><label>Account Number</label><input id="getAcct" placeholder="63412021212"/></div>
+          <div class="field-6">
+            <label id="lbl_acct">Account Number</label>
+            <div class="inwrap">
+              <input id="acctGet" placeholder="63412021212" />
+              <button class="mic" data-mic="acctGet" title="Speak">🎤</button>
+            </div>
+          </div>
         </div>
-        <div class="actions"><button id="getBtn" class="btn primary">Get Account</button></div>
-        <div id="getOut" class="result" aria-live="polite"></div>
+        <div class="actions">
+          <button id="getBtn" class="btn primary">Get Account</button>
+          <button id="speakGet" class="btn" title="Speak result">🔊</button>
+        </div>
+        <div id="getOut" class="result">Result will appear here.</div>
 
         <div class="jsonbox">
           <div class="jsonhdr"><b>Raw JSON</b>
@@ -152,13 +255,28 @@
       <!-- Update -->
       <div id="panelUpdate" class="panel">
         <div class="grid">
-          <div class="field"><label>Account Number</label><input id="updAcct" placeholder="63412021212"/></div>
-          <div class="field"><label>Full Name</label><input id="updFullName" placeholder="Optional"/></div>
-          <div class="field"><label>Mobile</label><input id="updMobile" inputmode="numeric" maxlength="10" placeholder="Optional"/></div>
-          <div class="field-6"><label>Address</label><input id="updAddress" placeholder="Optional"/></div>
+          <div class="field">
+            <label id="lbl_acct_u">Account Number</label>
+            <div class="inwrap"><input id="updAcct" placeholder="63412021212"/></div>
+          </div>
+          <div class="field">
+            <label id="lbl_fullName_u">Full Name</label>
+            <div class="inwrap"><input id="updFullName" placeholder="Optional"/><button class="mic" data-mic="updFullName">🎤</button></div>
+          </div>
+          <div class="field">
+            <label id="lbl_mobile_u">Mobile</label>
+            <div class="inwrap"><input id="updMobile" inputmode="numeric" maxlength="10" placeholder="Optional"/></div>
+          </div>
+          <div class="field-6">
+            <label id="lbl_address_u">Address</label>
+            <div class="inwrap"><input id="updAddress" placeholder="Optional"/><button class="mic" data-mic="updAddress">🎤</button></div>
+          </div>
         </div>
-        <div class="actions"><button id="updateBtn" class="btn primary">Update</button></div>
-        <div id="updateOut" class="result" aria-live="polite"></div>
+        <div class="actions">
+          <button id="updateBtn" class="btn primary">Update</button>
+          <button id="speakUpdate" class="btn" title="Speak result">🔊</button>
+        </div>
+        <div id="updateOut" class="result">Result will appear here.</div>
 
         <div class="jsonbox">
           <div class="jsonhdr"><b>Raw JSON</b>
@@ -175,10 +293,16 @@
       <!-- Delete -->
       <div id="panelDelete" class="panel">
         <div class="grid">
-          <div class="field-6"><label>Account Number</label><input id="delAcct" placeholder="63412021212"/></div>
+          <div class="field-6">
+            <label id="lbl_acct_d">Account Number</label>
+            <div class="inwrap"><input id="delAcct" placeholder="63412021212"/><button class="mic" data-mic="delAcct">🎤</button></div>
+          </div>
         </div>
-        <div class="actions"><button id="deleteBtn" class="btn danger">Delete</button></div>
-        <div id="deleteOut" class="result" aria-live="polite"></div>
+        <div class="actions">
+          <button id="deleteBtn" class="btn danger">Delete</button>
+          <button id="speakDelete" class="btn" title="Speak result">🔊</button>
+        </div>
+        <div id="deleteOut" class="result">Result will appear here.</div>
 
         <div class="jsonbox">
           <div class="jsonhdr"><b>Raw JSON</b>
@@ -195,34 +319,61 @@
       <!-- Settings -->
       <div id="panelSettings" class="panel">
         <div class="grid">
-          <div class="field-6"><label>Language</label>
-            <select id="language"><option value="en">English</option><option value="te">తెలుగు</option><option value="hi">हिन्दी</option></select>
+          <!-- Personalization -->
+          <div class="field-6">
+            <label>Language</label>
+            <select id="language">
+              <option value="en">English</option>
+              <option value="hi">हिन्दी</option>
+              <option value="te">తెలుగు</option>
+            </select>
           </div>
-          <div class="field"><label>Theme</label>
-            <select id="themeMode"><option value="system">System</option><option value="light">Light</option><option value="dark" selected>Dark</option></select>
+          <div class="field">
+            <label>Theme</label>
+            <select id="themeMode">
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark" selected>Dark</option>
+            </select>
           </div>
-          <div class="field"><label>Accent</label><input id="accent" type="color" value="#0ea5e9" /></div>
-          <div class="field"><label>High Contrast</label><input id="highContrast" type="checkbox" /></div>
-          <div class="field"><label>Density</label>
-            <select id="density"><option value="comfortable" selected>Comfortable</option><option value="compact">Compact</option></select>
+          <div class="field">
+            <label>Accent</label>
+            <input id="accent" type="color" value="#4ae387"/>
           </div>
-          <div class="field"><label>Font Size</label>
-            <select id="fontSize"><option value="sm">Small</option><option value="md" selected>Medium</option><option value="lg">Large</option></select>
+          <div class="field"><label>High Contrast</label><input id="highContrast" type="checkbox"/></div>
+          <div class="field">
+            <label>Density</label>
+            <select id="density">
+              <option value="comfortable" selected>Comfortable</option>
+              <option value="compact">Compact</option>
+            </select>
           </div>
-          <div class="field"><label>Reduce Motion</label><input id="reduceMotion" type="checkbox" /></div>
+          <div class="field">
+            <label>Font Size</label>
+            <select id="fontSize">
+              <option value="sm">Small</option>
+              <option value="md" selected>Medium</option>
+              <option value="lg">Large</option>
+            </select>
+          </div>
+          <div class="field"><label>Reduce Motion</label><input id="reduceMotion" type="checkbox"/></div>
 
-          <div class="field-12"><hr style="border-color:var(--border);opacity:.4"></div>
+          <div class="field-12"><hr style="border-color:rgba(255,255,255,.12)"></div>
 
-          <div class="field-6"><label>API Base URL</label><input id="apiBase" placeholder="https://your-proxy.onrender.com" /></div>
+          <!-- Network -->
+          <div class="field-6">
+            <label>API Base URL</label>
+            <input id="apiBase" placeholder="https://<your-web-service>.onrender.com" />
+          </div>
           <div class="field"><label>Timeout (ms)</label><input id="timeout" type="number" min="1000" step="500" value="12000" /></div>
-          <div class="field"><label>Retries</label><input id="retries" type="number" min="0" max="5" value="1" /></div>
-          <div class="field-12"><label>Use Credentials (cookies)</label><input id="useCreds" type="checkbox" /></div>
+          <div class="field"><label>Retries</label><input id="retries" type="number" min="0" max="5" value="1"/></div>
+          <div class="field-12"><label>Use Credentials (cookies)</label><input id="useCreds" type="checkbox"/></div>
 
-          <div class="field-6"><label>Client ID Header</label><input id="clientIdHeader" placeholder="X-Client-Id" /></div>
-          <div class="field-6"><label>Client ID Value</label><input id="clientIdValue" placeholder="" /></div>
-          <div class="field-6"><label>Client Secret Header</label><input id="clientSecretHeader" placeholder="X-Client-Secret" /></div>
-          <div class="field-6"><label>Client Secret Value</label><input id="clientSecretValue" placeholder="" /></div>
-          <div class="field-6"><label>Bearer Token</label><input id="bearerToken" placeholder="eyJ..." /></div>
+          <div class="field-6"><label>Client ID Header</label><input id="clientIdHeader" placeholder="X-Client-Id"/></div>
+          <div class="field-6"><label>Client ID Value</label><input id="clientIdValue" placeholder=""/></div>
+          <div class="field-6"><label>Client Secret Header</label><input id="clientSecretHeader" placeholder="X-Client-Secret"/></div>
+          <div class="field-6"><label>Client Secret Value</label><input id="clientSecretValue" placeholder=""/></div>
+          <div class="field-6"><label>Bearer Token</label><input id="bearerToken" placeholder="eyJ..."/></div>
 
           <div class="field-12" style="display:flex;gap:8px;align-items:center">
             <button id="testHealth" class="btn">Test /health</button>
@@ -230,339 +381,353 @@
             <button id="installBtn" class="btn" style="margin-left:auto;display:none">Install App</button>
           </div>
 
-          <div class="field-12" style="display:flex;gap:8px">
+          <div class="field-12" style="display:flex;gap:8px;flex-wrap:wrap">
             <button id="saveSettings" class="btn primary">Save</button>
             <button id="resetSettings" class="btn">Reset</button>
-          </div>
-
-          <div class="field-12"><hr style="border-color:var(--border);opacity:.4"></div>
-
-          <!-- Passkeys -->
-          <div class="field-12"><h3>Biometric Login (Passkey)</h3></div>
-          <div class="field-6"><label>Username</label><input id="pkUsername" placeholder="e.g., narsing"/></div>
-          <div class="field-6"><label>Display name (optional)</label><input id="pkDisplayName" placeholder="Visible on device"/></div>
-          <div class="field-12" style="display:flex;gap:8px;flex-wrap:wrap">
-            <button id="btnRegisterPasskey" class="btn">Register Passkey</button>
-            <button id="btnLoginPasskey" class="btn primary">Sign in with Passkey</button>
-            <button id="btnLoginConditional" class="btn">Try Conditional UI</button>
-            <button id="btnLogout" class="btn">Sign out</button>
-          </div>
-          <div class="jsonbox">
-            <div class="jsonhdr"><b>Passkey Debug</b><span>▼</span></div>
-            <div class="jsonbody"><pre id="passkeyLog">{}</pre></div>
           </div>
         </div>
       </div>
     </section>
 
-    <div style="display:flex;justify-content:space-between;align-items:center;color:var(--muted)">
+    <div class="foot">
       <div>© <span id="year"></span> #CreatedByNarsing-s</div>
-      <a href="https://github.com/Narsing-s" target="_blank" style="color:var(--muted);text-decoration:none">GitHub</a>
+      <a href="https://github.com/Narsing-s" target="_blank" rel="noopener" style="color:var(--muted)">GitHub</a>
     </div>
   </main>
 
-  <!-- Toast -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
-    // ===== Helpers & Settings =====
-    const $ = (id) => document.getElementById(id);
+    // ===== Helpers =====
+    const $ = (id)=>document.getElementById(id);
     const toastEl = $("toast");
     function toast(msg){ toastEl.textContent = msg; toastEl.classList.add("show"); setTimeout(()=>toastEl.classList.remove("show"), 2200); }
-
+    const THEME_KEY="bankapp:ui:theme";
     const SETTINGS_KEY="bankapp:settings";
     const defaultSettings = {
-      language: "en", themeMode: "dark", accent: "#0ea5e9", highContrast: false,
-      density: "comfortable", fontSize: "md", reduceMotion: false,
-      api: { base: "", timeout: 12000, retries: 1, useCreds: false, clientIdHeader:"",clientIdValue:"",clientSecretHeader:"",clientSecretValue:"", bearerToken:"" }
-    };
-    function loadSettings(){ try { return { ...defaultSettings, ...(JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}")) }; } catch { return { ...defaultSettings }; } }
-    function saveSettings(s){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
-    function applySettings(s){
-      const root = document.documentElement;
-      root.setAttribute("data-theme", s.themeMode==="light"?"light":"dark");
-      if (s.themeMode==="system") {
-        const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
-        root.setAttribute("data-theme", prefersLight?"light":"dark");
+      language:"en",
+      theme:"dark",
+      accent:"#4ae387",
+      highContrast:false,
+      density:"comfortable",
+      fontSize:"md",
+      reduceMotion:false,
+      api:{
+        base:"",
+        timeout:12000,
+        retries:1,
+        useCreds:false,
+        clientIdHeader:"",
+        clientIdValue:"",
+        clientSecretHeader:"",
+        clientSecretValue:"",
+        bearerToken:""
       }
-      if (s.highContrast) root.classList.add("hc"); else root.classList.remove("hc");
-      root.style.setProperty("--font-scale", s.fontSize==="sm"?0.9:(s.fontSize==="lg"?1.1:1));
-      root.style.setProperty("--density", s.density==="compact"?0.85:1);
-      root.style.setProperty("--accent", s.accent);
-      document.body.style.setProperty("transition", s.reduceMotion ? "none" : "");
+    };
 
+    // ===== Language strings =====
+    const STR = {
+      en:{
+        title:"Bank Account", subtitle:"Create • Get • Update • Delete",
+        fullName:"Full Name", email:"Email", dob:"Date of Birth", mobile:"Mobile (10 digits)",
+        address:"Address", aadhaar:"Aadhaar (12 digits)", bank:"Bank", acct:"Account Number",
+        result:"Result will appear here.", create:"Create Account", get:"Get Account", update:"Update", del:"Delete"
+      },
+      hi:{
+        title:"बैंक खाता", subtitle:"बनाएँ • प्राप्त करें • अपडेट • हटाएँ",
+        fullName:"पूरा नाम", email:"ईमेल", dob:"जन्म तिथि", mobile:"मोबाइल (10 अंक)",
+        address:"पता", aadhaar:"आधार (12 अंक)", bank:"बैंक", acct:"खाता संख्या",
+        result:"परिणाम यहाँ दिखाई देगा।", create:"खाता बनाएँ", get:"खाता प्राप्त करें", update:"अपडेट", del:"हटाएँ"
+      },
+      te:{
+        title:"బ్యాంక్ ఖాతా", subtitle:"సృష్టించండి • పొందండి • అప్‌డేట్ • తొలగించండి",
+        fullName:"పూర్తి పేరు", email:"ఈమెయిల్", dob:"పుట్టిన తేదీ", mobile:"మొబైల్ (10 అంకెలు)",
+        address:"చిరునామా", aadhaar:"ఆధార్ (12 అంకెలు)", bank:"బ్యాంక్", acct:"ఖాతా సంఖ్య",
+        result:"ఫలితం ఇక్కడ కనిపిస్తుంది.", create:"ఖాతా సృష్టించండి", get:"ఖాతా పొందండి", update:"అప్‌డేట్", del:"తొలగించండి"
+      }
+    };
+
+    // ===== Apply language text =====
+    function applyI18n(lang){
+      const D = STR[lang] || STR.en;
+      $("title").textContent = D.title;
+      $("subtitle").textContent = D.subtitle;
+      $("lbl_fullName").textContent = D.fullName;
+      $("lbl_email").textContent = D.email;
+      $("lbl_dob").textContent = D.dob;
+      $("lbl_mobile").textContent = D.mobile;
+      $("lbl_address").textContent = D.address;
+      $("lbl_aadhaar").textContent = D.aadhaar;
+      $("lbl_bank").textContent = D.bank;
+      $("lbl_acct").textContent = D.acct;
+      $("lbl_acct_u").textContent = D.acct;
+      $("lbl_fullName_u").textContent = D.fullName;
+      $("lbl_mobile_u").textContent = STR[lang].mobile.split(" ")[0]; // Mobile
+      $("lbl_address_u").textContent = D.address;
+      $("createOut").textContent = D.result;
+      $("getOut").textContent = D.result;
+      $("updateOut").textContent = D.result;
+      $("deleteOut").textContent = D.result;
+      document.documentElement.lang = lang;
+      document.documentElement.dir = "ltr";
+    }
+
+    // ===== Theme / Settings =====
+    function loadSettings(){ try{return {...defaultSettings, ...(JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}"))}}catch{return {...defaultSettings}}}
+    function saveSettings(s){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
+
+    function applySettings(s){
+      // theme
+      const root = document.documentElement;
+      let mode = s.theme; if (mode==="system"){ mode = (matchMedia && matchMedia("(prefers-color-scheme: light)").matches)?"light":"dark"; }
+      root.setAttribute("data-theme", mode);
+      $("themeToggle").checked = (mode==="light");
+      // hc, density, font, accent
+      if (s.highContrast) root.classList.add("hc"); else root.classList.remove("hc");
+      root.style.setProperty("--density", s.density==="compact" ? 0.85 : 1);
+      root.style.setProperty("--font-scale", s.fontSize==="sm"?0.9:(s.fontSize==="lg"?1.1:1));
+      root.style.setProperty("--primary", s.accent);
+      document.body.style.setProperty("transition", s.reduceMotion?"none":"");
+      // controls
       $("language").value = s.language;
-      $("themeMode").value = s.themeMode;
+      $("themeMode").value = s.theme;
       $("accent").value = s.accent;
       $("highContrast").checked = s.highContrast;
       $("density").value = s.density;
       $("fontSize").value = s.fontSize;
       $("reduceMotion").checked = s.reduceMotion;
-
       $("apiBase").value = s.api.base;
       $("timeout").value = s.api.timeout;
       $("retries").value = s.api.retries;
       $("useCreds").checked = s.api.useCreds;
-
       $("clientIdHeader").value = s.api.clientIdHeader;
       $("clientIdValue").value = s.api.clientIdValue;
       $("clientSecretHeader").value = s.api.clientSecretHeader;
       $("clientSecretValue").value = s.api.clientSecretValue;
       $("bearerToken").value = s.api.bearerToken;
+      applyI18n(s.language);
     }
 
-    // Tabs
-    const tabs = [["tabCreate","panelCreate"],["tabGet","panelGet"],["tabUpdate","panelUpdate"],["tabDelete","panelDelete"],["tabSettings","panelSettings"]];
+    // ===== Tabs =====
+    const tabs=[["tabCreate","panelCreate"],["tabGet","panelGet"],["tabUpdate","panelUpdate"],["tabDelete","panelDelete"],["tabSettings","panelSettings"]];
     tabs.forEach(([t,p])=> $(t).addEventListener("click", ()=>{
       tabs.forEach(([tt,pp])=>{ $(tt).classList.toggle("active", tt===t); $(pp).classList.toggle("active", pp===p); });
     }));
-    $("openSettings").addEventListener("click", ()=> { tabs.forEach(([tt,pp])=>{ $(tt).classList.toggle("active", tt==="tabSettings"); $(pp).classList.toggle("active", pp==="panelSettings");}); });
 
-    // Collapsible JSON
-    document.querySelectorAll(".jsonbox").forEach(box=>{
-      const hdr = box.querySelector(".jsonhdr");
-      const body = box.querySelector(".jsonbody");
-      hdr.addEventListener("click", ()=>{
-        const open = body.style.display==="block"; body.style.display = open ? "none" : "block";
-        hdr.querySelector("span").textContent = open ? "▼" : "▲";
-      });
+    // ===== JSON panel collapsible =====
+    document.addEventListener("click", (e)=>{
+      const hdr = e.target.closest(".jsonhdr"); if (!hdr) return;
+      const body = hdr.parentElement.querySelector(".jsonbody");
+      const open = body.style.display==="block"; body.style.display = open ? "none" : "block";
+      hdr.querySelector("span").textContent = open ? "▼" : "▲";
     });
 
-    // Network helpers
+    // ===== Voice: TTS & STT =====
+    function speak(text){
+      try{
+        const s = loadSettings();
+        const u = new SpeechSynthesisUtterance(text||"");
+        u.lang = s.language==="hi"?"hi-IN":s.language==="te"?"te-IN":"en-US";
+        speechSynthesis.cancel(); speechSynthesis.speak(u);
+      }catch{}
+    }
+    const hasSTT = ("webkitSpeechRecognition" in window) || ("SpeechRecognition" in window);
+    function startDictation(targetId, btn){
+      if (!hasSTT){ toast("Speech recognition not supported"); return; }
+      const s = loadSettings();
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const rec = new SR(); rec.lang = s.language==="hi"?"hi-IN":s.language==="te"?"te-IN":"en-US";
+      rec.interimResults = false; rec.maxAlternatives = 1;
+      btn.classList.add("recording");
+      rec.onresult = (ev)=>{
+        const text = ev.results[0][0].transcript || "";
+        const el = $(targetId);
+        if (["mobile","aadhaar","acctGet","updAcct","updMobile","delAcct"].includes(targetId)){
+          el.value = text.replace(/[^\d]/g,"");
+        } else {
+          el.value = text;
+        }
+      };
+      rec.onend = ()=> btn.classList.remove("recording");
+      rec.start();
+    }
+    document.querySelectorAll(".mic").forEach(btn=>{
+      const id=btn.getAttribute("data-mic");
+      btn.addEventListener("click", ()=> startDictation(id, btn));
+    });
+
+    // ===== Network helpers =====
     function buildHeaders(){
       const s = loadSettings();
-      const h = { "Content-Type":"application/json", "Accept":"application/json" };
-      if (s.api.clientIdHeader && s.api.clientIdValue) h[s.api.clientIdHeader] = s.api.clientIdValue;
-      if (s.api.clientSecretHeader && s.api.clientSecretValue) h[s.api.clientSecretHeader] = s.api.clientSecretValue;
+      const h = {"Content-Type":"application/json", "Accept":"application/json"};
+      if (s.api.clientIdHeader && s.api.clientIdValue) h[s.api.clientIdHeader]=s.api.clientIdValue;
+      if (s.api.clientSecretHeader && s.api.clientSecretValue) h[s.api.clientSecretHeader]=s.api.clientSecretValue;
       if (s.api.bearerToken) h["Authorization"] = `Bearer ${s.api.bearerToken}`;
       return h;
     }
     async function apiFetch(path, opts={}){
       const s = loadSettings();
-      if (!s.api.base) throw new Error("API Base URL not set (Settings)");
-      const url = s.api.base.replace(/\/+$/,"") + path;
+      const base = (s.api.base && s.api.base.trim()) ? s.api.base.trim().replace(/\/+$/,"") : "";
+      const url = base ? (base + path) : path; // allow relative (same origin) if empty
       const final = {
         method: opts.method || "GET",
         headers: { ...buildHeaders(), ...(opts.headers||{}) },
         credentials: s.api.useCreds ? "include" : "same-origin",
         body: opts.body ? (typeof opts.body==="string" ? opts.body : JSON.stringify(opts.body)) : undefined
       };
-      const attempt = async () => {
-        const ctl = new AbortController(); const t = setTimeout(()=>ctl.abort(), Number(s.api.timeout)||12000);
-        try { const res = await fetch(url, { ...final, signal: ctl.signal }); clearTimeout(t);
-          if (!res.ok) { const txt = await res.text().catch(()=> ""); throw new Error(`HTTP ${res.status}: ${txt || res.statusText}`); }
+      const attempt = async ()=>{
+        const ctl = new AbortController(); const t=setTimeout(()=>ctl.abort(), Number(s.api.timeout)||12000);
+        try{ const res = await fetch(url, { ...final, signal: ctl.signal }); clearTimeout(t);
+          if (!res.ok){ const txt = await res.text().catch(()=> ""); throw new Error(`HTTP ${res.status}: ${txt || res.statusText}`); }
           return res;
-        } catch (e) { clearTimeout(t); throw e; }
+        }catch(e){ clearTimeout(t); throw e; }
       };
       const retries = Math.max(0, Number(s.api.retries)||0);
-      for (let i=0;i<=retries;i++){ try { return await attempt(); } catch (e){ if (i===retries) throw e; await new Promise(r=>setTimeout(r, 500*Math.pow(2,i))); } }
+      for (let i=0;i<=retries;i++){ try{ return await attempt(); } catch(e){ if (i===retries) throw e; await new Promise(r=>setTimeout(r, 400*Math.pow(2,i))); } }
     }
-    function setJSON(preId, data){ const pre=$(preId); pre.textContent = typeof data==="string" ? data : JSON.stringify(data, null, 2); }
+    function setJSON(preId, data){ const el=$(preId); el.textContent = typeof data==="string" ? data : JSON.stringify(data, null, 2); }
     function copyText(txt){ navigator.clipboard?.writeText(txt).then(()=>toast("Copied")); }
 
-    // CRUD Input masks
-    $("mobile").addEventListener("input", ()=> { $("mobile").value = $("mobile").value.replace(/\D/g,"").slice(0,10); });
-    $("aadhaar").addEventListener("input", ()=> { $("aadhaar").value = $("aadhaar").value.replace(/\D/g,"").slice(0,12); });
-    $("updMobile").addEventListener("input", ()=> { $("updMobile").value = $("updMobile").value.replace(/\D/g,"").slice(0,10); });
+    // ===== Input masking =====
+    $("mobile").addEventListener("input", ()=> $("mobile").value=$("mobile").value.replace(/\D/g,"").slice(0,10));
+    $("aadhaar").addEventListener("input", ()=> $("aadhaar").value=$("aadhaar").value.replace(/\D/g,"").slice(0,12));
+    $("updMobile").addEventListener("input", ()=> $("updMobile").value=$("updMobile").value.replace(/\D/g,"").slice(0,10));
 
-    // Create
+    // ===== Create =====
     $("createBtn").addEventListener("click", async ()=>{
-      const payload = {
-        fullName: $("fullName").value.trim(),
-        email: $("email").value.trim(),
-        dob: $("dob").value.trim(),
-        mobile: $("mobile").value.trim(),
-        address: $("address").value.trim(),
-        aadhaar: $("aadhaar").value.trim(),
-        bankName: $("bankName").value.trim()
-      };
-      if (!/^\d{10}$/.test(payload.mobile)) return toast("Mobile must be 10 digits");
-      if (payload.aadhaar && !/^\d{12}$/.test(payload.aadhaar)) return toast("Aadhaar must be 12 digits");
-      if (!payload.fullName || !payload.email || !payload.dob) return toast("Full Name, Email, DOB required");
+      const fullName=$("fullName").value.trim();
+      const email=$("email").value.trim();
+      const dob=$("dob").value.trim();
+      const mobile=$("mobile").value.trim();
+      const address=$("address").value.trim();
+      const aadhaar=$("aadhaar").value.trim();
+      const bankName=$("bankName").value.trim();
 
-      try {
+      if (!/^\d{10}$/.test(mobile)) return toast("Mobile must be 10 digits");
+      if (aadhaar && !/^\d{12}$/.test(aadhaar)) return toast("Aadhaar must be 12 digits");
+      if (!fullName || !email || !dob) return toast("Full Name, Email, DOB required");
+
+      try{
         const res = await apiFetch(`/accounts`, {
           method:"POST",
-          body:{ adharNumber: payload.aadhaar, bankName: payload.bankName,
-            FullName: payload.fullName, dateOfBirth: payload.dob, mobileNumber: payload.mobile,
-            email: payload.email, address: payload.address
+          body:{
+            adharNumber: aadhaar, bankName,
+            FullName: fullName, dateOfBirth: dob, mobileNumber: mobile, email, address
           }
         });
         const js = await res.json().catch(()=> ({}));
         setJSON("createJson", js);
         $("createOut").className="result";
         $("createOut").textContent = js.message ? `${js.message}\nAccount: ${js.accountNumber||"(n/a)"}` : JSON.stringify(js,null,2);
-      } catch (e) {
-        $("createOut").className="result err"; $("createOut").textContent = e.message; setJSON("createJson", { error: e.message });
+      }catch(e){
+        $("createOut").className="result err"; $("createOut").textContent = e.message; setJSON("createJson", { error:e.message });
       }
     });
+    $("speakCreate").addEventListener("click", ()=> speak($("createOut").textContent||""));
     $("copyCreateJson").addEventListener("click", ()=> copyText($("createJson").textContent));
     $("dlCreateJson").addEventListener("click", ()=>{
       const blob = new Blob([$("createJson").textContent], { type:"application/json" });
-      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download="create.json"; a.click(); URL.revokeObjectURL(a.href);
+      const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="create.json"; a.click(); URL.revokeObjectURL(a.href);
     });
 
-    // Get
+    // ===== Get =====
     $("getBtn").addEventListener("click", async ()=>{
-      const acct = $("getAcct").value.trim();
-      if (!acct) return setJSON("getJson", { error: "Account number required" });
-      try {
+      const acct=$("acctGet").value.trim(); if (!acct) return toast("Account number required");
+      try{
         const res = await apiFetch(`/accounts/${encodeURIComponent(acct)}`, { method:"GET" });
         const js = await res.json().catch(()=> ({}));
         setJSON("getJson", js);
         $("getOut").className="result"; $("getOut").textContent = js.message || JSON.stringify(js,null,2);
-      } catch (e) {
-        $("getOut").className="result err"; $("getOut").textContent = e.message; setJSON("getJson", { error: e.message });
+      }catch(e){
+        $("getOut").className="result err"; $("getOut").textContent = e.message; setJSON("getJson", { error:e.message });
       }
     });
+    $("speakGet").addEventListener("click", ()=> speak($("getOut").textContent||""));
     $("copyGetJson").addEventListener("click", ()=> copyText($("getJson").textContent));
     $("dlGetJson").addEventListener("click", ()=>{
       const blob = new Blob([$("getJson").textContent], { type:"application/json" });
-      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download="get.json"; a.click(); URL.revokeObjectURL(a.href);
+      const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="get.json"; a.click(); URL.revokeObjectURL(a.href);
     });
 
-    // Update
+    // ===== Update =====
     $("updateBtn").addEventListener("click", async ()=>{
-      const acct = $("updAcct").value.trim(); if (!acct) return toast("Account number required");
-      const body = {};
-      if ($("updFullName").value.trim()) body.FullName = $("updFullName").value.trim();
-      if ($("updMobile").value.trim()) body.mobileNumber = $("updMobile").value.trim();
-      if ($("updAddress").value.trim()) body.address = $("updAddress").value.trim();
+      const acct=$("updAcct").value.trim(); if (!acct) return toast("Account number required");
+      const body={};
+      if ($("updFullName").value.trim()) body.FullName=$("updFullName").value.trim();
+      if ($("updMobile").value.trim()) body.mobileNumber=$("updMobile").value.trim();
+      if ($("updAddress").value.trim()) body.address=$("updAddress").value.trim();
       if (!Object.keys(body).length) return toast("Nothing to update");
 
-      try {
+      try{
         const res = await apiFetch(`/accounts/${encodeURIComponent(acct)}`, { method:"PUT", body });
         const js = await res.json().catch(()=> ({}));
         setJSON("updateJson", js);
-        $("updateOut").className="result"; $("updateOut").textContent = js.message ? `${js.message}\nAccount: ${js.accountNumber||"(n/a)"}` : JSON.stringify(js,null,2);
-      } catch (e) {
-        $("updateOut").className="result err"; $("updateOut").textContent = e.message; setJSON("updateJson", { error: e.message });
+        $("updateOut").className="result";
+        $("updateOut").textContent = js.message ? `${js.message}\nAccount: ${js.accountNumber||"(n/a)"}` : JSON.stringify(js,null,2);
+      }catch(e){
+        $("updateOut").className="result err"; $("updateOut").textContent = e.message; setJSON("updateJson", { error:e.message });
       }
     });
+    $("speakUpdate").addEventListener("click", ()=> speak($("updateOut").textContent||""));
     $("copyUpdateJson").addEventListener("click", ()=> copyText($("updateJson").textContent));
     $("dlUpdateJson").addEventListener("click", ()=>{
       const blob = new Blob([$("updateJson").textContent], { type:"application/json" });
-      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download="update.json"; a.click(); URL.revokeObjectURL(a.href);
+      const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="update.json"; a.click(); URL.revokeObjectURL(a.href);
     });
 
-    // Delete
+    // ===== Delete =====
     $("deleteBtn").addEventListener("click", async ()=>{
-      const acct = $("delAcct").value.trim(); if (!acct) return setJSON("deleteJson", { error: "Account number required" });
-      try {
+      const acct=$("delAcct").value.trim(); if (!acct) return toast("Account number required");
+      try{
         const res = await apiFetch(`/accounts/${encodeURIComponent(acct)}`, { method:"DELETE" });
         const text = await res.text().catch(()=> "");
         setJSON("deleteJson", text || { status:"deleted" });
         $("deleteOut").className="result"; $("deleteOut").textContent = text || "Deleted (see JSON)";
-      } catch (e) {
-        $("deleteOut").className="result err"; $("deleteOut").textContent = e.message; setJSON("deleteJson", { error: e.message });
+      }catch(e){
+        $("deleteOut").className="result err"; $("deleteOut").textContent = e.message; setJSON("deleteJson", { error:e.message });
       }
     });
+    $("speakDelete").addEventListener("click", ()=> speak($("deleteOut").textContent||""));
     $("copyDeleteJson").addEventListener("click", ()=> copyText($("deleteJson").textContent));
     $("dlDeleteJson").addEventListener("click", ()=>{
       const blob = new Blob([$("deleteJson").textContent], { type:"application/json" });
-      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download="delete.json"; a.click(); URL.revokeObjectURL(a.href);
+      const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="delete.json"; a.click(); URL.revokeObjectURL(a.href);
     });
 
-    // Settings handlers
+    // ===== Settings handlers =====
     let settings = loadSettings(); applySettings(settings);
+    $("themeToggle").addEventListener("click", ()=>{
+      const s=loadSettings(); const curr = document.documentElement.getAttribute("data-theme")==="light"?"dark":"light";
+      s.theme = (s.theme==="system") ? curr : (s.theme==="light"?"dark":"light"); saveSettings(s); applySettings(s);
+    });
+    $("language").addEventListener("change", ()=>{ const s=loadSettings(); s.language=$("language").value; saveSettings(s); applySettings(s); toast("Language saved"); });
     $("saveSettings").addEventListener("click", ()=>{
-      const s = loadSettings();
-      s.language = $("language").value; s.themeMode = $("themeMode").value; s.accent = $("accent").value;
-      s.highContrast = $("highContrast").checked; s.density = $("density").value;
-      s.fontSize = $("fontSize").value; s.reduceMotion = $("reduceMotion").checked;
-
-      s.api.base = $("apiBase").value.trim();
-      s.api.timeout = Number($("timeout").value)||12000; s.api.retries = Number($("retries").value)||0;
-      s.api.useCreds = $("useCreds").checked;
-      s.api.clientIdHeader = $("clientIdHeader").value.trim(); s.api.clientIdValue = $("clientIdValue").value.trim();
-      s.api.clientSecretHeader = $("clientSecretHeader").value.trim(); s.api.clientSecretValue = $("clientSecretValue").value.trim();
-      s.api.bearerToken = $("bearerToken").value.trim();
-
-      saveSettings(s); settings = s; applySettings(settings); toast("Settings saved");
+      const s=loadSettings();
+      s.theme=$("themeMode").value; s.accent=$("accent").value; s.highContrast=$("highContrast").checked;
+      s.density=$("density").value; s.fontSize=$("fontSize").value; s.reduceMotion=$("reduceMotion").checked;
+      s.api.base=$("apiBase").value.trim(); s.api.timeout=Number($("timeout").value)||12000; s.api.retries=Number($("retries").value)||0; s.api.useCreds=$("useCreds").checked;
+      s.api.clientIdHeader=$("clientIdHeader").value.trim(); s.api.clientIdValue=$("clientIdValue").value.trim();
+      s.api.clientSecretHeader=$("clientSecretHeader").value.trim(); s.api.clientSecretValue=$("clientSecretValue").value.trim();
+      s.api.bearerToken=$("bearerToken").value.trim();
+      saveSettings(s); applySettings(s); toast("Settings saved");
     });
-    $("resetSettings").addEventListener("click", ()=>{ saveSettings(defaultSettings); settings = loadSettings(); applySettings(settings); toast("Settings reset"); });
+    $("resetSettings").addEventListener("click", ()=>{ saveSettings(defaultSettings); applySettings(loadSettings()); toast("Settings reset"); });
     $("testHealth").addEventListener("click", async ()=>{
-      try { const res = await apiFetch("/health", { method:"GET" }); const js = await res.json().catch(()=> ({})); alert("Health OK:\n" + JSON.stringify(js, null, 2)); }
-      catch (e) { alert("Health ERROR:\n" + (e.message||e)); }
+      try{ const res = await apiFetch("/health", { method:"GET" }); const js = await res.json().catch(()=> ({})); alert("Health OK:\n" + JSON.stringify(js,null,2)); }
+      catch(e){ alert("Health ERROR:\n" + (e.message||e)); }
     });
 
-    // ===== Passkeys (WebAuthn) =====
-    const b64uToBuf = (v) => Uint8Array.from(atob(v.replace(/-/g,'+').replace(/_/g,'/')), c => c.charCodeAt(0));
-    const bufToB64u = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-    function logPK(obj){ $("passkeyLog").textContent = typeof obj==='string' ? obj : JSON.stringify(obj, null, 2); }
-
-    // Register
-    $("btnRegisterPasskey").addEventListener("click", async ()=>{
-      try {
-        const username = $("pkUsername").value.trim(); const displayName = $("pkDisplayName").value.trim();
-        if (!username) return alert("Username required");
-
-        const start = await apiFetch("/webauthn/register/start", { method:"POST", body:{ username, displayName } }).then(r=>r.json());
-        start.challenge = b64uToBuf(start.challenge); start.user.id = b64uToBuf(start.user.id);
-        if (start.excludeCredentials) start.excludeCredentials = start.excludeCredentials.map(c => ({...c, id: b64uToBuf(c.id)}));
-
-        const credential = await navigator.credentials.create({ publicKey: start });
-        const regRes = {
-          id: credential.id, rawId: bufToB64u(credential.rawId), type: credential.type,
-          response: { attestationObject: bufToB64u(credential.response.attestationObject), clientDataJSON: bufToB64u(credential.response.clientDataJSON) },
-          clientExtensionResults: credential.getClientExtensionResults(),
-        };
-        const finish = await apiFetch("/webauthn/register/finish", { method:"POST", body:{ username, ...regRes } }).then(r=>r.json());
-        logPK({ registerFinish: finish }); toast("Passkey registered");
-      } catch (e) { logPK({ error: String(e) }); alert("Registration failed: " + e.message); }
-    });
-
-    // Sign in
-    $("btnLoginPasskey").addEventListener("click", async ()=>{
-      try {
-        const username = $("pkUsername").value.trim(); if (!username) return alert("Username required");
-        const start = await apiFetch("/webauthn/authenticate/start", { method:"POST", body:{ username } }).then(r=>r.json());
-        start.challenge = b64uToBuf(start.challenge);
-        if (start.allowCredentials) start.allowCredentials = start.allowCredentials.map(c => ({...c, id: b64uToBuf(c.id)}));
-
-        const assertion = await navigator.credentials.get({ publicKey: start });
-        const authRes = {
-          id: assertion.id, rawId: bufToB64u(assertion.rawId), type: assertion.type,
-          response: {
-            authenticatorData: bufToB64u(assertion.response.authenticatorData),
-            clientDataJSON: bufToB64u(assertion.response.clientDataJSON),
-            signature: bufToB64u(assertion.response.signature),
-            userHandle: assertion.response.userHandle ? bufToB64u(assertion.response.userHandle) : null,
-          },
-          clientExtensionResults: assertion.getClientExtensionResults(),
-        };
-        const finish = await apiFetch("/webauthn/authenticate/finish", { method:"POST", body:{ username, ...authRes } }).then(r=>r.json());
-        logPK({ authFinish: finish }); if (finish.verified) toast("Signed in ✔"); else alert("Not verified");
-      } catch (e) { logPK({ error: String(e) }); alert("Login failed: " + e.message); }
-    });
-
-    // Conditional UI (optional)
-    $("btnLoginConditional").addEventListener("click", async ()=>{
-      try {
-        if (!('PublicKeyCredential' in window) || !('isConditionalMediationAvailable' in PublicKeyCredential)) return alert("Conditional UI not supported");
-        const available = await PublicKeyCredential.isConditionalMediationAvailable(); if (!available) return alert("Conditional mediation not available");
-
-        const start = await apiFetch("/webauthn/authenticate/start", { method:"POST", body:{ username: $("pkUsername").value.trim() } }).then(r=>r.json());
-        start.challenge = b64uToBuf(start.challenge); delete start.allowCredentials;
-
-        const assertion = await navigator.credentials.get({ publicKey: start, mediation: "conditional" });
-        // You can reuse the sign-in finish code here if needed
-        logPK({ conditionalUI: "assertion acquired; send to /webauthn/authenticate/finish" });
-      } catch (e) { logPK({ error: String(e) }); }
-    });
-
-    // Logout
-    $("btnLogout").addEventListener("click", async ()=>{
-      try { const res = await apiFetch("/logout", { method:"POST" }); await res.json(); toast("Signed out"); }
-      catch (e) { alert("Sign out failed"); }
-    });
-
-    // Footer, PWA
+    // Footer year
     $("year").textContent = new Date().getFullYear();
+
+    // ===== PWA register & install =====
     if ("serviceWorker" in navigator) window.addEventListener("load", ()=> navigator.serviceWorker.register("/service-worker.js").catch(console.error));
     let deferredPrompt=null;
-    window.addEventListener("beforeinstallprompt", e=>{ e.preventDefault(); deferredPrompt = e; const b=$("installBtn"); if (b) b.style.display="inline-flex"; });
-    const ib = $("installBtn"); if (ib) ib.addEventListener("click", async ()=>{ if(!deferredPrompt) return alert("Install not available"); deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; ib.style.display="none"; });
+    window.addEventListener("beforeinstallprompt", (e)=>{ e.preventDefault(); deferredPrompt=e; const b=$("installBtn"); if (b) b.style.display="inline-flex"; });
+    const ib=$("installBtn"); if (ib) ib.addEventListener("click", async ()=>{
+      if (!deferredPrompt) return alert("Install not available yet.");
+      deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; ib.style.display="none";
+    });
   </script>
 </body>
 </html>
