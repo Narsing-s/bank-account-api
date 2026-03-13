@@ -1,7 +1,7 @@
 {
   "name": "Bank Account — Android Web UI",
   "short_name": "BankAccount",
-  "description": "Android-style Bank Account UI with languages, voice, and PWA.",
+  "description": "Android-style Bank Account UI with languages, voice, passkeys, and PWA.",
   "lang": "en",
   "start_url": "/?source=pwa",
   "scope": "/",
