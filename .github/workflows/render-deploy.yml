@@ -1,0 +1,37 @@
+name: Deploy to Render (manual or on release)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target Render service (informational)"
+        type: string
+        default: "production"
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Trigger Render Deploy Hook
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate Deploy Hook secret
+        shell: bash
+        run: |
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
+            echo "❌ Missing secret: RENDER_DEPLOY_HOOK"
+            echo "Set it in GitHub → Settings → Secrets and variables → Actions"
+            exit 1
+          fi
+
+      - name: Call Deploy Hook
+        shell: bash
+        env:
+          DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          echo "Triggering Render deploy hook…"
+          curl -fsSL -X POST "$DEPLOY_HOOK"
+          echo "✅ Deploy hook invoked"
