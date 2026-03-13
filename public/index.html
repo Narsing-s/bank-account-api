@@ -5,21 +5,18 @@
   <title>Bank Account Management</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="robots" content="index,follow" />
-  <meta name="description" content="Create, get, update, and delete bank accounts with an Android-like, multilingual web UI. Voice input/output, JSON panels, and network settings included." />
+  <meta name="description" content="Create, get, update, and delete bank accounts with an Android-like, multilingual web UI. Voice input/output, JSON panels, network settings, and biometric login (Passkeys/WebAuthn)." />
   <!-- PWA hooks -->
-  /manifest.webmanifest
+  <link rel="manifest" href="/manifest.webmanifest">
   <meta name="theme-color" content="#0f172a" />
-  /icons/icon-192.png
-  /icons/icon-192.png
+  <link rel="icon" href="/icons/icon-192.png">
 
   <style>
-    /* ===== Tokens ===== */
     :root {
       --bg: #0f172a; --surface: #1f2a44; --text: #e5e7eb; --muted: #a1a1aa;
-      --border: #2b3553; --accent: #0ea5e9; --danger:#ef4444;
+      --border: #2b3553; --accent: #0ea5e9; --danger: #ef4444;
       --radius: 12px; --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --gap: 14px; --field-h: 48px;
-      --font-scale: 1; --density: 1;
+      --gap: 14px; --field-h: 48px; --font-scale: 1; --density: 1;
     }
     [data-theme="light"]{
       --bg:#f7fafc; --surface:#ffffff; --text:#111827; --muted:#6b7280; --border:#e5e7eb;
@@ -27,12 +24,10 @@
     .hc { --text: #fff; --border: #fff; }
     html,body{height:100%}
     body{
-      margin:0; color:var(--text); font: calc(16px * var(--font-scale))/1.5 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
-      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-      background-color: var(--bg);
+      margin:0; color:var(--text); font: calc(16px * var(--font-scale))/1.5 system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Noto Sans";
+      background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); background-color: var(--bg);
     }
 
-    /* ===== Header ===== */
     .app-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;backdrop-filter:blur(6px)}
     .brand{display:flex;align-items:center;gap:10px}
     .brand h1{margin:0;font-size:1.25rem}
@@ -42,10 +37,8 @@
     .btn.danger{background:var(--danger); color:#fff; border:none}
     .btn.ghost{background:transparent}
 
-    /* ===== Layout ===== */
     .container{max-width: 980px; margin:0 auto; padding:20px; display:grid; gap:16px}
     .card{background:color-mix(in oklab, var(--surface) 85%, transparent); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px}
-
     .tabs{display:flex;gap:8px;flex-wrap:wrap}
     .tab{padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer}
     .tab.active{background:linear-gradient(135deg, var(--accent), #5aa1ff);color:#081226;border:none}
@@ -62,15 +55,11 @@
 
     label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
     .inwrap{position:relative}
-    input,select,textarea{width:100%;height:var(--field-h);padding:12px 44px 12px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);outline:none}
-    textarea{height:auto;min-height:calc(var(--field-h)*2);resize:vertical;padding-right:14px}
+    input,select,textarea{width:100%;height:var(--field-h);padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text);outline:none}
+    textarea{height:auto;min-height:calc(var(--field-h)*2);resize:vertical}
     input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px color-mix(in oklab, var(--accent) 35%, transparent); border-color:var(--accent)}
 
-    .mic{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.1);border:1px solid var(--border);cursor:pointer}
-    .mic.recording{background:rgba(255,0,0,.25); border-color: rgba(255,0,0,.35)}
-
     .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-
     .result{margin-top:10px;border:1px dashed var(--border);background:rgba(0,0,0,.2);padding:12px;border-radius:12px;white-space:pre-wrap;word-break:break-word;min-height:44px}
     .result.err{color:#ffb3b3;background:rgba(255,0,0,.08);border-color:rgba(255,0,0,.25)}
 
@@ -80,14 +69,6 @@
     .jsonbody pre{margin:0;padding:12px;font-family:ui-monospace,Menlo,Consolas,Monaco,"Courier New",monospace;color:#d7eaff}
     .jsontools{display:flex;gap:6px}
 
-    /* Settings dialog */
-    dialog.panel{border:none;padding:0;width:min(760px,94vw);max-height:92vh;border-radius:var(--radius);background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
-    dialog.panel::backdrop{background:rgba(0,0,0,.5)}
-    .panel-hd,.panel-ft{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border)}
-    .panel-ft{border-top:1px solid var(--border);border-bottom:none}
-    .panel-bd{padding:16px;display:grid;gap:16px}
-
-    /* Toast */
     .toast{position:fixed;right:20px;bottom:20px;background:var(--surface);border:1px solid var(--border);padding:.75rem 1rem;border-radius:var(--radius);box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:opacity .25s ease,transform .25s ease}
     .toast.show{opacity:1;transform:translateY(0)}
   </style>
@@ -97,10 +78,10 @@
   <header class="app-header">
     <div class="brand">
       <span class="icon">🏦</span>
-      <h1 data-i18n="title">Bank Account Management</h1>
+      <h1>Bank Account Management</h1>
     </div>
     <div style="display:flex;gap:8px">
-      <button id="openSettingsBtn" class="btn ghost" aria-haspopup="dialog" aria-controls="settingsPanel" data-i18n="settings">Settings</button>
+      <button id="openSettings" class="btn ghost">Settings</button>
     </div>
   </header>
 
@@ -108,58 +89,36 @@
   <main class="container">
     <section class="card">
       <div class="tabs">
-        <button id="tabCreate" class="tab active" data-i18n="tab_create">Create</button>
-        <button id="tabGet" class="tab" data-i18n="tab_get">Get</button>
-        <button id="tabUpdate" class="tab" data-i18n="tab_update">Update</button>
-        <button id="tabDelete" class="tab" data-i18n="tab_delete">Delete</button>
-        <button id="tabSettings" class="tab" data-i18n="tab_settings">Settings</button>
+        <button id="tabCreate" class="tab active">Create</button>
+        <button id="tabGet" class="tab">Get</button>
+        <button id="tabUpdate" class="tab">Update</button>
+        <button id="tabDelete" class="tab">Delete</button>
+        <button id="tabSettings" class="tab">Settings</button>
       </div>
 
       <!-- Create -->
-      <div id="panelCreate" class="panel active" aria-labelledby="createTitle">
+      <div id="panelCreate" class="panel active">
         <div class="grid">
-          <div class="field"><label data-i18n="fullName">Full Name</label>
-            <div class="inwrap"><input id="fullName" placeholder="John Doe" /><button class="mic" data-mic="fullName">🎤</button></div>
-          </div>
-          <div class="field"><label data-i18n="email">Email</label>
-            <div class="inwrap"><input id="email" type="email" placeholder="john@example.com" /><button class="mic" data-mic="email">🎤</button></div>
-          </div>
-          <div class="field"><label data-i18n="dob">Date of Birth</label>
-            <div class="inwrap"><input id="dob" type="date" /><button class="mic" data-mic="dob">🎤</button></div>
-          </div>
-
-          <div class="field"><label data-i18n="mobile">Mobile (10 digits)</label>
-            <div class="inwrap"><input id="mobile" inputmode="numeric" maxlength="10" placeholder="9876543210" /><button class="mic" data-mic="mobile">🎤</button></div>
-          </div>
-          <div class="field-6"><label data-i18n="address">Address</label>
-            <div class="inwrap"><input id="address" placeholder="Street, City" /><button class="mic" data-mic="address">🎤</button></div>
-          </div>
-          <div class="field"><label data-i18n="aadhaar">Aadhaar (12 digits)</label>
-            <div class="inwrap"><input id="aadhaar" inputmode="numeric" maxlength="12" placeholder="123456789012" /><button class="mic" data-mic="aadhaar">🎤</button></div>
-          </div>
-
-          <div class="field-6"><label data-i18n="bankName">Bank</label>
-            <div class="inwrap">
-              <select id="bankName">
-                <option>HDFC</option>
-                <option>SBI</option>
-                <option>APGIVB</option>
-                <option>AXIS</option>
-                <option>ICICI</option>
-              </select>
-            </div>
+          <div class="field"><label>Full Name</label><input id="fullName" placeholder="John Doe"/></div>
+          <div class="field"><label>Email</label><input id="email" type="email" placeholder="john@example.com"/></div>
+          <div class="field"><label>Date of Birth</label><input id="dob" type="date"/></div>
+          <div class="field"><label>Mobile (10 digits)</label><input id="mobile" inputmode="numeric" maxlength="10" placeholder="9876543210"/></div>
+          <div class="field-6"><label>Address</label><input id="address" placeholder="Street, City"/></div>
+          <div class="field"><label>Aadhaar (12 digits)</label><input id="aadhaar" inputmode="numeric" maxlength="12" placeholder="123456789012"/></div>
+          <div class="field-6"><label>Bank</label>
+            <select id="bankName">
+              <option>HDFC</option><option>SBI</option><option>APGIVB</option><option>AXIS</option><option>ICICI</option>
+            </select>
           </div>
         </div>
 
         <div class="actions">
-          <button id="createBtn" class="btn primary" data-i18n="btn_create">Create Account</button>
-          <button id="createSpeak" class="btn" title="Speak result">🔊</button>
+          <button id="createBtn" class="btn primary">Create Account</button>
         </div>
-
         <div id="createOut" class="result" aria-live="polite"></div>
 
         <div class="jsonbox">
-          <div class="jsonhdr"><b data-i18n="json_raw">Raw JSON</b>
+          <div class="jsonhdr"><b>Raw JSON</b>
             <div class="jsontools">
               <button class="btn" id="copyCreateJson">Copy</button>
               <button class="btn" id="dlCreateJson">Download</button>
@@ -173,22 +132,13 @@
       <!-- Get -->
       <div id="panelGet" class="panel">
         <div class="grid">
-          <div class="field-6">
-            <label data-i18n="acctNumber">Account Number</label>
-            <div class="inwrap">
-              <input id="getAcct" placeholder="63412021212" />
-              <button class="mic" data-mic="getAcct">🎤</button>
-            </div>
-          </div>
+          <div class="field-6"><label>Account Number</label><input id="getAcct" placeholder="63412021212"/></div>
         </div>
-        <div class="actions">
-          <button id="getBtn" class="btn primary" data-i18n="btn_get">Get Account</button>
-          <button id="getSpeak" class="btn" title="Speak result">🔊</button>
-        </div>
+        <div class="actions"><button id="getBtn" class="btn primary">Get Account</button></div>
         <div id="getOut" class="result" aria-live="polite"></div>
 
         <div class="jsonbox">
-          <div class="jsonhdr"><b data-i18n="json_raw">Raw JSON</b>
+          <div class="jsonhdr"><b>Raw JSON</b>
             <div class="jsontools">
               <button class="btn" id="copyGetJson">Copy</button>
               <button class="btn" id="dlGetJson">Download</button>
@@ -202,27 +152,16 @@
       <!-- Update -->
       <div id="panelUpdate" class="panel">
         <div class="grid">
-          <div class="field"><label data-i18n="acctNumber">Account Number</label>
-            <div class="inwrap"><input id="updAcct" placeholder="63412021212"/><button class="mic" data-mic="updAcct">🎤</button></div>
-          </div>
-          <div class="field"><label data-i18n="fullName">Full Name</label>
-            <div class="inwrap"><input id="updFullName" placeholder="Optional"/><button class="mic" data-mic="updFullName">🎤</button></div>
-          </div>
-          <div class="field"><label data-i18n="mobile">Mobile</label>
-            <div class="inwrap"><input id="updMobile" inputmode="numeric" maxlength="10" placeholder="Optional"/><button class="mic" data-mic="updMobile">🎤</button></div>
-          </div>
-          <div class="field-6"><label data-i18n="address">Address</label>
-            <div class="inwrap"><input id="updAddress" placeholder="Optional"/><button class="mic" data-mic="updAddress">🎤</button></div>
-          </div>
+          <div class="field"><label>Account Number</label><input id="updAcct" placeholder="63412021212"/></div>
+          <div class="field"><label>Full Name</label><input id="updFullName" placeholder="Optional"/></div>
+          <div class="field"><label>Mobile</label><input id="updMobile" inputmode="numeric" maxlength="10" placeholder="Optional"/></div>
+          <div class="field-6"><label>Address</label><input id="updAddress" placeholder="Optional"/></div>
         </div>
-        <div class="actions">
-          <button id="updateBtn" class="btn primary" data-i18n="btn_update">Update</button>
-          <button id="updateSpeak" class="btn" title="Speak result">🔊</button>
-        </div>
+        <div class="actions"><button id="updateBtn" class="btn primary">Update</button></div>
         <div id="updateOut" class="result" aria-live="polite"></div>
 
         <div class="jsonbox">
-          <div class="jsonhdr"><b data-i18n="json_raw">Raw JSON</b>
+          <div class="jsonhdr"><b>Raw JSON</b>
             <div class="jsontools">
               <button class="btn" id="copyUpdateJson">Copy</button>
               <button class="btn" id="dlUpdateJson">Download</button>
@@ -236,19 +175,13 @@
       <!-- Delete -->
       <div id="panelDelete" class="panel">
         <div class="grid">
-          <div class="field-6">
-            <label data-i18n="acctNumber">Account Number</label>
-            <div class="inwrap"><input id="delAcct" placeholder="63412021212"/><button class="mic" data-mic="delAcct">🎤</button></div>
-          </div>
+          <div class="field-6"><label>Account Number</label><input id="delAcct" placeholder="63412021212"/></div>
         </div>
-        <div class="actions">
-          <button id="deleteBtn" class="btn danger" data-i18n="btn_delete">Delete</button>
-          <button id="deleteSpeak" class="btn" title="Speak result">🔊</button>
-        </div>
+        <div class="actions"><button id="deleteBtn" class="btn danger">Delete</button></div>
         <div id="deleteOut" class="result" aria-live="polite"></div>
 
         <div class="jsonbox">
-          <div class="jsonhdr"><b data-i18n="json_raw">Raw JSON</b>
+          <div class="jsonhdr"><b>Raw JSON</b>
             <div class="jsontools">
               <button class="btn" id="copyDeleteJson">Copy</button>
               <button class="btn" id="dlDeleteJson">Download</button>
@@ -262,20 +195,11 @@
       <!-- Settings -->
       <div id="panelSettings" class="panel">
         <div class="grid">
-          <div class="field-6">
-            <label>Language</label>
-            <select id="language">
-              <option value="en">English</option>
-              <option value="te">తెలుగు</option>
-              <option value="hi">हिन्दी</option>
-            </select>
+          <div class="field-6"><label>Language</label>
+            <select id="language"><option value="en">English</option><option value="te">తెలుగు</option><option value="hi">हिन्दी</option></select>
           </div>
           <div class="field"><label>Theme</label>
-            <select id="themeMode">
-              <option value="system">System</option>
-              <option value="light">Light</option>
-              <option value="dark" selected>Dark</option>
-            </select>
+            <select id="themeMode"><option value="system">System</option><option value="light">Light</option><option value="dark" selected>Dark</option></select>
           </div>
           <div class="field"><label>Accent</label><input id="accent" type="color" value="#0ea5e9" /></div>
           <div class="field"><label>High Contrast</label><input id="highContrast" type="checkbox" /></div>
@@ -310,13 +234,30 @@
             <button id="saveSettings" class="btn primary">Save</button>
             <button id="resetSettings" class="btn">Reset</button>
           </div>
+
+          <div class="field-12"><hr style="border-color:var(--border);opacity:.4"></div>
+
+          <!-- Passkeys -->
+          <div class="field-12"><h3>Biometric Login (Passkey)</h3></div>
+          <div class="field-6"><label>Username</label><input id="pkUsername" placeholder="e.g., narsing"/></div>
+          <div class="field-6"><label>Display name (optional)</label><input id="pkDisplayName" placeholder="Visible on device"/></div>
+          <div class="field-12" style="display:flex;gap:8px;flex-wrap:wrap">
+            <button id="btnRegisterPasskey" class="btn">Register Passkey</button>
+            <button id="btnLoginPasskey" class="btn primary">Sign in with Passkey</button>
+            <button id="btnLoginConditional" class="btn">Try Conditional UI</button>
+            <button id="btnLogout" class="btn">Sign out</button>
+          </div>
+          <div class="jsonbox">
+            <div class="jsonhdr"><b>Passkey Debug</b><span>▼</span></div>
+            <div class="jsonbody"><pre id="passkeyLog">{}</pre></div>
+          </div>
         </div>
       </div>
     </section>
 
     <div style="display:flex;justify-content:space-between;align-items:center;color:var(--muted)">
       <div>© <span id="year"></span> #CreatedByNarsing-s</div>
-      https://github.com/Narsing-s#CreatedByNarsing-s</a>
+      <a href="https://github.com/Narsing-s" target="_blank" style="color:var(--muted);text-decoration:none">GitHub</a>
     </div>
   </main>
 
@@ -324,75 +265,32 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script>
-    // ---------- Helpers ----------
-    const $ = (id) => document.getElementById(id); // single global helper
+    // ===== Helpers & Settings =====
+    const $ = (id) => document.getElementById(id);
     const toastEl = $("toast");
     function toast(msg){ toastEl.textContent = msg; toastEl.classList.add("show"); setTimeout(()=>toastEl.classList.remove("show"), 2200); }
-    const STR = {
-      en: { title:"Bank Account Management", settings:"Settings", tab_create:"Create", tab_get:"Get", tab_update:"Update", tab_delete:"Delete",
-        fullName:"Full Name", email:"Email", dob:"Date of Birth", mobile:"Mobile", address:"Address", aadhaar:"Aadhaar (12 digits)", bankName:"Bank",
-        acctNumber:"Account Number", btn_create:"Create Account", btn_get:"Get Account", btn_update:"Update", btn_delete:"Delete", json_raw:"Raw JSON" },
-      te: { title:"బ్యాంక్ ఖాతా నిర్వహణ", settings:"సెట్టింగ్స్", tab_create:"సృష్టించండి", tab_get:"తీసుకోండి", tab_update:"నవీకరించండి", tab_delete:"తొలగించండి",
-        fullName:"పూర్తి పేరు", email:"ఈమెయిల్", dob:"పుట్టిన తేదీ", mobile:"మొబైల్", address:"చిరునామా", aadhaar:"ఆధార్ (12 అంకెలు)", bankName:"బ్యాంక్",
-        acctNumber:"ఖాతా సంఖ్య", btn_create:"ఖాతా సృష్టించండి", btn_get:"ఖాతా పొందండి", btn_update:"నవీకరణ", btn_delete:"తొలగించండి", json_raw:"మూల JSON" },
-      hi: { title:"बैंक खाता प्रबंधन", settings:"सेटिंग्स", tab_create:"बनाएँ", tab_get:"प्राप्त करें", tab_update:"अपडेट करें", tab_delete:"हटाएँ",
-        fullName:"पूरा नाम", email:"ईमेल", dob:"जन्म तिथि", mobile:"मोबाइल", address:"पता", aadhaar:"आधार (12 अंक)", bankName:"बैंक",
-        acctNumber:"खाता संख्या", btn_create:"खाता बनाएँ", btn_get:"खाता प्राप्त करें", btn_update:"अपडेट", btn_delete:"हटाएँ", json_raw:"कच्चा JSON" }
-    };
-    const rtl = new Set(["ar","ur","fa","he"]);
-    function applyLang(lang){
-      const dict = STR[lang] || STR.en;
-      document.querySelectorAll("[data-i18n]").forEach(el=>{
-        const k = el.getAttribute("data-i18n");
-        if (dict[k]) el.textContent = dict[k];
-      });
-      document.documentElement.lang = lang;
-      document.documentElement.dir = rtl.has(lang) ? "rtl" : "ltr";
-    }
 
-    // ---------- Settings model ----------
     const SETTINGS_KEY="bankapp:settings";
     const defaultSettings = {
-      language: "en",
-      themeMode: "dark",
-      accent: "#0ea5e9",
-      highContrast: false,
-      density: "comfortable",
-      fontSize: "md",
-      reduceMotion: false,
-      api: {
-        base: "",       // e.g., https://your-proxy.onrender.com
-        timeout: 12000, // ms
-        retries: 1,     // retry count
-        useCreds: false,
-        clientIdHeader: "",
-        clientIdValue: "",
-        clientSecretHeader: "",
-        clientSecretValue: "",
-        bearerToken: ""
-      }
+      language: "en", themeMode: "dark", accent: "#0ea5e9", highContrast: false,
+      density: "comfortable", fontSize: "md", reduceMotion: false,
+      api: { base: "", timeout: 12000, retries: 1, useCreds: false, clientIdHeader:"",clientIdValue:"",clientSecretHeader:"",clientSecretValue:"", bearerToken:"" }
     };
-    function loadSettings(){
-      try { return { ...defaultSettings, ...(JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}")) }; }
-      catch { return { ...defaultSettings }; }
-    }
+    function loadSettings(){ try { return { ...defaultSettings, ...(JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}")) }; } catch { return { ...defaultSettings }; } }
     function saveSettings(s){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
-
     function applySettings(s){
-      // Theme
       const root = document.documentElement;
-      root.setAttribute("data-theme", s.themeMode === "light" ? "light" : "dark");
-      if (s.themeMode === "system") {
+      root.setAttribute("data-theme", s.themeMode==="light"?"light":"dark");
+      if (s.themeMode==="system") {
         const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
-        root.setAttribute("data-theme", prefersLight ? "light" : "dark");
+        root.setAttribute("data-theme", prefersLight?"light":"dark");
       }
       if (s.highContrast) root.classList.add("hc"); else root.classList.remove("hc");
-      root.style.setProperty("--font-scale", s.fontSize === "sm" ? 0.9 : s.fontSize === "lg" ? 1.1 : 1);
-      root.style.setProperty("--density", s.density === "compact" ? 0.85 : 1);
+      root.style.setProperty("--font-scale", s.fontSize==="sm"?0.9:(s.fontSize==="lg"?1.1:1));
+      root.style.setProperty("--density", s.density==="compact"?0.85:1);
       root.style.setProperty("--accent", s.accent);
       document.body.style.setProperty("transition", s.reduceMotion ? "none" : "");
 
-      // Controls
       $("language").value = s.language;
       $("themeMode").value = s.themeMode;
       $("accent").value = s.accent;
@@ -405,82 +303,32 @@
       $("timeout").value = s.api.timeout;
       $("retries").value = s.api.retries;
       $("useCreds").checked = s.api.useCreds;
+
       $("clientIdHeader").value = s.api.clientIdHeader;
       $("clientIdValue").value = s.api.clientIdValue;
       $("clientSecretHeader").value = s.api.clientSecretHeader;
       $("clientSecretValue").value = s.api.clientSecretValue;
       $("bearerToken").value = s.api.bearerToken;
-
-      applyLang(s.language);
     }
 
-    // ---------- Tabs ----------
-    const tabs = [
-      ["tabCreate","panelCreate"],
-      ["tabGet","panelGet"],
-      ["tabUpdate","panelUpdate"],
-      ["tabDelete","panelDelete"],
-      ["tabSettings","panelSettings"]
-    ];
-    tabs.forEach(([tId,pId])=>{
-      $(tId).addEventListener("click", ()=>{
-        tabs.forEach(([tt,pp])=>{
-          $(tt).classList.toggle("active", tt===tId);
-          $(pp).classList.toggle("active", pp===pId);
-        });
-      });
-    });
+    // Tabs
+    const tabs = [["tabCreate","panelCreate"],["tabGet","panelGet"],["tabUpdate","panelUpdate"],["tabDelete","panelDelete"],["tabSettings","panelSettings"]];
+    tabs.forEach(([t,p])=> $(t).addEventListener("click", ()=>{
+      tabs.forEach(([tt,pp])=>{ $(tt).classList.toggle("active", tt===t); $(pp).classList.toggle("active", pp===p); });
+    }));
+    $("openSettings").addEventListener("click", ()=> { tabs.forEach(([tt,pp])=>{ $(tt).classList.toggle("active", tt==="tabSettings"); $(pp).classList.toggle("active", pp==="panelSettings");}); });
 
-    // ---------- Collapsible JSON ----------
+    // Collapsible JSON
     document.querySelectorAll(".jsonbox").forEach(box=>{
       const hdr = box.querySelector(".jsonhdr");
       const body = box.querySelector(".jsonbody");
       hdr.addEventListener("click", ()=>{
-        const open = body.style.display==="block";
-        body.style.display = open ? "none" : "block";
+        const open = body.style.display==="block"; body.style.display = open ? "none" : "block";
         hdr.querySelector("span").textContent = open ? "▼" : "▲";
       });
     });
 
-    // ---------- Voice (TTS/STT) ----------
-    function speak(text){
-      try {
-        const lang = loadSettings().language;
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = lang==="hi" ? "hi-IN" : lang==="te" ? "te-IN" : "en-US";
-        speechSynthesis.cancel(); speechSynthesis.speak(u);
-      } catch {}
-    }
-    const hasSTT = ("webkitSpeechRecognition" in window) || ("SpeechRecognition" in window);
-    function startDictation(targetId, btn){
-      if (!hasSTT) return toast("Speech recognition not supported");
-      const s = loadSettings();
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const rec = new SR();
-      rec.lang = s.language==="hi"?"hi-IN":s.language==="te"?"te-IN":"en-US";
-      rec.interimResults = false; rec.maxAlternatives = 1;
-      btn.classList.add("recording");
-      rec.onresult = (ev)=>{
-        const text = ev.results[0][0].transcript || "";
-        const el = $(targetId);
-        // Try parse number for numeric fields, else put text
-        const numeric = ["mobile","aadhaar","getAcct","updAcct","updMobile","delAcct"];
-        if (numeric.includes(targetId)) {
-          const num = text.replace(/[^\d]/g,"");
-          el.value = num;
-        } else {
-          el.value = text;
-        }
-      };
-      rec.onend = ()=> btn.classList.remove("recording");
-      rec.start();
-    }
-    document.querySelectorAll(".mic").forEach(btn=>{
-      const id = btn.getAttribute("data-mic");
-      btn.addEventListener("click", ()=>startDictation(id, btn));
-    });
-
-    // ---------- Network helpers ----------
+    // Network helpers
     function buildHeaders(){
       const s = loadSettings();
       const h = { "Content-Type":"application/json", "Accept":"application/json" };
@@ -500,98 +348,82 @@
         body: opts.body ? (typeof opts.body==="string" ? opts.body : JSON.stringify(opts.body)) : undefined
       };
       const attempt = async () => {
-        const ctl = new AbortController();
-        const t = setTimeout(()=>ctl.abort(), Number(s.api.timeout) || 12000);
-        try {
-          const res = await fetch(url, { ...final, signal: ctl.signal });
-          clearTimeout(t);
-          if (!res.ok) {
-            const txt = await res.text().catch(()=> "");
-            throw new Error(`HTTP ${res.status}: ${txt || res.statusText}`);
-          }
+        const ctl = new AbortController(); const t = setTimeout(()=>ctl.abort(), Number(s.api.timeout)||12000);
+        try { const res = await fetch(url, { ...final, signal: ctl.signal }); clearTimeout(t);
+          if (!res.ok) { const txt = await res.text().catch(()=> ""); throw new Error(`HTTP ${res.status}: ${txt || res.statusText}`); }
           return res;
         } catch (e) { clearTimeout(t); throw e; }
       };
       const retries = Math.max(0, Number(s.api.retries)||0);
-      for (let i=0;i<=retries;i++){
-        try { return await attempt(); }
-        catch (e) { if (i===retries) throw e; await new Promise(r=>setTimeout(r, 500*Math.pow(2,i))); }
-      }
+      for (let i=0;i<=retries;i++){ try { return await attempt(); } catch (e){ if (i===retries) throw e; await new Promise(r=>setTimeout(r, 500*Math.pow(2,i))); } }
     }
-    function setJSON(preId, data){
-      const pre = $(preId);
-      pre.textContent = typeof data==="string" ? data : JSON.stringify(data, null, 2);
-    }
+    function setJSON(preId, data){ const pre=$(preId); pre.textContent = typeof data==="string" ? data : JSON.stringify(data, null, 2); }
     function copyText(txt){ navigator.clipboard?.writeText(txt).then(()=>toast("Copied")); }
 
-    // ---------- Create ----------
+    // CRUD Input masks
     $("mobile").addEventListener("input", ()=> { $("mobile").value = $("mobile").value.replace(/\D/g,"").slice(0,10); });
     $("aadhaar").addEventListener("input", ()=> { $("aadhaar").value = $("aadhaar").value.replace(/\D/g,"").slice(0,12); });
+    $("updMobile").addEventListener("input", ()=> { $("updMobile").value = $("updMobile").value.replace(/\D/g,"").slice(0,10); });
 
+    // Create
     $("createBtn").addEventListener("click", async ()=>{
-      const fullName = $("fullName").value.trim();
-      const email = $("email").value.trim();
-      const dob = $("dob").value.trim();
-      const mobile = $("mobile").value.trim();
-      const address = $("address").value.trim();
-      const aadhaar = $("aadhaar").value.trim();
-      const bankName = $("bankName").value.trim();
-
-      if (!/^\d{10}$/.test(mobile)) { toast("Mobile must be 10 digits"); return; }
-      if (aadhaar && !/^\d{12}$/.test(aadhaar)) { toast("Aadhaar must be 12 digits"); return; }
-      if (!fullName || !email || !dob) { toast("Full Name, Email, DOB required"); return; }
+      const payload = {
+        fullName: $("fullName").value.trim(),
+        email: $("email").value.trim(),
+        dob: $("dob").value.trim(),
+        mobile: $("mobile").value.trim(),
+        address: $("address").value.trim(),
+        aadhaar: $("aadhaar").value.trim(),
+        bankName: $("bankName").value.trim()
+      };
+      if (!/^\d{10}$/.test(payload.mobile)) return toast("Mobile must be 10 digits");
+      if (payload.aadhaar && !/^\d{12}$/.test(payload.aadhaar)) return toast("Aadhaar must be 12 digits");
+      if (!payload.fullName || !payload.email || !payload.dob) return toast("Full Name, Email, DOB required");
 
       try {
-        const res = await apiFetch(`/accounts?adharNumber=${encodeURIComponent(aadhaar)}&bankName=${encodeURIComponent(bankName)}`, {
+        const res = await apiFetch(`/accounts`, {
           method:"POST",
-          body:{ FullName: fullName, dateOfBirth: dob, mobileNumber: mobile, email, address }
+          body:{ adharNumber: payload.aadhaar, bankName: payload.bankName,
+            FullName: payload.fullName, dateOfBirth: payload.dob, mobileNumber: payload.mobile,
+            email: payload.email, address: payload.address
+          }
         });
         const js = await res.json().catch(()=> ({}));
         setJSON("createJson", js);
         $("createOut").className="result";
         $("createOut").textContent = js.message ? `${js.message}\nAccount: ${js.accountNumber||"(n/a)"}` : JSON.stringify(js,null,2);
       } catch (e) {
-        $("createOut").className="result err";
-        $("createOut").textContent = e.message;
-        setJSON("createJson", { error: e.message });
+        $("createOut").className="result err"; $("createOut").textContent = e.message; setJSON("createJson", { error: e.message });
       }
     });
-    $("createSpeak").addEventListener("click", ()=> speak($("createOut").textContent || "") );
     $("copyCreateJson").addEventListener("click", ()=> copyText($("createJson").textContent));
     $("dlCreateJson").addEventListener("click", ()=>{
       const blob = new Blob([$("createJson").textContent], { type:"application/json" });
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download="create.json"; a.click(); URL.revokeObjectURL(a.href);
     });
 
-    // ---------- Get ----------
+    // Get
     $("getBtn").addEventListener("click", async ()=>{
       const acct = $("getAcct").value.trim();
-      if (!acct) return toast("Account number required");
+      if (!acct) return setJSON("getJson", { error: "Account number required" });
       try {
         const res = await apiFetch(`/accounts/${encodeURIComponent(acct)}`, { method:"GET" });
         const js = await res.json().catch(()=> ({}));
         setJSON("getJson", js);
-        $("getOut").className="result";
-        $("getOut").textContent = js.message ? js.message : JSON.stringify(js,null,2);
+        $("getOut").className="result"; $("getOut").textContent = js.message || JSON.stringify(js,null,2);
       } catch (e) {
-        $("getOut").className="result err";
-        $("getOut").textContent = e.message;
-        setJSON("getJson", { error: e.message });
+        $("getOut").className="result err"; $("getOut").textContent = e.message; setJSON("getJson", { error: e.message });
       }
     });
-    $("getSpeak").addEventListener("click", ()=> speak($("getOut").textContent || "") );
     $("copyGetJson").addEventListener("click", ()=> copyText($("getJson").textContent));
     $("dlGetJson").addEventListener("click", ()=>{
       const blob = new Blob([$("getJson").textContent], { type:"application/json" });
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download="get.json"; a.click(); URL.revokeObjectURL(a.href);
     });
 
-    // ---------- Update ----------
-    $("updMobile").addEventListener("input", ()=> { $("updMobile").value = $("updMobile").value.replace(/\D/g,"").slice(0,10); });
-
+    // Update
     $("updateBtn").addEventListener("click", async ()=>{
-      const acct = $("updAcct").value.trim();
-      if (!acct) return toast("Account number required");
+      const acct = $("updAcct").value.trim(); if (!acct) return toast("Account number required");
       const body = {};
       if ($("updFullName").value.trim()) body.FullName = $("updFullName").value.trim();
       if ($("updMobile").value.trim()) body.mobileNumber = $("updMobile").value.trim();
@@ -602,109 +434,135 @@
         const res = await apiFetch(`/accounts/${encodeURIComponent(acct)}`, { method:"PUT", body });
         const js = await res.json().catch(()=> ({}));
         setJSON("updateJson", js);
-        $("updateOut").className="result";
-        $("updateOut").textContent = js.message ? `${js.message}\nAccount: ${js.accountNumber||"(n/a)"}` : JSON.stringify(js,null,2);
+        $("updateOut").className="result"; $("updateOut").textContent = js.message ? `${js.message}\nAccount: ${js.accountNumber||"(n/a)"}` : JSON.stringify(js,null,2);
       } catch (e) {
-        $("updateOut").className="result err";
-        $("updateOut").textContent = e.message;
-        setJSON("updateJson", { error: e.message });
+        $("updateOut").className="result err"; $("updateOut").textContent = e.message; setJSON("updateJson", { error: e.message });
       }
     });
-    $("updateSpeak").addEventListener("click", ()=> speak($("updateOut").textContent || "") );
     $("copyUpdateJson").addEventListener("click", ()=> copyText($("updateJson").textContent));
     $("dlUpdateJson").addEventListener("click", ()=>{
       const blob = new Blob([$("updateJson").textContent], { type:"application/json" });
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download="update.json"; a.click(); URL.revokeObjectURL(a.href);
     });
 
-    // ---------- Delete ----------
+    // Delete
     $("deleteBtn").addEventListener("click", async ()=>{
-      const acct = $("delAcct").value.trim();
-      if (!acct) return toast("Account number required");
+      const acct = $("delAcct").value.trim(); if (!acct) return setJSON("deleteJson", { error: "Account number required" });
       try {
         const res = await apiFetch(`/accounts/${encodeURIComponent(acct)}`, { method:"DELETE" });
         const text = await res.text().catch(()=> "");
         setJSON("deleteJson", text || { status:"deleted" });
-        $("deleteOut").className="result";
-        $("deleteOut").textContent = text || "Deleted (see JSON)";
+        $("deleteOut").className="result"; $("deleteOut").textContent = text || "Deleted (see JSON)";
       } catch (e) {
-        $("deleteOut").className="result err";
-        $("deleteOut").textContent = e.message;
-        setJSON("deleteJson", { error: e.message });
+        $("deleteOut").className="result err"; $("deleteOut").textContent = e.message; setJSON("deleteJson", { error: e.message });
       }
     });
-    $("deleteSpeak").addEventListener("click", ()=> speak($("deleteOut").textContent || "") );
     $("copyDeleteJson").addEventListener("click", ()=> copyText($("deleteJson").textContent));
     $("dlDeleteJson").addEventListener("click", ()=>{
       const blob = new Blob([$("deleteJson").textContent], { type:"application/json" });
       const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download="delete.json"; a.click(); URL.revokeObjectURL(a.href);
     });
 
-    // ---------- Settings handlers ----------
-    let settings = loadSettings();
-    applySettings(settings);
-
-    $("openSettingsBtn").addEventListener("click", ()=> {
-      tabs.forEach(([t,p])=>{
-        $(t).classList.toggle("active", t==="tabSettings");
-        $(p).classList.toggle("active", p==="panelSettings");
-      });
-    });
-
-    $("language").addEventListener("change", ()=>{
-      settings = loadSettings(); settings.language = $("language").value; saveSettings(settings); applySettings(settings); toast("Language saved");
-    });
+    // Settings handlers
+    let settings = loadSettings(); applySettings(settings);
     $("saveSettings").addEventListener("click", ()=>{
       const s = loadSettings();
-      s.language = $("language").value;
-      s.themeMode = $("themeMode").value;
-      s.accent = $("accent").value;
-      s.highContrast = $("highContrast").checked;
-      s.density = $("density").value;
-      s.fontSize = $("fontSize").value;
-      s.reduceMotion = $("reduceMotion").checked;
+      s.language = $("language").value; s.themeMode = $("themeMode").value; s.accent = $("accent").value;
+      s.highContrast = $("highContrast").checked; s.density = $("density").value;
+      s.fontSize = $("fontSize").value; s.reduceMotion = $("reduceMotion").checked;
 
       s.api.base = $("apiBase").value.trim();
-      s.api.timeout = Number($("timeout").value)||12000;
-      s.api.retries = Number($("retries").value)||0;
+      s.api.timeout = Number($("timeout").value)||12000; s.api.retries = Number($("retries").value)||0;
       s.api.useCreds = $("useCreds").checked;
-      s.api.clientIdHeader = $("clientIdHeader").value.trim();
-      s.api.clientIdValue = $("clientIdValue").value.trim();
-      s.api.clientSecretHeader = $("clientSecretHeader").value.trim();
-      s.api.clientSecretValue = $("clientSecretValue").value.trim();
+      s.api.clientIdHeader = $("clientIdHeader").value.trim(); s.api.clientIdValue = $("clientIdValue").value.trim();
+      s.api.clientSecretHeader = $("clientSecretHeader").value.trim(); s.api.clientSecretValue = $("clientSecretValue").value.trim();
       s.api.bearerToken = $("bearerToken").value.trim();
 
       saveSettings(s); settings = s; applySettings(settings); toast("Settings saved");
     });
-    $("resetSettings").addEventListener("click", ()=>{
-      saveSettings(defaultSettings); settings = loadSettings(); applySettings(settings); toast("Settings reset");
-    });
+    $("resetSettings").addEventListener("click", ()=>{ saveSettings(defaultSettings); settings = loadSettings(); applySettings(settings); toast("Settings reset"); });
     $("testHealth").addEventListener("click", async ()=>{
+      try { const res = await apiFetch("/health", { method:"GET" }); const js = await res.json().catch(()=> ({})); alert("Health OK:\n" + JSON.stringify(js, null, 2)); }
+      catch (e) { alert("Health ERROR:\n" + (e.message||e)); }
+    });
+
+    // ===== Passkeys (WebAuthn) =====
+    const b64uToBuf = (v) => Uint8Array.from(atob(v.replace(/-/g,'+').replace(/_/g,'/')), c => c.charCodeAt(0));
+    const bufToB64u = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    function logPK(obj){ $("passkeyLog").textContent = typeof obj==='string' ? obj : JSON.stringify(obj, null, 2); }
+
+    // Register
+    $("btnRegisterPasskey").addEventListener("click", async ()=>{
       try {
-        const res = await apiFetch("/health", { method:"GET" });
-        const js = await res.json().catch(()=> ({}));
-        alert("Health OK:\n" + JSON.stringify(js, null, 2));
-      } catch (e) {
-        alert("Health ERROR:\n" + (e.message||e));
-      }
+        const username = $("pkUsername").value.trim(); const displayName = $("pkDisplayName").value.trim();
+        if (!username) return alert("Username required");
+
+        const start = await apiFetch("/webauthn/register/start", { method:"POST", body:{ username, displayName } }).then(r=>r.json());
+        start.challenge = b64uToBuf(start.challenge); start.user.id = b64uToBuf(start.user.id);
+        if (start.excludeCredentials) start.excludeCredentials = start.excludeCredentials.map(c => ({...c, id: b64uToBuf(c.id)}));
+
+        const credential = await navigator.credentials.create({ publicKey: start });
+        const regRes = {
+          id: credential.id, rawId: bufToB64u(credential.rawId), type: credential.type,
+          response: { attestationObject: bufToB64u(credential.response.attestationObject), clientDataJSON: bufToB64u(credential.response.clientDataJSON) },
+          clientExtensionResults: credential.getClientExtensionResults(),
+        };
+        const finish = await apiFetch("/webauthn/register/finish", { method:"POST", body:{ username, ...regRes } }).then(r=>r.json());
+        logPK({ registerFinish: finish }); toast("Passkey registered");
+      } catch (e) { logPK({ error: String(e) }); alert("Registration failed: " + e.message); }
     });
 
-    // Footer
+    // Sign in
+    $("btnLoginPasskey").addEventListener("click", async ()=>{
+      try {
+        const username = $("pkUsername").value.trim(); if (!username) return alert("Username required");
+        const start = await apiFetch("/webauthn/authenticate/start", { method:"POST", body:{ username } }).then(r=>r.json());
+        start.challenge = b64uToBuf(start.challenge);
+        if (start.allowCredentials) start.allowCredentials = start.allowCredentials.map(c => ({...c, id: b64uToBuf(c.id)}));
+
+        const assertion = await navigator.credentials.get({ publicKey: start });
+        const authRes = {
+          id: assertion.id, rawId: bufToB64u(assertion.rawId), type: assertion.type,
+          response: {
+            authenticatorData: bufToB64u(assertion.response.authenticatorData),
+            clientDataJSON: bufToB64u(assertion.response.clientDataJSON),
+            signature: bufToB64u(assertion.response.signature),
+            userHandle: assertion.response.userHandle ? bufToB64u(assertion.response.userHandle) : null,
+          },
+          clientExtensionResults: assertion.getClientExtensionResults(),
+        };
+        const finish = await apiFetch("/webauthn/authenticate/finish", { method:"POST", body:{ username, ...authRes } }).then(r=>r.json());
+        logPK({ authFinish: finish }); if (finish.verified) toast("Signed in ✔"); else alert("Not verified");
+      } catch (e) { logPK({ error: String(e) }); alert("Login failed: " + e.message); }
+    });
+
+    // Conditional UI (optional)
+    $("btnLoginConditional").addEventListener("click", async ()=>{
+      try {
+        if (!('PublicKeyCredential' in window) || !('isConditionalMediationAvailable' in PublicKeyCredential)) return alert("Conditional UI not supported");
+        const available = await PublicKeyCredential.isConditionalMediationAvailable(); if (!available) return alert("Conditional mediation not available");
+
+        const start = await apiFetch("/webauthn/authenticate/start", { method:"POST", body:{ username: $("pkUsername").value.trim() } }).then(r=>r.json());
+        start.challenge = b64uToBuf(start.challenge); delete start.allowCredentials;
+
+        const assertion = await navigator.credentials.get({ publicKey: start, mediation: "conditional" });
+        // You can reuse the sign-in finish code here if needed
+        logPK({ conditionalUI: "assertion acquired; send to /webauthn/authenticate/finish" });
+      } catch (e) { logPK({ error: String(e) }); }
+    });
+
+    // Logout
+    $("btnLogout").addEventListener("click", async ()=>{
+      try { const res = await apiFetch("/logout", { method:"POST" }); await res.json(); toast("Signed out"); }
+      catch (e) { alert("Sign out failed"); }
+    });
+
+    // Footer, PWA
     $("year").textContent = new Date().getFullYear();
-
-    // ---------- PWA registration & install ----------
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", ()=> navigator.serviceWorker.register("/service-worker.js").catch(console.error));
-    }
+    if ("serviceWorker" in navigator) window.addEventListener("load", ()=> navigator.serviceWorker.register("/service-worker.js").catch(console.error));
     let deferredPrompt=null;
-    window.addEventListener("beforeinstallprompt", (e)=>{
-      e.preventDefault(); deferredPrompt = e; const b=$("installBtn"); if (b) b.style.display="inline-flex";
-    });
-    const ib = $("installBtn");
-    if (ib) ib.addEventListener("click", async ()=>{
-      if (!deferredPrompt) return alert("Install not available yet.");
-      deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; ib.style.display="none";
-    });
+    window.addEventListener("beforeinstallprompt", e=>{ e.preventDefault(); deferredPrompt = e; const b=$("installBtn"); if (b) b.style.display="inline-flex"; });
+    const ib = $("installBtn"); if (ib) ib.addEventListener("click", async ()=>{ if(!deferredPrompt) return alert("Install not available"); deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; ib.style.display="none"; });
   </script>
 </body>
 </html>
