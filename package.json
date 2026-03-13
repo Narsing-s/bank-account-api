@@ -8,7 +8,7 @@
     "build": "echo \"No build step required for this app\""
   },
   "engines": {
-    "node": ">=18"
+    "node": "20.x"
   },
   "license": "MIT",
   "dependencies": {
@@ -17,4 +17,3 @@
     "express": "^4.18.2"
   }
 }
-``
