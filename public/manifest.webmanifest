@@ -1,14 +1,14 @@
 {
-  "name": "Bank Account Management",
-  "short_name": "BankAccounts",
-  "description": "Create, get, update, and delete bank accounts with an Android-like, multilingual web UI. Passkeys/WebAuthn support.",
+  "name": "Bank Account — Android Web UI",
+  "short_name": "BankAccount",
+  "description": "Android-style Bank Account UI with languages, voice, and PWA.",
   "lang": "en",
   "start_url": "/?source=pwa",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "theme_color": "#0f172a",
-  "background_color": "#0f172a",
+  "theme_color": "#0b1225",
+  "background_color": "#0b1225",
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
