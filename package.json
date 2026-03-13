@@ -1,14 +1,13 @@
 {
   "name": "bank-account-app",
   "version": "1.0.0",
-  "description": "Bank Account UI with MuleSoft API",
+  "description": "Bank Account UI with MuleSoft API (Android-style UI, i18n, voice, JSON panels, network settings, PWA)",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "build": "echo build completed"
+    "start": "node server.js"
   },
+  "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "node-fetch": "^2.6.7"
+    "express": "^4.18.2"
   }
 }
