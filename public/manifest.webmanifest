@@ -1,7 +1,7 @@
 {
   "name": "Bank Account Management",
   "short_name": "BankAccounts",
-  "description": "Create, get, update, and delete bank accounts with an Android-like, multilingual web UI.",
+  "description": "Create, get, update, and delete bank accounts with an Android-like, multilingual web UI. Passkeys/WebAuthn support.",
   "lang": "en",
   "start_url": "/?source=pwa",
   "scope": "/",
