@@ -17,7 +17,7 @@ self.addEventListener("activate", (e) => {
 // API = network-first; Shell = cache-first
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
-  if (url.pathname.startsWith("/accounts") || url.pathname.startsWith("/health")) {
+  if (url.pathname.startsWith("/accounts") || url.pathname.startsWith("/webauthn") || url.pathname.startsWith("/health")) {
     e.respondWith(
       fetch(e.request)
         .then((res) => {
@@ -39,3 +39,4 @@ self.addEventListener("fetch", (e) => {
     );
   }
 });
+``
