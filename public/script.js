@@ -7,6 +7,22 @@ const statusText = $("statusText");
 const loader = $("loader");
 const themeToggle = $("themeToggle");
 const themeIcon = $("themeIcon");
+const debugToggle = $("debugToggle");
+const debugClose = $("debugClose");
+
+// Debug elements
+const dbg = $("debug"), dbgUrl = $("dbgUrl"), dbgStatus = $("dbgStatus"), dbgMethod = $("dbgMethod"), dbgReq = $("dbgReq"), dbgRes = $("dbgRes");
+
+function setDebug({url="", status="—", method="—", reqBody=null, resBody=null}){
+  dbgUrl.textContent = url;
+  dbgStatus.textContent = status;
+  dbgMethod.textContent = method;
+  dbgReq.textContent = reqBody ? JSON.stringify(reqBody, null, 2) : "—";
+  dbgRes.textContent = resBody ? (typeof resBody === "string" ? resBody : JSON.stringify(resBody, null, 2)) : "—";
+}
+
+debugToggle.addEventListener("click", ()=> dbg.classList.toggle("hidden"));
+debugClose.addEventListener("click", ()=> dbg.classList.add("hidden"));
 
 // Toasts
 function toast(msg, type="ok"){
@@ -96,7 +112,7 @@ function cycleTheme(){
   applyTheme(next);
   toast(`Theme: ${next}`, "ok");
 }
-$("themeToggle").addEventListener("click", cycleTheme);
+themeToggle.addEventListener("click", cycleTheme);
 window.matchMedia?.("(prefers-color-scheme: dark)").addEventListener?.("change", ()=>{
   const saved = localStorage.getItem(THEME_KEY) || "auto";
   if (saved === "auto") applyTheme("auto");
@@ -114,6 +130,36 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
     setTimeout(updateStickyHeight, 150);
   });
 });
+
+// ---------- Confetti FX ----------
+function launchConfetti(count=60){
+  const colors = ["#6ee7ff","#a78bfa","#30e88c","#ff6b6b","#fbbf24"];
+  const fx = $("fx");
+  for(let i=0;i<count;i++){
+    const c = document.createElement("div");
+    c.className = "confetti";
+    const size = 6 + Math.random()*8;
+    c.style.width = `${size}px`;
+    c.style.height = `${size*1.5}px`;
+    c.style.left = `${Math.random()*100}vw`;
+    c.style.background = colors[(Math.random()*colors.length)|0];
+    c.style.animationDuration = `${1.8 + Math.random()*1.4}s`;
+    c.style.animationDelay = `${Math.random()*0.2}s`;
+    c.style.transform = `translateY(-100px) rotate(${Math.random()*360}deg)`;
+    fx.appendChild(c);
+    setTimeout(()=> fx.removeChild(c), 2500);
+  }
+}
+
+// ---------- Network helper (captures debug info) ----------
+async function doFetch(url, options){
+  setDebug({ url, method: options?.method || "GET", reqBody: options?.body ? JSON.parse(options.body) : null });
+  const res = await fetch(url, options);
+  const text = await res.text();
+  let data; try{ data = text ? JSON.parse(text) : {}; } catch{ data = text; }
+  setDebug({ url, status: res.status, method: options?.method || "GET", reqBody: options?.body ? JSON.parse(options.body) : null, resBody: data });
+  return {res, data};
+}
 
 // ---------- CREATE (POST /api/accounts?adharNumber=&bankName=) ----------
 $("btnCreate").addEventListener("click", async ()=>{
@@ -136,28 +182,27 @@ $("btnCreate").addEventListener("click", async ()=>{
   if(!["SBI","HDFC","APGIVB","AXIS","ICICI"].includes(bankName)){ toast("Select a valid bank", "err"); $("bank").focus(); return; }
 
   const payload = { FullName, dateOfBirth, mobileNumber, email, address };
-
   const btn = $("btnCreate");
   btn.disabled = true; showLoader(true);
   try{
     const qs = new URLSearchParams({ adharNumber, bankName }).toString();
-    const res = await fetch(API(`/accounts?${qs}`), {
+    const {res, data} = await doFetch(API(`/accounts?${qs}`), {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload)
     });
-    const text = await res.text();
-    let data; try{ data = text ? JSON.parse(text) : {}; } catch{ data = { raw: text }; }
 
     if(!res.ok){
-      throw new Error(data?.message || data?.error || `HTTP ${res.status}`);
+      throw new Error((data && data.message) || `HTTP ${res.status}`);
     }
     $("createResult").textContent = JSON.stringify(data, null, 2);
     toast("Account created successfully");
+    launchConfetti(70);
     lastSuccess = Date.now();
   }catch(e){
     $("createResult").textContent = `Error: ${e.message}`;
     toast(e.message, "err");
+    dbg.classList.remove("hidden"); // auto-show debug if error
   }finally{
     btn.disabled = false; showLoader(false); updateStickyHeight();
   }
@@ -175,17 +220,12 @@ $("btnSearch").addEventListener("click", async ()=>{
 
   showLoader(true);
   try{
-    const res = await fetch(API(`/accounts/${encodeURIComponent(id)}`));
-    const text = await res.text();
-    let data; try{ data = text ? JSON.parse(text) : {}; } catch{ data = { raw: text }; }
-
+    const {res, data} = await doFetch(API(`/accounts/${encodeURIComponent(id)}`), { method: "GET" });
     if(!res.ok){
-      throw new Error(data?.message || data?.error || `HTTP ${res.status}`);
+      throw new Error((data && data.message) || `HTTP ${res.status}`);
     }
 
-    // Mule GET returns a flat object; fullName is lowercased in your transform.
     const fullName = data.FullName || data.fullName || "(No Name)";
-
     const card = document.createElement("div");
     card.className = "bankCard";
     const h3 = document.createElement("h3"); h3.textContent = fullName;
@@ -194,13 +234,14 @@ $("btnSearch").addEventListener("click", async ()=>{
     const pEmail = document.createElement("p"); pEmail.textContent = `Email: ${data.email ?? "(unknown)"}`;
     const pDob = document.createElement("p"); pDob.textContent = `DOB: ${data.dateOfBirth ?? "(unknown)"}`;
     const pAddr = document.createElement("p"); pAddr.textContent = `Address: ${data.address ?? "(unknown)"}`;
-    card.innerHTML = ""; card.appendChild(h3); card.appendChild(pAcc); card.appendChild(pMob); card.appendChild(pEmail); card.appendChild(pDob); card.appendChild(pAddr);
+    card.innerHTML = ""; [h3,pAcc,pMob,pEmail,pDob,pAddr].forEach(e=> card.appendChild(e));
     cardWrap.innerHTML = ""; cardWrap.appendChild(card);
     toast("Account fetched");
     lastSuccess = Date.now();
   }catch(e){
     cardWrap.textContent = `Error: ${e.message}`;
     toast(e.message, "err");
+    dbg.classList.remove("hidden");
   }finally{
     showLoader(false); updateStickyHeight();
   }
@@ -225,23 +266,22 @@ $("btnUpdate").addEventListener("click", async ()=>{
   const btn = $("btnUpdate");
   btn.disabled = true; showLoader(true);
   try{
-    const res = await fetch(API(`/accounts/${encodeURIComponent(id)}`), {
+    const {res, data} = await doFetch(API(`/accounts/${encodeURIComponent(id)}`), {
       method: "PATCH",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload)
     });
-    const text = await res.text();
-    let data; try{ data = text ? JSON.parse(text) : {}; } catch{ data = { raw: text }; }
-
     if(!res.ok){
-      throw new Error(data?.message || data?.error || `HTTP ${res.status}`);
+      throw new Error((data && data.message) || `HTTP ${res.status}`);
     }
     $("updateResult").textContent = JSON.stringify(data, null, 2);
     toast("Account updated");
+    launchConfetti(40);
     lastSuccess = Date.now();
   }catch(e){
     $("updateResult").textContent = `Error: ${e.message}`;
     toast(e.message, "err");
+    dbg.classList.remove("hidden");
   }finally{
     btn.disabled = false; showLoader(false); updateStickyHeight();
   }
@@ -256,19 +296,18 @@ $("btnDelete").addEventListener("click", async ()=>{
   const btn = $("btnDelete");
   btn.disabled = true; showLoader(true);
   try{
-    const res = await fetch(API(`/accounts/${encodeURIComponent(id)}`), { method:"DELETE" });
-    const text = await res.text();
-    let data; try{ data = text ? JSON.parse(text) : {}; } catch{ data = { raw: text }; }
-
+    const {res, data} = await doFetch(API(`/accounts/${encodeURIComponent(id)}`), { method:"DELETE" });
     if(!res.ok){
-      throw new Error(data?.message || data?.error || `HTTP ${res.status}`);
+      throw new Error((data && data.message) || `HTTP ${res.status}`);
     }
     $("deleteResult").textContent = JSON.stringify(data, null, 2);
     toast("Account deleted");
+    launchConfetti(30);
     lastSuccess = Date.now();
   }catch(e){
     $("deleteResult").textContent = `Error: ${e.message}`;
     toast(e.message, "err");
+    dbg.classList.remove("hidden");
   }finally{
     btn.disabled = false; showLoader(false); updateStickyHeight();
   }
