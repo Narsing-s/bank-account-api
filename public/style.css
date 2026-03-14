@@ -1,54 +1,115 @@
 body{
-font-family:Arial;
+font-family: Arial, sans-serif;
 margin:0;
+padding:0;
+
+/* Gradient background */
+background: linear-gradient(135deg,#0f2027,#2c5364,#ff4fa3);
+min-height:100vh;
+color:white;
 }
+
+/* Header */
 
 header{
 display:flex;
 justify-content:space-between;
-padding:15px;
-color:white;
+align-items:center;
+padding:20px 40px;
+background:linear-gradient(90deg,#001f4d,#0066ff,#ff4fa3);
+box-shadow:0 4px 15px rgba(0,0,0,0.3);
 }
+
+header h1{
+margin:0;
+}
+
+.settings{
+display:flex;
+gap:10px;
+align-items:center;
+}
+
+.settings select{
+padding:5px;
+border-radius:5px;
+border:none;
+}
+
+/* Container */
 
 .container{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-gap:20px;
-padding:20px;
+gap:25px;
+padding:30px;
 }
 
+/* Cards */
+
 .card{
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 3px 10px rgba(0,0,0,0.1);
+background:rgba(255,255,255,0.15);
+backdrop-filter:blur(10px);
+padding:25px;
+border-radius:15px;
+box-shadow:0 6px 25px rgba(0,0,0,0.25);
+transition:0.3s;
 }
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+/* Inputs */
 
 input,select{
 width:100%;
-padding:8px;
+padding:10px;
 margin-bottom:10px;
+border:none;
+border-radius:8px;
+outline:none;
 }
+
+/* Buttons */
 
 button{
 padding:10px;
 border:none;
-color:white;
+border-radius:8px;
 cursor:pointer;
+font-weight:bold;
+
+/* Button gradient */
+background:linear-gradient(45deg,#0066ff,#ff4fa3);
+color:white;
+
+transition:0.3s;
 }
 
-.blue header{
-background:#1976d2;
+button:hover{
+background:linear-gradient(45deg,#ff4fa3,#001f4d);
+transform:scale(1.05);
 }
 
-.blue button{
-background:#1976d2;
+/* Response Output */
+
+pre{
+background:black;
+color:#00ff9d;
+padding:10px;
+border-radius:8px;
+overflow:auto;
 }
 
-.pink header{
-background:#d81b60;
+/* Pink Theme */
+
+.pink{
+background:linear-gradient(135deg,#3a003a,#ff4fa3,#ff9ac6);
 }
 
-.pink button{
-background:#d81b60;
+/* Blue Theme */
+
+.blue{
+background:linear-gradient(135deg,#001f4d,#0066ff,#2c5364);
 }
