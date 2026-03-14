@@ -8,35 +8,35 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Animated background layers -->
+  <!-- Animated backgrounds -->
   <div class="bg-gradient"></div>
   <div class="bg-aurora"></div>
   <div class="bg-particles" aria-hidden="true"></div>
 
-  <header class="topbar">
+  <header class="topbar" role="banner">
     <div class="brand">
-      <div class="logo">🏦</div>
+      <div class="logo" aria-hidden="true">🏦</div>
       <div>
         <div class="brand-title">Bank-account-dashboard</div>
-        <div class="brand-sub">user friendly bank portal</div>
+        <div class="brand-sub">User friendly bank portal</div>
       </div>
     </div>
-    <div class="status" id="status">
-      <span class="dot offline" id="statusDot"></span>
+    <div class="status" id="status" aria-live="polite">
+      <span class="dot offline" id="statusDot" aria-hidden="true"></span>
       <span id="statusText">Offline</span>
     </div>
   </header>
 
-  <nav class="tabs">
-    <button class="tab-btn active" data-tab="create">Create</button>
-    <button class="tab-btn" data-tab="search">Search</button>
-    <button class="tab-btn" data-tab="update">Update</button>
-    <button class="tab-btn" data-tab="delete">Delete</button>
+  <nav class="tabs" role="tablist" aria-label="Operations">
+    <button class="tab-btn active" data-tab="create" role="tab" aria-selected="true">Create</button>
+    <button class="tab-btn" data-tab="search" role="tab">Search</button>
+    <button class="tab-btn" data-tab="update" role="tab">Update</button>
+    <button class="tab-btn" data-tab="delete" role="tab">Delete</button>
   </nav>
 
   <main class="container">
     <!-- CREATE -->
-    <section id="create" class="panel active">
+    <section id="create" class="panel active" role="tabpanel" aria-labelledby="Create Account">
       <h2>Create Account</h2>
       <div class="grid">
         <label>Full Name
@@ -58,7 +58,7 @@
           <input id="aadhaar" placeholder="123412341234" maxlength="12" inputmode="numeric" />
         </label>
         <label>Bank
-          <select id="bank">
+          <select id="bank" aria-label="Bank Name">
             <option>SBI</option>
             <option>HDFC</option>
             <option>APGIVB</option>
@@ -68,18 +68,17 @@
         </label>
       </div>
 
-      <!-- Sticky action bar on mobile -->
       <div class="action-bar" data-for="create">
         <div class="action-bar-inner">
           <button id="btnCreate" class="primary">Create Account</button>
         </div>
       </div>
 
-      <pre id="createResult" class="result"></pre>
+      <pre id="createResult" class="result" aria-live="polite"></pre>
     </section>
 
     <!-- SEARCH -->
-    <section id="search" class="panel">
+    <section id="search" class="panel" role="tabpanel">
       <h2>Search Account</h2>
       <div class="grid">
         <label>Account Number
@@ -93,7 +92,7 @@
         </div>
       </div>
 
-      <div id="bankCard" class="bankCard placeholder">
+      <div id="bankCard" class="bankCard placeholder" aria-live="polite">
         <div class="skeleton title"></div>
         <div class="skeleton line"></div>
         <div class="skeleton line"></div>
@@ -101,7 +100,7 @@
     </section>
 
     <!-- UPDATE -->
-    <section id="update" class="panel">
+    <section id="update" class="panel" role="tabpanel">
       <h2>Update Account</h2>
       <div class="grid">
         <label>Account Number
@@ -124,11 +123,11 @@
         </div>
       </div>
 
-      <pre id="updateResult" class="result"></pre>
+      <pre id="updateResult" class="result" aria-live="polite"></pre>
     </section>
 
     <!-- DELETE -->
-    <section id="delete" class="panel">
+    <section id="delete" class="panel" role="tabpanel">
       <h2>Delete Account</h2>
       <div class="grid">
         <label>Account Number
@@ -142,15 +141,15 @@
         </div>
       </div>
 
-      <pre id="deleteResult" class="result"></pre>
+      <pre id="deleteResult" class="result" aria-live="polite"></pre>
     </section>
   </main>
 
   <!-- Toasts -->
-  <div id="toasts" class="toasts"></div>
+  <div id="toasts" class="toasts" aria-live="polite"></div>
 
   <!-- Loader -->
-  <div id="loader" class="loader hidden">
+  <div id="loader" class="loader hidden" role="alert" aria-busy="true" aria-live="polite">
     <div class="spinner"></div>
   </div>
 
