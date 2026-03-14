@@ -18,81 +18,51 @@ z-index:-1;
 @keyframes gradient{
 
 0%{background-position:0% 50%}
-
 50%{background-position:100% 50%}
-
 100%{background-position:0% 50%}
 
 }
 
 header{
-
-padding:20px;
 text-align:center;
 font-size:30px;
-font-weight:bold;
-
+padding:20px;
 }
 
 .container{
-
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
 gap:20px;
 padding:20px;
-
 }
 
 .card{
-
 background:rgba(255,255,255,0.15);
-border-radius:15px;
 padding:20px;
+border-radius:15px;
 backdrop-filter:blur(10px);
-transition:0.3s;
-
-}
-
-.card:hover{
-
-transform:scale(1.05);
-box-shadow:0 10px 30px rgba(0,0,0,0.4);
-
 }
 
 input,select{
-
 width:100%;
 padding:10px;
 margin-bottom:10px;
 border:none;
 border-radius:8px;
-
 }
 
 button{
-
 padding:10px;
 border:none;
 border-radius:8px;
-background:#111;
+background:black;
 color:white;
 cursor:pointer;
-
-}
-
-button:hover{
-
-background:#333;
-
 }
 
 .bankCard{
-
 background:linear-gradient(135deg,#667eea,#764ba2);
 padding:20px;
 border-radius:12px;
 margin-top:10px;
-font-size:18px;
-
 }
