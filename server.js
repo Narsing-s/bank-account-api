@@ -1,92 +1,105 @@
-const express = require("express");
-const path = require("path");
+const express = require("express")
+const axios = require("axios")
+const cors = require("cors")
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const app = express()
 
-const BASE_URL =
-"https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api";
+app.use(express.json())
+app.use(cors())
+app.use(express.static("public"))
 
-app.use(express.json());
-app.use(express.static(path.join(__dirname,"public")));
+const MULE_API = "http://localhost:8081/api"
 
-app.get("/health",(req,res)=>{
-res.json({status:"ok"});
-});
 
-/* CREATE */
-app.post("/accounts",async(req,res)=>{
+// CREATE ACCOUNT
+app.post("/createAccount", async (req,res)=>{
+
 try{
 
-const {adharNumber,bankName,...body}=req.body;
+const {FullName,dateOfBirth,mobileNumber,email,address,adharNumber,bankName}=req.body
 
-const url=`${BASE_URL}/accounts?adharNumber=${adharNumber}&bankName=${bankName}`;
+const response=await axios.post(
+`${MULE_API}/accounts?adharNumber=${adharNumber}&bankName=${bankName}`,
+{
+FullName,
+dateOfBirth,
+mobileNumber,
+email,
+address
+})
 
-const api=await fetch(url,{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(body)
-});
+res.json(response.data)
 
-const data=await api.text();
-
-res.status(api.status).send(data);
-
-}catch(e){
-res.status(500).json({error:e.message});
+}catch(err){
+res.status(500).json(err.response?.data || err.message)
 }
-});
 
-/* GET */
+})
 
-app.get("/accounts/:id",async(req,res)=>{
 
-const api=await fetch(`${BASE_URL}/accounts/${req.params.id}`);
 
-const data=await api.text();
+// GET ACCOUNT
+app.get("/getAccount/:accountNumber", async (req,res)=>{
 
-res.status(api.status).send(data);
+try{
 
-});
+const response=await axios.get(
+`${MULE_API}/accounts/${req.params.accountNumber}`
+)
 
-/* UPDATE */
+res.json(response.data)
 
-app.put("/accounts/:id",async(req,res)=>{
+}catch(err){
+res.status(500).json(err.response?.data || err.message)
+}
 
-const api=await fetch(`${BASE_URL}/accounts/${req.params.id}`,{
+})
 
-method:"PUT",
 
-headers:{"Content-Type":"application/json"},
 
-body:JSON.stringify(req.body)
+// UPDATE ACCOUNT
+app.patch("/updateAccount/:accountNumber", async (req,res)=>{
 
-});
+try{
 
-const data=await api.text();
+const {FullName,email,mobileNumber}=req.body
 
-res.status(api.status).send(data);
+const response=await axios.patch(
+`${MULE_API}/accounts/${req.params.accountNumber}`,
+{
+FullName,
+ADDRESS:email,
+MOBILENUMBER:mobileNumber
+})
 
-});
+res.json(response.data)
 
-/* DELETE */
+}catch(err){
+res.status(500).json(err.response?.data || err.message)
+}
 
-app.delete("/accounts/:id",async(req,res)=>{
+})
 
-const api=await fetch(`${BASE_URL}/accounts/${req.params.id}`,{
 
-method:"DELETE"
 
-});
+// DELETE ACCOUNT
+app.delete("/deleteAccount/:accountNumber", async (req,res)=>{
 
-const data=await api.text();
+try{
 
-res.status(api.status).send(data);
+const response=await axios.delete(
+`${MULE_API}/accounts/${req.params.accountNumber}`
+)
 
-});
+res.json(response.data)
 
-app.listen(PORT,()=>{
+}catch(err){
+res.status(500).json(err.response?.data || err.message)
+}
 
-console.log("Server running on port "+PORT);
+})
 
-});
+
+app.listen(3000,()=>{
+console.log("Server running at http://localhost:3000")
+})
