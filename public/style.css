@@ -5,22 +5,23 @@
   --text:#e9f0ff; --muted:#a8b3d1; --ok:#2EE59D; --danger:#ff6b8a;
   --border:rgba(255,255,255,.12);
   --shadow:0 20px 40px rgba(0,0,0,.38);
-
   --fs-12: clamp(11px, 1.6vw, 12px);
   --fs-14: clamp(12px, 1.8vw, 14px);
   --fs-16: clamp(14px, 2.2vw, 16px);
   --fs-18: clamp(15px, 2.6vw, 18px);
-
   --pad: clamp(12px, 3.2vw, 22px);
   --radius: 16px;
   --stickyH: 0px;
 }
 
-/* Base / Background FX (unchanged)… */
+/* Base & BG FX */
 *{box-sizing:border-box}
 html,body{height:100%}
-body{ margin:0; font-family:Segoe UI, system-ui, -apple-system, Roboto, Arial; color:var(--text);
-  background:linear-gradient(120deg,var(--bg1),var(--bg2)); overflow-x:hidden; padding-bottom: env(safe-area-inset-bottom); }
+body{
+  margin:0; font-family:Segoe UI, system-ui, -apple-system, Roboto, Arial;
+  color:var(--text); background:linear-gradient(120deg,var(--bg1),var(--bg2));
+  overflow-x:hidden; padding-bottom: env(safe-area-inset-bottom);
+}
 .bg-gradient{ position:fixed; inset:0; z-index:-3;
   background: radial-gradient(60vw 60vw at 15% 20%, rgba(0,198,255,.16), transparent 60%),
               radial-gradient(50vw 50vw at 85% 30%, rgba(255,97,210,.16), transparent 60%),
@@ -28,26 +29,41 @@ body{ margin:0; font-family:Segoe UI, system-ui, -apple-system, Roboto, Arial; c
 .bg-aurora{ position:fixed; inset:auto 0 0 0; height:40vh; z-index:-2;
   background:linear-gradient(90deg, rgba(0,198,255,.25), rgba(255,97,210,.25), rgba(0,198,255,.25));
   filter: blur(40px); animation: aurora 14s ease-in-out infinite alternate; }
-.bg-particles{ position:fixed; inset:0; z-index:-1; background-image: radial-gradient(rgba(255,255,255,.08) 1px, transparent 1px);
+.bg-particles{ position:fixed; inset:0; z-index:-1;
+  background-image: radial-gradient(rgba(255,255,255,.08) 1px, transparent 1px);
   background-size: 18px 18px; opacity:.6; animation: drift 24s linear infinite; }
-@keyframes aurora{ from{transform:translateY(0)} to{transform:translateY(-14px)} } @keyframes drift{ from{ background-position:0 0 } to{ background-position:0 18px } }
+@keyframes aurora{ from{transform:translateY(0)} to{transform:translateY(-14px)} }
+@keyframes drift{ from{ background-position:0 0 } to{ background-position:0 18px } }
 
-/* Topbar with Voice Panel */
-.topbar{ display:flex; justify-content:space-between; align-items:center; padding:calc(var(--pad) - 6px) var(--pad);
-  padding-top:max(var(--pad), env(safe-area-inset-top)); position:sticky; top:0; z-index:20;
-  background:linear-gradient(180deg, rgba(0,0,0,.35), transparent); backdrop-filter: blur(6px); }
+/* Top bar */
+.topbar{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:calc(var(--pad) - 6px) var(--pad);
+  padding-top:max(var(--pad), env(safe-area-inset-top));
+  position:sticky; top:0; z-index:20;
+  background:linear-gradient(180deg, rgba(0,0,0,.35), transparent);
+  backdrop-filter: blur(6px);
+}
 .brand{display:flex; gap:12px; align-items:center}
 .logo{ font-size:24px }
 .brand-title{ font-weight:800; letter-spacing:.2px; font-size:var(--fs-16) }
 .brand-sub{ font-size:var(--fs-12); color:var(--muted) }
-.status{ display:flex; align-items:center; gap:8px; font-size:var(--fs-12); color:var(--muted) }
-.dot{ width:10px; height:10px; border-radius:50% } .dot.offline{ background:#888 } .dot.online{ background:var(--ok); box-shadow:0 0 10px var(--ok) }
 
-.voice-panel{ display:flex; align-items:center; gap:10px; background:var(--glass); border:1px solid var(--border);
-  padding:8px 10px; border-radius:14px; backdrop-filter: blur(8px); }
-.voice-panel select{ background:rgba(0,0,0,.35); color:var(--text); border:1px solid var(--border); border-radius:10px; padding:8px; min-height:40px; font-size:var(--fs-14) }
-.icon-btn{ min-width:44px; min-height:44px; border-radius:12px; border:1px solid var(--border); background:var(--glass); color:inherit;
-  cursor:pointer; display:grid; place-items:center; font-size:18px; box-shadow:var(--shadow); backdrop-filter:blur(8px); transition:.2s; }
+/* Voice + Language panel */
+.voice-panel{
+  display:flex; align-items:center; gap:10px;
+  background:var(--glass); border:1px solid var(--border);
+  padding:8px 10px; border-radius:14px; backdrop-filter: blur(8px);
+}
+.voice-panel select{
+  background:rgba(0,0,0,.35); color:var(--text); border:1px solid var(--border);
+  border-radius:10px; padding:8px; min-height:40px; font-size:var(--fs-14)
+}
+.icon-btn{
+  min-width:44px; min-height:44px; border-radius:12px; border:1px solid var(--border);
+  background:var(--glass); color:inherit; cursor:pointer; display:grid; place-items:center;
+  font-size:18px; box-shadow:var(--shadow); backdrop-filter:blur(8px); transition:.2s;
+}
 .icon-btn:hover{ transform:translateY(-1px) }
 
 /* Toggle switch */
@@ -59,15 +75,29 @@ body{ margin:0; font-family:Segoe UI, system-ui, -apple-system, Roboto, Arial; c
 .switch input:checked + .slider{ background:linear-gradient(135deg, var(--blue), var(--pink)) }
 .switch input:checked + .slider::after{ left:23px }
 
-/* Tabs / Panels / Form / Buttons (magnetic) / Carousel / Toasts / Loader — unchanged from previous version ... */
-/* (Keep your existing styles for tabs, panel, grid, inputs, buttons, carousel, toasts, loader, etc.) */
+/* Tabs */
+.tabs{
+  display:flex; gap:10px; padding:0 var(--pad) 10px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+}
+.tab-btn{
+  position:relative; flex:0 0 auto; cursor:pointer;
+  color:var(--text); background:var(--glass); border:1px solid var(--border);
+  padding:12px 14px; border-radius:14px; font-weight:700; font-size:var(--fs-14);
+  transition:.25s; backdrop-filter: blur(6px);
+  will-change: transform;
+}
+.tab-btn::before{
+  content:""; position:absolute; inset:-1px; border-radius:16px; z-index:-1; opacity:.0; transition:.25s;
+  background:conic-gradient(from 0deg, var(--blue), var(--pink), var(--blue));
+  filter:blur(12px);
+}
+.tab-btn:hover, .tab-btn.active{ transform:translateY(-1px); box-shadow:var(--shadow) }
+.tab-btn:hover::before, .tab-btn.active::before{ opacity:.35 }
 
-/* For brevity, reuse your latest posted styles for:
-   - .tabs, .tab-btn, .container, .panel, h2
-   - .grid, label, input, select
-   - button (magnetic styles), .result
-   - .carousel, .carousel-viewport, .carousel-track, .gcard, .carousel-nav
-   - .skeleton, .action-bar, .action-bar-inner
-   - .toasts, .toast, .loader, .spinner
-   - focus-visible, reduced motion, mobile tweaks
+/* Panels / Forms / Buttons / Carousel / Toasts / Loader */
+/* (Use the same styles from the previous version you integrated:
+   .container, .panel, h2, .grid, label, input, select,
+   button (magnetic), .result,
+   .carousel, .carousel-viewport, .carousel-track, .gcard, .carousel-nav,
+   .skeleton, .action-bar, .action-bar-inner, .toasts, .toast, .loader, .spinner, etc.)
 */
