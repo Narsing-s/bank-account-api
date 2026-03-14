@@ -1,344 +1,267 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
-<title>Bank Account Management</title>
+<title>Bank Account UI</title>
 
 <style>
 
 body{
 font-family:Arial;
-background:linear-gradient(135deg,#ff4fa3,#3b82ff);
-color:white;
+background:#f2f2f2;
 padding:40px;
 }
 
-.card{
-background:rgba(255,255,255,0.2);
-padding:20px;
-border-radius:15px;
-margin-bottom:20px;
-width:340px;
+.container{
+background:white;
+padding:25px;
+margin-bottom:25px;
+border-radius:8px;
+box-shadow:0 0 8px rgba(0,0,0,0.1);
+width:450px;
 }
 
 input{
 width:100%;
-padding:10px;
-margin:6px 0;
-border:none;
-border-radius:8px;
+padding:8px;
+margin-top:6px;
+margin-bottom:10px;
 }
 
 button{
-width:100%;
 padding:10px;
-border:none;
-border-radius:10px;
-background:black;
+background:#2e7d32;
 color:white;
+border:none;
 cursor:pointer;
 }
 
-button:hover{
-opacity:0.8;
-}
-
-table{
-margin-top:30px;
-width:100%;
-border-collapse:collapse;
-background:white;
-color:black;
-}
-
-th,td{
-padding:10px;
-border:1px solid #ddd;
-text-align:left;
-}
-
-th{
-background:#333;
-color:white;
+.result{
+margin-top:10px;
+color:blue;
 }
 
 </style>
-
 </head>
 
 <body>
 
-<h1>Bank Account Management</h1>
+<h2>Bank Account Management</h2>
 
 <!-- CREATE ACCOUNT -->
 
-<div class="card">
+<div class="container">
 
 <h3>Create Account</h3>
 
-<input id="name" placeholder="Full Name">
+<input id="fullName" placeholder="Full Name">
 
-<input id="address" placeholder="Address">
+<input id="dob" placeholder="DOB MM-DD-YYYY">
 
 <input id="mobile" placeholder="Mobile Number">
 
-<input id="dob" type="date">
+<input id="email" placeholder="Email">
 
-<input id="aadhaar" placeholder="Aadhar Number">
+<input id="address" placeholder="Address">
 
-<input id="bank" placeholder="Bank Name">
+<input id="adhar" placeholder="Aadhar Number">
 
-<button onclick="createAccount()">Create Account</button>
+<input id="bankName" placeholder="Bank Name">
+
+<button onclick="createAccount()">Create</button>
+
+<div class="result" id="createResult"></div>
 
 </div>
 
 
 <!-- GET ACCOUNT -->
 
-<div class="card">
+<div class="container">
 
 <h3>Get Account</h3>
 
-<input id="getId" placeholder="Account Number (12 digits)">
+<input id="getAccountNumber" placeholder="12 Digit Account Number">
 
-<button onclick="getAccount()">Get Account</button>
+<button onclick="getAccount()">Get</button>
+
+<div class="result" id="getResult"></div>
 
 </div>
 
 
 <!-- UPDATE ACCOUNT -->
 
-<div class="card">
+<div class="container">
 
 <h3>Update Account</h3>
 
-<input id="updateId" placeholder="Account Number">
+<input id="updateAccountNumber" placeholder="Account Number">
 
 <input id="updateName" placeholder="Full Name">
 
 <input id="updateAddress" placeholder="Address">
 
-<input id="updateMobile" placeholder="Mobile Number">
+<input id="updateMobile" placeholder="Mobile">
 
-<button onclick="updateAccount()">Update Account</button>
+<button onclick="updateAccount()">Update</button>
+
+<div class="result" id="updateResult"></div>
 
 </div>
 
 
 <!-- DELETE ACCOUNT -->
 
-<div class="card">
+<div class="container">
 
 <h3>Delete Account</h3>
 
-<input id="deleteId" placeholder="Account Number">
+<input id="deleteAccountNumber" placeholder="Account Number">
 
-<button onclick="deleteAccount()">Delete Account</button>
+<button onclick="deleteAccount()">Delete</button>
+
+<div class="result" id="deleteResult"></div>
 
 </div>
 
 
-<h2>Account Details</h2>
-
-<table id="accountTable">
-
-<thead>
-
-<tr>
-
-<th>Account Number</th>
-<th>Full Name</th>
-<th>Address</th>
-<th>Mobile</th>
-<th>Date Of Birth</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-</tbody>
-
-</table>
-
-<pre id="result"></pre>
-
-
 <script>
 
-const result=document.getElementById("result")
+const BASE_URL="http://localhost:8081/api";
 
-function validateAccount(id){
 
-if(id.length!==12){
+function convertDOB(dob){
 
-alert("Account number must be 12 digits")
+const parts=dob.split("-")
 
-return false
+const mm=parts[0]
+const dd=parts[1]
+const yyyy=parts[2]
 
-}
-
-return true
-
-}
-
-/* FORMAT DATE */
-
-function formatDate(date){
-
-const d=new Date(date)
-
-const year=d.getFullYear()
-
-let month=(d.getMonth()+1).toString().padStart(2,"0")
-
-let day=d.getDate().toString().padStart(2,"0")
-
-return `${year}-${month}-${day}`
+return yyyy+"-"+mm+"-"+dd
 
 }
 
-/* CREATE */
 
-async function createAccount(){
+function createAccount(){
 
 const dobInput=document.getElementById("dob").value
 
-if(!dobInput){
+const payload={
 
-alert("Select Date Of Birth")
+FullName:document.getElementById("fullName").value,
 
-return
-
-}
-
-const body={
-
-adharNumber:document.getElementById("aadhaar").value,
-
-bankName:document.getElementById("bank").value,
-
-FullName:document.getElementById("name").value,
-
-email:document.getElementById("address").value,
+dateOfBirth:convertDOB(dobInput),
 
 mobileNumber:document.getElementById("mobile").value,
 
-dateOfBirth:formatDate(dobInput)
+email:document.getElementById("email").value,
+
+address:document.getElementById("address").value
 
 }
 
-const res=await fetch("/accounts",{
+const adhar=document.getElementById("adhar").value
+const bank=document.getElementById("bankName").value
+
+fetch(`${BASE_URL}/accounts?adharNumber=${adhar}&bankName=${bank}`,{
 
 method:"POST",
 
-headers:{"Content-Type":"application/json"},
+headers:{
+"Content-Type":"application/json"
+},
 
-body:JSON.stringify(body)
+body:JSON.stringify(payload)
 
 })
 
-const data=await res.text()
+.then(res=>res.json())
 
-result.innerText=data
+.then(data=>{
 
-}
+document.getElementById("createResult").innerText=
+JSON.stringify(data,null,2)
 
-/* GET ACCOUNT */
-
-async function getAccount(){
-
-const id=document.getElementById("getId").value
-
-if(!validateAccount(id)) return
-
-const res=await fetch(`/accounts/${id}`)
-
-const data=await res.json()
-
-displayAccount(data)
+})
 
 }
 
-/* DISPLAY ACCOUNT IN TABLE */
 
-function displayAccount(data){
+function getAccount(){
 
-const table=document.querySelector("#accountTable tbody")
+const acc=document.getElementById("getAccountNumber").value
 
-table.innerHTML=""
+fetch(`${BASE_URL}/accounts/${acc}`)
 
-const row=`<tr>
+.then(res=>res.json())
 
-<td>${data.accountNumber || ""}</td>
+.then(data=>{
 
-<td>${data.FULLNAME || ""}</td>
+document.getElementById("getResult").innerText=
+JSON.stringify(data,null,2)
 
-<td>${data.ADDRESS || ""}</td>
-
-<td>${data.MOBILENUMBER || ""}</td>
-
-<td>${data.DATEOFBIRTH || ""}</td>
-
-</tr>`
-
-table.innerHTML=row
+})
 
 }
 
-/* UPDATE */
 
-async function updateAccount(){
+function updateAccount(){
 
-const id=document.getElementById("updateId").value
+const acc=document.getElementById("updateAccountNumber").value
 
-if(!validateAccount(id)) return
-
-const body={
+const payload={
 
 FullName:document.getElementById("updateName").value,
 
-email:document.getElementById("updateAddress").value,
+ADDRESS:document.getElementById("updateAddress").value,
 
-mobileNumber:document.getElementById("updateMobile").value
+MOBILENUMBER:document.getElementById("updateMobile").value
 
 }
 
-const res=await fetch(`/accounts/${id}`,{
+fetch(`${BASE_URL}/accounts/${acc}`,{
 
-method:"PUT",
+method:"PATCH",
 
-headers:{"Content-Type":"application/json"},
+headers:{
+"Content-Type":"application/json"
+},
 
-body:JSON.stringify(body)
+body:JSON.stringify(payload)
 
 })
 
-const data=await res.text()
+.then(res=>res.json())
 
-result.innerText=data
+.then(data=>{
+
+document.getElementById("updateResult").innerText=
+JSON.stringify(data,null,2)
+
+})
 
 }
 
-/* DELETE */
 
-async function deleteAccount(){
+function deleteAccount(){
 
-const id=document.getElementById("deleteId").value
+const acc=document.getElementById("deleteAccountNumber").value
 
-if(!validateAccount(id)) return
-
-const res=await fetch(`/accounts/${id}`,{
+fetch(`${BASE_URL}/accounts/${acc}`,{
 
 method:"DELETE"
 
 })
 
-const data=await res.text()
+.then(res=>res.json())
 
-result.innerText=data
+.then(data=>{
+
+document.getElementById("deleteResult").innerText=
+JSON.stringify(data,null,2)
+
+})
 
 }
 
