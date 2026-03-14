@@ -37,7 +37,6 @@ function setOnline(online){
   statusText.textContent = online ? "Online" : "Offline";
 }
 
-// Maintain last success to drive Online badge
 let lastSuccess = 0;
 setOnline(navigator.onLine);
 window.addEventListener("online", ()=> setOnline(true));
@@ -47,7 +46,7 @@ setInterval(()=>{
   setOnline(online);
 }, 4000);
 
-// ---------- Sticky action bar height -> CSS var to lift toasts ----------
+// ---------- Sticky action bar height ----------
 function updateStickyHeight(){
   const activePanel = document.querySelector(".panel.active");
   const bar = activePanel?.querySelector(".action-bar");
@@ -70,7 +69,7 @@ const THEME_KEY = "nb_theme";
 function getSystemTheme(){
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
-function applyTheme(mode){ // mode: "light" | "dark" | "auto"
+function applyTheme(mode){
   const html = document.documentElement;
   if (mode === "auto") {
     const sys = getSystemTheme();
@@ -81,10 +80,8 @@ function applyTheme(mode){ // mode: "light" | "dark" | "auto"
     html.setAttribute("data-theme", mode);
     html.setAttribute("data-theme-active", mode);
   }
-  // Update icon
   const active = html.getAttribute("data-theme-active");
   themeIcon.textContent = active === "light" ? "🌙" : "☀️";
-  // Theme color meta
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute("content", active === "light" ? "#f6f7fb" : "#0f1020");
 }
@@ -99,7 +96,7 @@ function cycleTheme(){
   applyTheme(next);
   toast(`Theme: ${next}`, "ok");
 }
-themeToggle.addEventListener("click", cycleTheme);
+$("themeToggle").addEventListener("click", cycleTheme);
 window.matchMedia?.("(prefers-color-scheme: dark)").addEventListener?.("change", ()=>{
   const saved = localStorage.getItem(THEME_KEY) || "auto";
   if (saved === "auto") applyTheme("auto");
@@ -118,7 +115,7 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
   });
 });
 
-// ---------- CREATE ----------
+// ---------- CREATE (POST /api/accounts?adharNumber=&bankName=) ----------
 $("btnCreate").addEventListener("click", async ()=>{
   blurActive();
   const FullName = ($("name").value || "").trim();
@@ -126,30 +123,25 @@ $("btnCreate").addEventListener("click", async ()=>{
   const mobileNumber = ($("mobile").value || "").trim();
   const email = ($("email").value || "").trim();
   const address = ($("address").value || "").trim();
-  const aadhaar = ($("aadhaar").value || "").trim();
+  const adharNumber = ($("aadhaar").value || "").trim(); // RAML key is "adharNumber"
   const bankName = ($("bank").value || "").trim();
 
-  if(!FullName){
-    toast("FullName is required", "err");
-    $("name").focus();
-    return;
-  }
+  // RAML-required validations
+  if(!FullName){ toast("FullName is required", "err"); $("name").focus(); return; }
+  if(!dateOfBirth){ toast("dateOfBirth must be YYYYMMDD", "err"); $("dob").focus(); return; }
+  if(!mobileNumber){ toast("mobileNumber is required", "err"); $("mobile").focus(); return; }
+  if(!email){ toast("email is required", "err"); $("email").focus(); return; }
+  if(!address){ toast("address is required", "err"); $("address").focus(); return; }
+  if(!/^\d{12}$/.test(adharNumber)){ toast("Aadhaar (adharNumber) must be 12 digits", "err"); $("aadhaar").focus(); return; }
+  if(!["SBI","HDFC","APGIVB","AXIS","ICICI"].includes(bankName)){ toast("Select a valid bank", "err"); $("bank").focus(); return; }
 
-  // If your RAML expects aadhaarNumber instead of adharNumber, change key here:
-  const payload = {
-    FullName,
-    dateOfBirth,
-    mobileNumber,
-    email,
-    address,
-    adharNumber: aadhaar,
-    bankName
-  };
+  const payload = { FullName, dateOfBirth, mobileNumber, email, address };
 
   const btn = $("btnCreate");
   btn.disabled = true; showLoader(true);
   try{
-    const res = await fetch(API("/createAccount"), {
+    const qs = new URLSearchParams({ adharNumber, bankName }).toString();
+    const res = await fetch(API(`/accounts?${qs}`), {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload)
@@ -171,7 +163,7 @@ $("btnCreate").addEventListener("click", async ()=>{
   }
 });
 
-// ---------- SEARCH ----------
+// ---------- SEARCH (GET /api/accounts/{id}) ----------
 $("btnSearch").addEventListener("click", async ()=>{
   blurActive();
   const id = ($("getAcc").value || "").trim();
@@ -183,21 +175,26 @@ $("btnSearch").addEventListener("click", async ()=>{
 
   showLoader(true);
   try{
-    const res = await fetch(API(`/getAccount/${encodeURIComponent(id)}`));
+    const res = await fetch(API(`/accounts/${encodeURIComponent(id)}`));
     const text = await res.text();
     let data; try{ data = text ? JSON.parse(text) : {}; } catch{ data = { raw: text }; }
 
     if(!res.ok){
       throw new Error(data?.message || data?.error || `HTTP ${res.status}`);
     }
-    const acc = data?.account_data || {};
+
+    // Mule GET returns a flat object; fullName is lowercased in your transform.
+    const fullName = data.FullName || data.fullName || "(No Name)";
+
     const card = document.createElement("div");
     card.className = "bankCard";
-    const h3 = document.createElement("h3"); h3.textContent = acc.FullName || "(No Name)";
+    const h3 = document.createElement("h3"); h3.textContent = fullName;
     const pAcc = document.createElement("p"); pAcc.textContent = `Account: ${data.accountNumber ?? "(unknown)"}`;
-    const pMob = document.createElement("p"); pMob.textContent = `Mobile: ${acc.mobileNumber ?? "(unknown)"}`;
-    const pEmail = document.createElement("p"); pEmail.textContent = `Email: ${acc.email ?? "(unknown)"}`;
-    card.innerHTML = ""; card.appendChild(h3); card.appendChild(pAcc); card.appendChild(pMob); card.appendChild(pEmail);
+    const pMob = document.createElement("p"); pMob.textContent = `Mobile: ${data.mobileNumber ?? "(unknown)"}`;
+    const pEmail = document.createElement("p"); pEmail.textContent = `Email: ${data.email ?? "(unknown)"}`;
+    const pDob = document.createElement("p"); pDob.textContent = `DOB: ${data.dateOfBirth ?? "(unknown)"}`;
+    const pAddr = document.createElement("p"); pAddr.textContent = `Address: ${data.address ?? "(unknown)"}`;
+    card.innerHTML = ""; card.appendChild(h3); card.appendChild(pAcc); card.appendChild(pMob); card.appendChild(pEmail); card.appendChild(pDob); card.appendChild(pAddr);
     cardWrap.innerHTML = ""; cardWrap.appendChild(card);
     toast("Account fetched");
     lastSuccess = Date.now();
@@ -209,7 +206,7 @@ $("btnSearch").addEventListener("click", async ()=>{
   }
 });
 
-// ---------- UPDATE ----------
+// ---------- UPDATE (PATCH /api/accounts/{id}) ----------
 $("btnUpdate").addEventListener("click", async ()=>{
   blurActive();
   const id = ($("updateAcc").value || "").trim();
@@ -228,7 +225,7 @@ $("btnUpdate").addEventListener("click", async ()=>{
   const btn = $("btnUpdate");
   btn.disabled = true; showLoader(true);
   try{
-    const res = await fetch(API(`/updateAccount/${encodeURIComponent(id)}`), {
+    const res = await fetch(API(`/accounts/${encodeURIComponent(id)}`), {
       method: "PATCH",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload)
@@ -250,7 +247,7 @@ $("btnUpdate").addEventListener("click", async ()=>{
   }
 });
 
-// ---------- DELETE ----------
+// ---------- DELETE (DELETE /api/accounts/{id}) ----------
 $("btnDelete").addEventListener("click", async ()=>{
   blurActive();
   const id = ($("deleteAcc").value || "").trim();
@@ -259,7 +256,7 @@ $("btnDelete").addEventListener("click", async ()=>{
   const btn = $("btnDelete");
   btn.disabled = true; showLoader(true);
   try{
-    const res = await fetch(API(`/deleteAccount/${encodeURIComponent(id)}`), { method:"DELETE" });
+    const res = await fetch(API(`/accounts/${encodeURIComponent(id)}`), { method:"DELETE" });
     const text = await res.text();
     let data; try{ data = text ? JSON.parse(text) : {}; } catch{ data = { raw: text }; }
 
