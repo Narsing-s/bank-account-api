@@ -1,7 +1,7 @@
 {
   "name": "bank-ui",
   "version": "1.0.0",
-  "description": "Bank UI for MuleSoft API",
+  "description": "Bank UI for MuleSoft CloudHub API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
