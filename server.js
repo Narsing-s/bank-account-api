@@ -1,27 +1,24 @@
-const express = require("express")
-const axios = require("axios")
-const cors = require("cors")
+const express=require("express")
+const axios=require("axios")
+const cors=require("cors")
 
-const app = express()
+const app=express()
 
 app.use(express.json())
 app.use(cors())
 app.use(express.static("public"))
 
-/* CloudHub Mule API */
-const MULE_API = "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api"
+const API="https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api"
 
 
-/* CREATE ACCOUNT */
-
-app.post("/createAccount", async (req,res)=>{
+app.post("/createAccount",async(req,res)=>{
 
 try{
 
 const {FullName,dateOfBirth,mobileNumber,email,address,adharNumber,bankName}=req.body
 
-const response = await axios.post(
-`${MULE_API}/accounts?adharNumber=${adharNumber}&bankName=${bankName}`,
+const response=await axios.post(
+`${API}/accounts?adharNumber=${adharNumber}&bankName=${bankName}`,
 {
 FullName,
 dateOfBirth,
@@ -34,79 +31,66 @@ res.json(response.data)
 
 }catch(err){
 
-res.status(500).json(err.response?.data || err.message)
+res.status(500).json(err.response?.data||err.message)
 
 }
 
 })
 
 
-
-/* GET ACCOUNT */
-
-app.get("/getAccount/:accountNumber", async (req,res)=>{
+app.get("/getAccount/:id",async(req,res)=>{
 
 try{
 
-const response = await axios.get(
-`${MULE_API}/accounts/${req.params.accountNumber}`
-)
+const response=await axios.get(`${API}/accounts/${req.params.id}`)
 
 res.json(response.data)
 
 }catch(err){
 
-res.status(500).json(err.response?.data || err.message)
+res.status(500).json(err.response?.data||err.message)
 
 }
 
 })
 
 
-
-/* UPDATE ACCOUNT */
-
-app.patch("/updateAccount/:accountNumber", async (req,res)=>{
+app.patch("/updateAccount/:id",async(req,res)=>{
 
 try{
 
-const {FullName,email,mobileNumber} = req.body
+const {FullName,email,mobileNumber}=req.body
 
-const response = await axios.patch(
-`${MULE_API}/accounts/${req.params.accountNumber}`,
-{
+const response=await axios.patch(`${API}/accounts/${req.params.id}`,{
+
 FullName,
 ADDRESS:email,
 MOBILENUMBER:mobileNumber
+
 })
 
 res.json(response.data)
 
 }catch(err){
 
-res.status(500).json(err.response?.data || err.message)
+res.status(500).json(err.response?.data||err.message)
 
 }
 
 })
 
 
-
-/* DELETE ACCOUNT */
-
-app.delete("/deleteAccount/:accountNumber", async (req,res)=>{
+app.delete("/deleteAccount/:id",async(req,res)=>{
 
 try{
 
-const response = await axios.delete(
-`${MULE_API}/accounts/${req.params.accountNumber}`
-)
+const response=await axios.delete(`${API}/accounts/${req.params.id}`)
 
 res.json(response.data)
 
 }catch(err){
 
-res.status(500).json(err.response?.data || err.message)
+res.status(500).json(err.response?.data||err.message)
 
 }
 
