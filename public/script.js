@@ -17,9 +17,9 @@ function toast(msg, type="ok"){
     setTimeout(()=> wrap.removeChild(el), 250);
   }, 3000);
 }
-
 function showLoader(on){ loader.classList.toggle("hidden", !on); }
 function blurActive(){ if (document.activeElement?.blur) document.activeElement.blur(); }
+
 function setOnline(online){
   statusDot.classList.toggle("online", online);
   statusDot.classList.toggle("offline", !online);
@@ -34,7 +34,7 @@ setInterval(()=>{
   setOnline(online);
 }, 4000);
 
-// Hover shimmer position
+// Shimmer hover
 document.addEventListener("pointermove", e => {
   document.querySelectorAll("button").forEach(btn=>{
     const rect = btn.getBoundingClientRect();
@@ -102,12 +102,10 @@ function launchConfetti(count=60){
     setTimeout(()=> fx.removeChild(c), 2600);
   }
 }
-
-// Add keyframes for confetti at runtime if not present
+// add keyframes
 (function ensureConfettiKeyframes(){
   const style = document.createElement("style");
-  style.textContent = `
-  @keyframes fall { to { transform: translateY(110vh) rotate(360deg) } }`;
+  style.textContent = `@keyframes fall { to { transform: translateY(110vh) rotate(360deg) } }`;
   document.head.appendChild(style);
 })();
 
@@ -140,6 +138,7 @@ $("btnCreate").addEventListener("click", async ()=>{
   if(!["SBI","HDFC","APGIVB","AXIS","ICICI"].includes(bankName)){ toast("Select a valid bank", "err"); $("bank").focus(); return; }
 
   const payload = { FullName, dateOfBirth, mobileNumber, email, address };
+
   const btn = $("btnCreate");
   btn.disabled = true; showLoader(true);
   try{
@@ -150,7 +149,7 @@ $("btnCreate").addEventListener("click", async ()=>{
       body: JSON.stringify(payload)
     });
 
-    if(!res.ok){
+    if(!(res.status === 200 || res.status === 201)){
       throw new Error((data && data.message) || `HTTP ${res.status}`);
     }
     $("createResult").textContent = JSON.stringify(data, null, 2);
@@ -265,5 +264,4 @@ $("btnDelete").addEventListener("click", async ()=>{
   }
 });
 
-// Initial compute of sticky area
 window.addEventListener("load", updateStickyHeight);
