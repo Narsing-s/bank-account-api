@@ -1,5 +1,4 @@
 :root{
-  /* Blue & Pink palette */
   --blue:#00c6ff; --blue2:#2bd2ff; --pink:#ff61d2; --pink2:#ff78e1;
   --bg1:#0b1024; --bg2:#0e1536;
   --glass:rgba(255,255,255,.09);
@@ -17,6 +16,24 @@
 
   --stickyH: 0px;
 }
+
+/* THEME: dark / light via data-theme on html */
+html[data-theme="light"]{
+  --bg1:#f3f6fb; --bg2:#e7eef8;
+  --text:#0e1536; --muted:#334066;
+  --glass:rgba(255,255,255,.7);
+  --border:rgba(0,0,0,.12);
+  --shadow:0 10px 30px rgba(0,0,0,.18);
+}
+
+/* High contrast */
+html.hc {
+  --border:#fff;
+  --glass:rgba(255,255,255,.12);
+}
+
+/* Reduced motion */
+html.rm *{ animation: none !important; transition: none !important }
 
 /* Base */
 *{box-sizing:border-box}
@@ -64,6 +81,11 @@ body{
 .dot{ width:10px; height:10px; border-radius:50% }
 .dot.offline{ background:#888 }
 .dot.online{ background:var(--ok); box-shadow:0 0 10px var(--ok) }
+.actions{ display:flex; gap:10px; align-items:center }
+.icon-btn{
+  background:var(--glass); border:1px solid var(--border); border-radius:12px; color:var(--text);
+  padding:8px 10px; cursor:pointer;
+}
 
 /* Tabs */
 .tabs{
@@ -126,12 +148,37 @@ button:hover::after{ opacity:.45 }
 button.danger{ background:linear-gradient(135deg, #ff7ea8, #ff416c) }
 button:disabled{ filter:grayscale(.8) opacity(.7); cursor:not-allowed }
 
-/* Results */
+/* Chips (settings) */
+.chips{ display:flex; gap:8px; flex-wrap:wrap }
+.chip{
+  background:var(--glass); border:1px solid var(--border); border-radius:999px; color:var(--text);
+  padding:8px 12px; font-weight:700;
+}
+
+/* Results / Response */
 .result{
   background:rgba(0,0,0,.45); border:1px solid var(--border); border-radius:12px;
   padding:12px; margin-top:12px; max-height:260px; overflow:auto;
   font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:var(--fs-12);
 }
+
+/* Response Overlay */
+.overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,.45);
+  display:grid; place-items:center; z-index:2000;
+}
+.overlay.hidden{ display:none }
+.overlay-card{
+  width:min(900px, 92vw); max-height:80vh; overflow:auto;
+  background:rgba(255,255,255,.08); border:1px solid var(--border);
+  border-radius:16px; box-shadow:var(--shadow); backdrop-filter:blur(12px);
+  animation: pop .2s ease;
+}
+.overlay-head{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px 16px; border-bottom:1px solid var(--border)
+}
+@keyframes pop{ from{ transform:translateY(6px); opacity:0 } to{ transform:translateY(0); opacity:1 } }
 
 /* Bank card */
 .bankCard{
@@ -170,14 +217,13 @@ button:disabled{ filter:grayscale(.8) opacity(.7); cursor:not-allowed }
 /* Toasts */
 .toasts{
   position:fixed; right:12px; left:12px; bottom: calc(12px + var(--stickyH));
-  display:flex; flex-direction:column; gap:8px; z-index:1000
+  display:flex; flex-direction:column; gap:8px; z-index:1500
 }
 .toast{
   background:rgba(0,0,0,.85); color:#fff; padding:12px 14px; border-radius:10px; border:1px solid var(--border);
   box-shadow:var(--shadow); animation:pop .2s ease; font-size:var(--fs-14)
 }
 .toast.ok{ border-left:4px solid var(--ok) } .toast.err{ border-left:4px solid var(--danger) }
-@keyframes pop{ from{ transform:translateY(6px); opacity:0 } to{ transform:translateY(0); opacity:1 } }
 @media (min-width:640px){ .toasts{ right:18px; left:auto } .toast{ min-width:260px } }
 
 /* Loader */
@@ -189,14 +235,26 @@ button:disabled{ filter:grayscale(.8) opacity(.7); cursor:not-allowed }
 }
 @keyframes spin{ to{ transform:rotate(360deg) } }
 
+/* Settings Drawer */
+.settings{
+  position:fixed; inset:0; z-index:2200; display:grid; grid-template-columns: 1fr min(420px, 90vw);
+}
+.settings.hidden{ display:none }
+.settings::before{ content:""; background:rgba(0,0,0,.45) }
+.settings-card{
+  background:rgba(255,255,255,.08); border-left:1px solid var(--border);
+  backdrop-filter: blur(12px); padding:16px; overflow:auto;
+}
+.settings-head{
+  display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;
+}
+.settings-group{ margin:16px 0 }
+.settings-group.toggles label{ display:flex; gap:10px; align-items:center }
+
 /* Focus */
 :focus-visible{ outline:2px solid var(--pink); outline-offset:3px; border-radius:10px }
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce){
-  *{ animation:none !important; transition:none !important }
-  .bg-gradient, .bg-aurora, .bg-particles{ display:none }
-}
+/* Reduced motion toggle effect (class added on html: rm) handled above */
 
 /* Mobile tweaks */
 @media (max-width:420px){
