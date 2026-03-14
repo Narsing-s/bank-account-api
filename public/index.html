@@ -25,7 +25,7 @@
 <option value="pink">Pink</option>
 </select>
 
-<select id="lang">
+<select>
 <option>English</option>
 <option>Hindi</option>
 <option>Telugu</option>
@@ -37,10 +37,7 @@
 
 
 <div class="status">
-
-API STATUS :
-<span id="apiStatus">Checking...</span>
-
+API STATUS : <span id="apiStatus">Checking...</span>
 </div>
 
 
@@ -51,15 +48,10 @@ API STATUS :
 <h2>Create Account</h2>
 
 <input id="name" placeholder="Full Name">
-
 <input id="dob" placeholder="YYYYMMDD">
-
 <input id="mobile" placeholder="Mobile">
-
 <input id="email" placeholder="Email">
-
 <input id="address" placeholder="Address">
-
 <input id="adhar" placeholder="Aadhar Number">
 
 <select id="bank">
@@ -80,19 +72,18 @@ API STATUS :
 
 <div class="card">
 
-<h2>Get Account</h2>
+<h2>Search Account</h2>
 
 <div class="searchBox">
 
 <input id="getAcc" placeholder="Account Number" onkeyup="showSuggestions()">
-
 <div id="suggestions"></div>
 
 </div>
 
 <button onclick="getAccount()">Search</button>
 
-<div id="accountCards"></div>
+<div id="bankCard"></div>
 
 <div id="getResult"></div>
 
@@ -102,43 +93,19 @@ API STATUS :
 
 <div class="card">
 
-<h2>Account Analytics</h2>
+<h2>Transaction Timeline</h2>
+
+<ul id="timeline"></ul>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>Analytics</h2>
 
 <canvas id="accountChart"></canvas>
-
-</div>
-
-
-
-<div class="card">
-
-<h2>Update Account</h2>
-
-<input id="updateAcc" placeholder="Account Number">
-
-<input id="updateName" placeholder="Full Name">
-
-<input id="updateAddress" placeholder="Address">
-
-<input id="updateMobile" placeholder="Mobile">
-
-<button onclick="updateAccount()">Update</button>
-
-<pre id="updateResult"></pre>
-
-</div>
-
-
-
-<div class="card">
-
-<h2>Delete Account</h2>
-
-<input id="deleteAcc" placeholder="Account Number">
-
-<button onclick="deleteAccount()">Delete</button>
-
-<pre id="deleteResult"></pre>
 
 </div>
 
