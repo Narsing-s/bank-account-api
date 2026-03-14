@@ -1,7 +1,7 @@
 {
   "name": "bank-dashboard",
-  "version": "2.3.1",
-  "description": "Animated Blue & Pink Bank Dashboard UI for MuleSoft API (Fixed, Multi-language + Voice + Magnetic + Glass Carousel)",
+  "version": "2.0.0",
+  "description": "Animated Blue & Pink Bank Dashboard UI for MuleSoft API",
   "private": true,
   "main": "server.js",
   "scripts": {
