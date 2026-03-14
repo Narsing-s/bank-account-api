@@ -1,7 +1,7 @@
 {
-  "name": "bank-dashboard",
-  "version": "2.0.0",
-  "description": "Animated Bank Dashboard UI (MuleSoft CloudHub API)",
+  "name": "bank-portal",
+  "version": "3.0.0",
+  "description": "Animated Banking UI (MuleSoft CloudHub API) with i18n + PWA + Android path",
   "private": true,
   "main": "server.js",
   "scripts": {
@@ -17,3 +17,4 @@
     "morgan": "^1.10.0"
   }
 }
+``
