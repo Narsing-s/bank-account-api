@@ -5,7 +5,7 @@ const axios = require("axios");
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// ✅ Your CloudHub base (already includes /api)
+// ✅ Your CloudHub base (already includes /api from your Mule listener path)
 const API_BASE = process.env.API_BASE || "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api";
 
 app.use(cors());
@@ -31,7 +31,6 @@ async function proxy(method, path, req, res) {
       validateStatus: () => true
     });
 
-    // Log upstream for debugging 404s
     console.log(`[UPSTREAM] ${method} ${url} -> ${ax.status}`);
 
     if (typeof ax.data === "object") {
@@ -45,7 +44,7 @@ async function proxy(method, path, req, res) {
   }
 }
 
-/** === RESTful routes mapping 1:1 to your RAML === */
+/** === RESTful routes (align with RAML) === */
 app.post("/api/accounts", (req, res) => proxy("POST", "/accounts", req, res));
 app.get("/api/accounts/:id", (req, res) => proxy("GET", `/accounts/${encodeURIComponent(req.params.id)}`, req, res));
 app.patch("/api/accounts/:id", (req, res) => proxy("PATCH", `/accounts/${encodeURIComponent(req.params.id)}`, req, res));
