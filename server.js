@@ -8,116 +8,106 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static("public"))
 
-const API = "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api"
+const API="https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api"
 
 
 // CREATE ACCOUNT
-app.post("/createAccount", async (req, res) => {
+app.post("/createAccount",async(req,res)=>{
 
-  try {
+try{
 
-    const { FullName, dateOfBirth, mobileNumber, email, address, adharNumber, bankName } = req.body
+const {FullName,dateOfBirth,mobileNumber,email,address,adharNumber,bankName}=req.body
 
-    console.log("Create request:", req.body)
+const response=await axios.post(
+`${API}/accounts?adharNumber=${adharNumber}&bankName=${bankName}`,
+{
+FullName,
+dateOfBirth,
+mobileNumber,
+email,
+address
+})
 
-    const response = await axios.post(
-      `${API}/accounts?adharNumber=${adharNumber}&bankName=${bankName}`,
-      {
-        FullName,
-        dateOfBirth,
-        mobileNumber,
-        email,
-        address
-      }
-    )
+res.json(response.data)
 
-    res.json(response.data)
+}catch(err){
 
-  } catch (err) {
+console.log(err.response?.data)
 
-    console.log("Create error:", err.response?.data)
-    res.status(500).json(err.response?.data || err.message)
+res.status(500).json(err.response?.data||err.message)
 
-  }
+}
 
 })
 
 
 // GET ACCOUNT
-app.get("/getAccount/:id", async (req, res) => {
+app.get("/getAccount/:id",async(req,res)=>{
 
-  try {
+try{
 
-    console.log("Searching:", req.params.id)
+const response=await axios.get(`${API}/accounts/${req.params.id}`)
 
-    const response = await axios.get(`${API}/accounts/${req.params.id}`)
+res.json(response.data)
 
-    res.json(response.data)
+}catch(err){
 
-  } catch (err) {
+res.status(500).json(err.response?.data||err.message)
 
-    console.log("Get error:", err.response?.data)
-    res.status(500).json(err.response?.data || err.message)
-
-  }
+}
 
 })
 
 
 // UPDATE ACCOUNT
-app.patch("/updateAccount/:id", async (req, res) => {
+app.patch("/updateAccount/:id",async(req,res)=>{
 
-  try {
+try{
 
-    const id = req.params.id
-    const { FullName, email, mobileNumber } = req.body
+const payload={}
 
-    console.log("Update request:", id, req.body)
+if(req.body.FullName) payload.FullName=req.body.FullName
+if(req.body.email) payload.email=req.body.email
+if(req.body.mobileNumber) payload.mobileNumber=req.body.mobileNumber
 
-    const payload = {}
+const response=await axios.patch(
+`${API}/accounts/${req.params.id}`,
+payload
+)
 
-    if (FullName) payload.FullName = FullName
-    if (email) payload.email = email
-    if (mobileNumber) payload.mobileNumber = mobileNumber
+res.json(response.data)
 
-    const response = await axios.patch(
-      `${API}/accounts/${id}`,
-      payload
-    )
+}catch(err){
 
-    res.json(response.data)
+console.log(err.response?.data)
 
-  } catch (err) {
+res.status(500).json(err.response?.data||err.message)
 
-    console.log("Update error:", err.response?.data)
-    res.status(500).json(err.response?.data || err.message)
-
-  }
+}
 
 })
 
 
 // DELETE ACCOUNT
-app.delete("/deleteAccount/:id", async (req, res) => {
+app.delete("/deleteAccount/:id",async(req,res)=>{
 
-  try {
+try{
 
-    console.log("Deleting:", req.params.id)
+const response=await axios.delete(`${API}/accounts/${req.params.id}`)
 
-    const response = await axios.delete(`${API}/accounts/${req.params.id}`)
+res.json(response.data)
 
-    res.json(response.data)
+}catch(err){
 
-  } catch (err) {
+res.status(500).json(err.response?.data||err.message)
 
-    console.log("Delete error:", err.response?.data)
-    res.status(500).json(err.response?.data || err.message)
-
-  }
+}
 
 })
 
 
-app.listen(3000, () => {
-  console.log("Server running → http://localhost:3000")
+app.listen(3000,()=>{
+
+console.log("Server running → http://localhost:3000")
+
 })
