@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Bank Dashboard</title>
+
+<title>Bank Account Dashboard</title>
+
 <link rel="stylesheet" href="style.css">
+
 </head>
 
-<body class="blue">
+<body>
 
 <header>
 
@@ -14,16 +18,23 @@
 <div class="settings">
 
 <label>Theme</label>
-<select id="themeSelect">
+
+<select id="theme">
+
+<option value="default">Gradient</option>
 <option value="blue">Blue</option>
 <option value="pink">Pink</option>
+
 </select>
 
 <label>Language</label>
-<select id="langSelect">
+
+<select id="lang">
+
 <option value="en">English</option>
 <option value="hi">Hindi</option>
 <option value="te">Telugu</option>
+
 </select>
 
 </div>
@@ -50,14 +61,16 @@
 <input id="adhar" placeholder="Aadhar Number">
 
 <select id="bank">
+
 <option value="">Select Bank</option>
 <option value="SBI">SBI</option>
 <option value="HDFC">HDFC</option>
 <option value="ICICI">ICICI</option>
 <option value="AXIS">AXIS</option>
+
 </select>
 
-<button onclick="createAccount()">Create</button>
+<button onclick="createAccount()">Create Account</button>
 
 <pre id="createResult"></pre>
 
@@ -70,9 +83,9 @@
 
 <input id="getAcc" placeholder="Account Number">
 
-<button onclick="getAccount()">Get</button>
+<button onclick="getAccount()">Get Account</button>
 
-<pre id="getResult"></pre>
+<div id="getResult"></div>
 
 </div>
 
@@ -109,6 +122,8 @@
 </div>
 
 </div>
+
+<div id="toast"></div>
 
 <script src="script.js"></script>
 
