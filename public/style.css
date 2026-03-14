@@ -1,117 +1,73 @@
 body{
-
 font-family:Arial;
 margin:0;
 color:white;
-
 }
 
 .theme-blue{
-
 background:linear-gradient(270deg,#001f4d,#0066ff,#00c6ff);
 background-size:600% 600%;
-animation:gradientMove 10s infinite;
-
+animation:move 10s infinite;
 }
 
 .theme-pink{
-
 background:linear-gradient(270deg,#ff4fa3,#ff7eb3,#ff2e63);
 background-size:600% 600%;
-animation:gradientMove 10s infinite;
-
+animation:move 10s infinite;
 }
 
 .theme-dark{
-
 background:linear-gradient(270deg,#0f2027,#203a43,#2c5364);
 background-size:600% 600%;
-animation:gradientMove 10s infinite;
-
+animation:move 10s infinite;
 }
 
-@keyframes gradientMove{
-
+@keyframes move{
 0%{background-position:0% 50%}
 50%{background-position:100% 50%}
 100%{background-position:0% 50%}
-
 }
 
 header{
-
 display:flex;
 justify-content:space-between;
 padding:20px;
-
 }
 
 .container{
-
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
 gap:20px;
 padding:20px;
-
 }
 
 .card{
-
 background:rgba(255,255,255,0.15);
 padding:20px;
 border-radius:12px;
 backdrop-filter:blur(10px);
-
 }
 
 input,select{
-
 width:100%;
 padding:10px;
 margin-bottom:10px;
 border:none;
 border-radius:5px;
-
 }
 
 button{
-
 padding:10px;
 border:none;
 border-radius:6px;
-cursor:pointer;
-background:#000;
+background:black;
 color:white;
-
+cursor:pointer;
 }
 
 .bankCard{
-
 background:linear-gradient(135deg,#ff4fa3,#0066ff);
 padding:20px;
-border-radius:12px;
-margin-top:10px;
-
-}
-
-#timeline{
-
-list-style:none;
-padding:10px;
-background:#00000040;
 border-radius:10px;
-max-height:200px;
-overflow:auto;
-
-}
-
-#toast{
-
-position:fixed;
-bottom:20px;
-right:20px;
-background:black;
-padding:10px;
-display:none;
-
+margin-top:10px;
 }
