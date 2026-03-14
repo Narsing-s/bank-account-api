@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="auto">
 <head>
   <meta charset="utf-8" />
-  <title>NeoBank Control Center</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bank-account-api</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f1020" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -16,9 +17,14 @@
         <div class="brand-sub">Real‑time Account Management</div>
       </div>
     </div>
-    <div class="status" id="status">
-      <span class="dot offline" id="statusDot"></span>
-      <span id="statusText">Offline</span>
+    <div class="topbar-right">
+      <button id="themeToggle" class="icon-btn" aria-label="Toggle theme" title="Toggle theme">
+        <span id="themeIcon">🌙</span>
+      </button>
+      <div class="status" id="status">
+        <span class="dot offline" id="statusDot"></span>
+        <span id="statusText">Offline</span>
+      </div>
     </div>
   </header>
 
@@ -61,9 +67,14 @@
           </select>
         </label>
       </div>
-      <div class="actions">
-        <button id="btnCreate" class="primary">Create Account</button>
+
+      <!-- Sticky action bar on mobile -->
+      <div class="action-bar" data-for="create">
+        <div class="action-bar-inner">
+          <button id="btnCreate" class="primary">Create Account</button>
+        </div>
       </div>
+
       <pre id="createResult" class="result"></pre>
     </section>
 
@@ -75,9 +86,13 @@
           <input id="getAcc" placeholder="Enter account number" />
         </label>
       </div>
-      <div class="actions">
-        <button id="btnSearch" class="primary">Search</button>
+
+      <div class="action-bar" data-for="search">
+        <div class="action-bar-inner">
+          <button id="btnSearch" class="primary">Search</button>
+        </div>
       </div>
+
       <div id="bankCard" class="bankCard placeholder">
         <div class="skeleton title"></div>
         <div class="skeleton line"></div>
@@ -102,9 +117,13 @@
           <input id="updateMobile" placeholder="10-digit number" inputmode="tel" />
         </label>
       </div>
-      <div class="actions">
-        <button id="btnUpdate" class="primary">Update</button>
+
+      <div class="action-bar" data-for="update">
+        <div class="action-bar-inner">
+          <button id="btnUpdate" class="primary">Update</button>
+        </div>
       </div>
+
       <pre id="updateResult" class="result"></pre>
     </section>
 
@@ -116,9 +135,13 @@
           <input id="deleteAcc" placeholder="Enter account number" />
         </label>
       </div>
-      <div class="actions">
-        <button id="btnDelete" class="danger">Delete</button>
+
+      <div class="action-bar" data-for="delete">
+        <div class="action-bar-inner">
+          <button id="btnDelete" class="danger">Delete</button>
+        </div>
       </div>
+
       <pre id="deleteResult" class="result"></pre>
     </section>
   </main>
@@ -132,7 +155,7 @@
   </div>
 
   <script>
-    // Frontend will call /api/* (proxied by server.js)
+    // Frontend will call /api/* (proxied by server.js to your CloudHub URL)
     window.API_PREFIX = "/api";
   </script>
   <script src="script.js"></script>
