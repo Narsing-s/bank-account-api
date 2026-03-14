@@ -36,13 +36,15 @@ const acc=data.account_data||{}
 document.getElementById("bankCard").innerHTML=
 
 `
-<div style="padding:15px;background:linear-gradient(45deg,#ff4fa3,#0066ff);border-radius:10px">
+<div class="bankCard">
 
 <h3>${acc.FullName||""}</h3>
 
 <p>Account: ${data.accountNumber||""}</p>
 
 <p>${acc.mobileNumber||""}</p>
+
+<p>${acc.email||""}</p>
 
 </div>
 `
@@ -89,7 +91,8 @@ const values=[
 
 (data.accountNumber||"").length,
 (acc.mobileNumber||"").length,
-(acc.email||"").length
+(acc.email||"").length,
+(acc.address||"").length
 
 ]
 
@@ -97,14 +100,12 @@ if(chart) chart.destroy()
 
 chart=new Chart(document.getElementById("accountChart"),{
 
-type:"bar",
+type:"doughnut",
 
 data:{
-
-labels:["Account","Mobile","Email"],
+labels:["Account","Mobile","Email","Address"],
 
 datasets:[{data:values}]
-
 }
 
 })
@@ -112,13 +113,6 @@ datasets:[{data:values}]
 }
 
 async function createAccount(){
-
-if(!document.getElementById("name").value){
-
-toast("Full Name required")
-return
-
-}
 
 const payload={
 
@@ -154,13 +148,6 @@ addTimeline("Account created")
 async function getAccount(){
 
 const acc=document.getElementById("getAcc").value
-
-if(acc.length!==12){
-
-toast("Account must be 12 digits")
-return
-
-}
 
 const res=await fetch(`/getAccount/${acc}`)
 
@@ -226,20 +213,8 @@ addTimeline("Account deleted")
 
 }
 
-function toggleTheme(){
+function setTheme(theme){
 
-document.body.classList.toggle("dark")
-
-}
-
-function changeLanguage(){
-
-const lang=document.getElementById("language").value
-
-if(lang==="te") document.getElementById("title").innerText="బ్యాంక్ డాష్‌బోర్డ్"
-
-if(lang==="hi") document.getElementById("title").innerText="बैंक डैशबोर्ड"
-
-if(lang==="en") document.getElementById("title").innerText="🏦 Bank Dashboard"
+document.body.className="theme-"+theme
 
 }
