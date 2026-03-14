@@ -1,20 +1,13 @@
 body{
 font-family:Arial;
 margin:0;
-padding:0;
 }
 
 header{
 display:flex;
 justify-content:space-between;
-align-items:center;
 padding:15px;
 color:white;
-}
-
-.settings{
-display:flex;
-gap:10px;
 }
 
 .container{
@@ -44,14 +37,6 @@ color:white;
 cursor:pointer;
 }
 
-pre{
-background:#eee;
-padding:10px;
-}
-
-
-/* BLUE THEME */
-
 .blue header{
 background:#1976d2;
 }
@@ -59,9 +44,6 @@ background:#1976d2;
 .blue button{
 background:#1976d2;
 }
-
-
-/* PINK THEME */
 
 .pink header{
 background:#d81b60;
