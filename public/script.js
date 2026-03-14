@@ -1,11 +1,65 @@
-// ---------- Utilities ----------
-const $ = id => document.getElementById(id);
-const API = (path) => `${window.API_PREFIX || ""}${path}`;
+// ========= Config & Utilities =========
+const $ = (id) => document.getElementById(id);
+const q = (sel) => document.querySelector(sel);
+const qa = (sel) => Array.from(document.querySelectorAll(sel));
+
+function getApiUrl(path){
+  const mode = window.AppConfig?.mode || "web";
+  if (mode === "android") return `${window.AppConfig.ANDROID_BASE}${path}`;
+  return `${window.AppConfig.WEB_PREFIX || ""}${path}`;
+}
 
 const statusDot = $("statusDot");
 const statusText = $("statusText");
 const loader = $("loader");
+const respOverlay = $("respOverlay");
+const respBody = $("respBody");
 
+// ===== I18N =====
+const I18N = { en: null, te: null, hi: null };
+let currentLang = localStorage.getItem("lang") || "en";
+
+async function loadLang(lang){
+  if (!I18N[lang]) {
+    const res = await fetch(`/i18n/${lang}.json`);
+    I18N[lang] = await res.json();
+  }
+  currentLang = lang;
+  localStorage.setItem("lang", lang);
+  applyLang();
+}
+
+function t(key){
+  return (I18N[currentLang] && I18N[currentLang][key]) || key;
+}
+
+function applyLang(){
+  qa("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    el.textContent = t(key);
+  });
+}
+
+// ===== THEME & SETTINGS =====
+function applyTheme(theme){
+  const html = document.documentElement;
+  if (theme === "system") {
+    html.removeAttribute("data-theme");
+  } else {
+    html.setAttribute("data-theme", theme);
+  }
+  localStorage.setItem("theme", theme);
+}
+function applyMotion(reduce){
+  document.documentElement.classList.toggle("rm", !!reduce);
+  localStorage.setItem("reduceMotion", reduce ? "1" : "0");
+}
+function applyContrast(hc){
+  document.documentElement.classList.toggle("hc", !!hc);
+  localStorage.setItem("highContrast", hc ? "1" : "0");
+}
+
+// ===== UI Helpers =====
 function toast(msg, type="ok"){
   const wrap = $("toasts");
   const el = document.createElement("div");
@@ -19,7 +73,6 @@ function toast(msg, type="ok"){
 }
 function showLoader(on){ loader.classList.toggle("hidden", !on); }
 function blurActive(){ if (document.activeElement?.blur) document.activeElement.blur(); }
-
 function setOnline(online){
   statusDot.classList.toggle("online", online);
   statusDot.classList.toggle("offline", !online);
@@ -67,10 +120,10 @@ window.addEventListener("scroll", updateStickyHeight);
 setInterval(updateStickyHeight, 500);
 
 // Tabs
-document.querySelectorAll(".tab-btn").forEach(btn=>{
+qa(".tab-btn").forEach(btn=>{
   btn.addEventListener("click", ()=>{
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+    qa(".tab-btn").forEach(b=>b.classList.remove("active"));
+    qa(".panel").forEach(p=>p.classList.remove("active"));
     btn.classList.add("active");
     $(btn.dataset.tab).classList.add("active");
     setTimeout(()=> $(btn.dataset.tab)?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
@@ -78,7 +131,7 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
   });
 });
 
-// Confetti (blue & pink)
+// Confetti
 function launchConfetti(count=60){
   const colors = ["#00c6ff","#2bd2ff","#ff61d2","#ff78e1"];
   const fx = $("fx");
@@ -102,20 +155,64 @@ function launchConfetti(count=60){
     setTimeout(()=> fx.removeChild(c), 2600);
   }
 }
-// add keyframes
 (function ensureConfettiKeyframes(){
   const style = document.createElement("style");
   style.textContent = `@keyframes fall { to { transform: translateY(110vh) rotate(360deg) } }`;
   document.head.appendChild(style);
 })();
 
-// Common fetch wrapper
+// Fetch wrapper
 async function doFetch(url, options){
   const res = await fetch(url, options);
   const text = await res.text();
   let data; try{ data = text ? JSON.parse(text) : {}; } catch{ data = text; }
-  return {res, data};
+  return {res, data, text};
 }
+
+// Response Viewer
+function showResponse(obj) {
+  const pretty = typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
+  respBody.textContent = pretty;
+  respOverlay.classList.remove("hidden");
+}
+function hideResponse(){
+  respOverlay.classList.add("hidden");
+}
+$("btnCloseResp").addEventListener("click", hideResponse);
+$("btnCopyResp").addEventListener("click", async ()=>{
+  try {
+    await navigator.clipboard.writeText(respBody.textContent);
+    toast("Copied");
+  } catch {
+    toast("Copy failed","err");
+  }
+});
+
+// Settings
+const settings = $("settings");
+$("btnSettings").addEventListener("click", ()=> settings.classList.remove("hidden"));
+$("btnCloseSettings").addEventListener("click", ()=> settings.classList.add("hidden"));
+qa('[data-theme]').forEach(btn=>{
+  btn.addEventListener("click", ()=> applyTheme(btn.dataset.theme));
+});
+qa('[data-lang]').forEach(btn=>{
+  btn.addEventListener("click", ()=> loadLang(btn.dataset.lang));
+});
+$("toggleMotion").addEventListener("change", (e)=> applyMotion(e.target.checked));
+$("toggleContrast").addEventListener("change", (e)=> applyContrast(e.target.checked));
+
+// Init settings
+(function initSettings(){
+  const theme = localStorage.getItem("theme") || "system";
+  const reduce = localStorage.getItem("reduceMotion") === "1";
+  const hc = localStorage.getItem("highContrast") === "1";
+  applyTheme(theme); applyMotion(reduce); applyContrast(hc);
+  $("toggleMotion").checked = reduce;
+  $("toggleContrast").checked = hc;
+})();
+
+// Load language and apply
+loadLang(currentLang).catch(console.error);
 
 // ---------- CREATE ----------
 $("btnCreate").addEventListener("click", async ()=>{
@@ -125,17 +222,16 @@ $("btnCreate").addEventListener("click", async ()=>{
   const mobileNumber = ($("mobile").value || "").trim();
   const email = ($("email").value || "").trim();
   const address = ($("address").value || "").trim();
-  const adharNumber = ($("aadhaar").value || "").trim(); // RAML key uses 'adharNumber'
+  const adharNumber = ($("aadhaar").value || "").trim();
   const bankName = ($("bank").value || "").trim();
 
-  // RAML validations
-  if(!FullName){ toast("FullName is required", "err"); $("name").focus(); return; }
-  if(!dateOfBirth){ toast("dateOfBirth must be YYYYMMDD", "err"); $("dob").focus(); return; }
-  if(!mobileNumber){ toast("mobileNumber is required", "err"); $("mobile").focus(); return; }
-  if(!email){ toast("email is required", "err"); $("email").focus(); return; }
-  if(!address){ toast("address is required", "err"); $("address").focus(); return; }
-  if(!/^\d{12}$/.test(adharNumber)){ toast("Aadhaar (adharNumber) must be 12 digits", "err"); $("aadhaar").focus(); return; }
-  if(!["SBI","HDFC","APGIVB","AXIS","ICICI"].includes(bankName)){ toast("Select a valid bank", "err"); $("bank").focus(); return; }
+  if(!FullName){ toast(t("toast.required.fullName"), "err"); $("name").focus(); return; }
+  if(!dateOfBirth){ toast(t("toast.required.dob"), "err"); $("dob").focus(); return; }
+  if(!mobileNumber){ toast(t("toast.required.mobile"), "err"); $("mobile").focus(); return; }
+  if(!email){ toast(t("toast.required.email"), "err"); $("email").focus(); return; }
+  if(!address){ toast(t("toast.required.address"), "err"); $("address").focus(); return; }
+  if(!/^\d{12}$/.test(adharNumber)){ toast(t("toast.invalid.aadhaar"), "err"); $("aadhaar").focus(); return; }
+  if(!["SBI","HDFC","APGIVB","AXIS","ICICI"].includes(bankName)){ toast(t("toast.invalid.bank"), "err"); $("bank").focus(); return; }
 
   const payload = { FullName, dateOfBirth, mobileNumber, email, address };
 
@@ -143,21 +239,21 @@ $("btnCreate").addEventListener("click", async ()=>{
   btn.disabled = true; showLoader(true);
   try{
     const qs = new URLSearchParams({ adharNumber, bankName }).toString();
-    const {res, data} = await doFetch(API(`/accounts?${qs}`), {
+    const {res, data, text} = await doFetch(getApiUrl(`/accounts?${qs}`), {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload)
     });
 
     if(!(res.status === 200 || res.status === 201)){
+      showResponse(text || data);
       throw new Error((data && data.message) || `HTTP ${res.status}`);
     }
-    $("createResult").textContent = JSON.stringify(data, null, 2);
-    toast("Account created successfully");
+    showResponse(data);
+    toast(t("toast.created"));
     launchConfetti(80);
     lastSuccess = Date.now();
   }catch(e){
-    $("createResult").textContent = `Error: ${e.message}`;
     toast(e.message, "err");
   }finally{
     btn.disabled = false; showLoader(false); updateStickyHeight();
@@ -168,7 +264,7 @@ $("btnCreate").addEventListener("click", async ()=>{
 $("btnSearch").addEventListener("click", async ()=>{
   blurActive();
   const id = ($("getAcc").value || "").trim();
-  if(!id){ toast("Account number is required", "err"); return; }
+  if(!id){ toast(t("toast.required.acc"), "err"); return; }
 
   const cardWrap = $("bankCard");
   cardWrap.classList.remove("placeholder");
@@ -176,8 +272,9 @@ $("btnSearch").addEventListener("click", async ()=>{
 
   showLoader(true);
   try{
-    const {res, data} = await doFetch(API(`/accounts/${encodeURIComponent(id)}`), { method:"GET" });
+    const {res, data, text} = await doFetch(getApiUrl(`/accounts/${encodeURIComponent(id)}`), { method:"GET" });
     if(!res.ok){
+      showResponse(text || data);
       throw new Error((data && data.message) || `HTTP ${res.status}`);
     }
     const fullName = data.FullName || data.fullName || "(No Name)";
@@ -190,10 +287,10 @@ $("btnSearch").addEventListener("click", async ()=>{
     const pAddr = document.createElement("p"); pAddr.textContent = `Address: ${data.address ?? "(unknown)"}`;
     card.append(h3,pAcc,pMob,pEmail,pDob,pAddr);
     cardWrap.innerHTML = ""; cardWrap.appendChild(card);
-    toast("Account fetched");
+    showResponse(data);
+    toast(t("toast.fetched"));
     lastSuccess = Date.now();
   }catch(e){
-    cardWrap.textContent = `Error: ${e.message}`;
     toast(e.message, "err");
   }finally{
     showLoader(false); updateStickyHeight();
@@ -204,7 +301,7 @@ $("btnSearch").addEventListener("click", async ()=>{
 $("btnUpdate").addEventListener("click", async ()=>{
   blurActive();
   const id = ($("updateAcc").value || "").trim();
-  if(!id){ toast("Account number is required", "err"); return; }
+  if(!id){ toast(t("toast.required.acc"), "err"); return; }
 
   const payload = {
     FullName: ($("updateName").value || "").trim(),
@@ -219,20 +316,20 @@ $("btnUpdate").addEventListener("click", async ()=>{
   const btn = $("btnUpdate");
   btn.disabled = true; showLoader(true);
   try{
-    const {res, data} = await doFetch(API(`/accounts/${encodeURIComponent(id)}`), {
+    const {res, data, text} = await doFetch(getApiUrl(`/accounts/${encodeURIComponent(id)}`), {
       method: "PATCH",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload)
     });
     if(!res.ok){
+      showResponse(text || data);
       throw new Error((data && data.message) || `HTTP ${res.status}`);
     }
-    $("updateResult").textContent = JSON.stringify(data, null, 2);
-    toast("Account updated");
+    showResponse(data);
+    toast(t("toast.updated"));
     launchConfetti(50);
     lastSuccess = Date.now();
   }catch(e){
-    $("updateResult").textContent = `Error: ${e.message}`;
     toast(e.message, "err");
   }finally{
     btn.disabled = false; showLoader(false); updateStickyHeight();
@@ -243,21 +340,21 @@ $("btnUpdate").addEventListener("click", async ()=>{
 $("btnDelete").addEventListener("click", async ()=>{
   blurActive();
   const id = ($("deleteAcc").value || "").trim();
-  if(!id){ toast("Account number is required", "err"); return; }
+  if(!id){ toast(t("toast.required.acc"), "err"); return; }
 
   const btn = $("btnDelete");
   btn.disabled = true; showLoader(true);
   try{
-    const {res, data} = await doFetch(API(`/accounts/${encodeURIComponent(id)}`), { method:"DELETE" });
+    const {res, data, text} = await doFetch(getApiUrl(`/accounts/${encodeURIComponent(id)}`), { method:"DELETE" });
     if(!res.ok){
+      showResponse(text || data);
       throw new Error((data && data.message) || `HTTP ${res.status}`);
     }
-    $("deleteResult").textContent = JSON.stringify(data, null, 2);
-    toast("Account deleted");
+    showResponse(data);
+    toast(t("toast.deleted"));
     launchConfetti(40);
     lastSuccess = Date.now();
   }catch(e){
-    $("deleteResult").textContent = `Error: ${e.message}`;
     toast(e.message, "err");
   }finally{
     btn.disabled = false; showLoader(false); updateStickyHeight();
@@ -265,3 +362,4 @@ $("btnDelete").addEventListener("click", async ()=>{
 });
 
 window.addEventListener("load", updateStickyHeight);
+``
