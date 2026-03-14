@@ -33,7 +33,6 @@ body{
   background: radial-gradient(60vw 60vw at 15% 20%, rgba(0,198,255,.16), transparent 60%),
               radial-gradient(50vw 50vw at 85% 30%, rgba(255,97,210,.16), transparent 60%),
               linear-gradient(120deg, rgba(0,198,255,.08), rgba(255,97,210,.08));
-  filter: blur(0px);
 }
 .bg-aurora{
   position:fixed; inset:auto 0 0 0; height:40vh; z-index:-2;
@@ -76,6 +75,7 @@ body{
   color:var(--text); background:var(--glass); border:1px solid var(--border);
   padding:12px 14px; border-radius:14px; font-weight:700; font-size:var(--fs-14);
   transition:.25s; backdrop-filter: blur(6px);
+  will-change: transform;
 }
 .tab-btn::before{
   content:""; position:absolute; inset:-1px; border-radius:16px; z-index:-1; opacity:.0; transition:.25s;
@@ -111,12 +111,13 @@ input:focus, select:focus{
   border-color:transparent; box-shadow:0 0 0 2px var(--blue), 0 0 0 6px rgba(0,198,255,.15), inset 0 0 0 1px var(--pink);
 }
 
-/* Buttons */
+/* Magnetic Buttons */
 button{
   position:relative; overflow:hidden; cursor:pointer; border:0; min-height:48px;
   border-radius:12px; padding:14px 18px; font-weight:800; font-size:var(--fs-16);
   color:#0b1024; background:linear-gradient(135deg, var(--blue), var(--pink));
   transition: transform .2s ease, box-shadow .2s ease;
+  will-change: transform;
 }
 button::after{
   content:""; position:absolute; inset:0; background:radial-gradient(120px 60px at var(--x,50%) var(--y,50%), rgba(255,255,255,.35), transparent 60%);
@@ -124,7 +125,6 @@ button::after{
 }
 button:hover{ transform:translateY(-1px); box-shadow:var(--shadow) }
 button:hover::after{ opacity:.45 }
-button.primary{ }
 button.danger{ background:linear-gradient(135deg, #ff7ea8, #ff416c) }
 button:disabled{ filter:grayscale(.8) opacity(.7); cursor:not-allowed }
 
@@ -135,17 +135,48 @@ button:disabled{ filter:grayscale(.8) opacity(.7); cursor:not-allowed }
   font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:var(--fs-12);
 }
 
-/* Bank card */
-.bankCard{
-  margin-top:16px; padding:20px; border-radius:16px; color:#fff;
-  background:linear-gradient(135deg, #3aa0ff, #d657ff);
-  box-shadow:var(--shadow); transform-style:preserve-3d; transition:transform .2s ease, box-shadow .2s ease;
-  border:1px solid rgba(255,255,255,.18);
+/* Glassmorphism Carousel */
+.carousel{
+  position:relative; margin-top:16px;
 }
-.bankCard:hover{ transform:perspective(800px) rotateX(1.5deg) rotateY(-2deg); box-shadow:0 30px 60px rgba(0,0,0,.45) }
-.bankCard.placeholder{ display:none }
-.bankCard h3{ margin:0 0 6px 0; font-size:var(--fs-16) }
-.bankCard p{ margin:2px 0; font-size:var(--fs-14) }
+.carousel-viewport{
+  overflow:hidden;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  backdrop-filter: blur(10px);
+}
+.carousel-track{
+  display:flex; align-items:stretch; gap:16px; padding:16px;
+  transition: transform .35s ease;
+  will-change: transform;
+}
+.gcard{
+  min-width: 280px; max-width: 320px; flex: 0 0 auto;
+  border-radius:16px; padding:18px; color:#fff;
+  background:linear-gradient(135deg, rgba(58,160,255,.25), rgba(214,87,255,.22));
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow: var(--shadow);
+  transform-style:preserve-3d; transition:transform .2s ease, box-shadow .2s ease, background .35s ease;
+}
+.gcard:hover{
+  transform:perspective(800px) rotateX(1.5deg) rotateY(-2deg) translateY(-2px);
+  box-shadow:0 30px 60px rgba(0,0,0,.45);
+  background:linear-gradient(135deg, rgba(58,160,255,.32), rgba(214,87,255,.30));
+}
+.gcard h3{ margin:0 0 6px 0; font-size:var(--fs-16) }
+.gcard p{ margin:2px 0; font-size:var(--fs-14); color:#f3f6ff }
+
+.carousel-nav{
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:44px; height:44px; border-radius:50%; border:1px solid var(--border);
+  background:var(--glass); color:var(--text);
+  display:grid; place-items:center; font-size:22px; cursor:pointer;
+  box-shadow:var(--shadow); backdrop-filter:blur(8px);
+}
+.carousel-nav.left{ left:8px }
+.carousel-nav.right{ right:8px }
+.carousel-nav:hover{ transform:translateY(-50%) scale(1.06) }
 
 /* Skeletons */
 .skeleton{
