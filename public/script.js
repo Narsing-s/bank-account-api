@@ -1,9 +1,14 @@
 let chart
 
+
 function convertDOB(d){
+
 if(!d || d.length!==8) return ""
+
 return `${d.substring(0,4)}-${d.substring(4,6)}-${d.substring(6,8)}`
+
 }
+
 
 
 async function createAccount(){
@@ -35,6 +40,7 @@ createResult.innerText=JSON.stringify(data,null,2)
 }
 
 
+
 async function getAccount(){
 
 const acc=getAcc.value
@@ -62,6 +68,7 @@ getResult.innerHTML=`<pre>${JSON.stringify(data,null,2)}</pre>`
 renderChart(data)
 
 }
+
 
 
 function renderChart(data){
@@ -92,15 +99,18 @@ datasets:[{data:values}]
 }
 
 
+
 async function updateAccount(){
 
 const acc=updateAcc.value
 
-const payload={}
+const payload={
 
-if(updateName.value) payload.FullName=updateName.value
-if(updateEmail.value) payload.email=updateEmail.value
-if(updateMobile.value) payload.mobileNumber=updateMobile.value
+FullName:updateName.value,
+email:updateEmail.value,
+mobileNumber:updateMobile.value
+
+}
 
 const res=await fetch(`/updateAccount/${acc}`,{
 
@@ -117,6 +127,7 @@ updateResult.innerText=JSON.stringify(data,null,2)
 }
 
 
+
 async function deleteAccount(){
 
 const acc=deleteAcc.value
@@ -130,12 +141,5 @@ method:"DELETE"
 const data=await res.json()
 
 deleteResult.innerText=JSON.stringify(data,null,2)
-
-}
-
-
-function setTheme(theme){
-
-document.body.className="theme-"+theme
 
 }
