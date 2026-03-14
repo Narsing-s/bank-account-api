@@ -2,13 +2,31 @@ body{
 
 font-family:Arial;
 margin:0;
-
-background:linear-gradient(270deg,#001f4d,#0066ff,#ff4fa3,#001f4d);
-background-size:800% 800%;
-
-animation:gradientMove 12s ease infinite;
-
 color:white;
+
+}
+
+.theme-blue{
+
+background:linear-gradient(270deg,#001f4d,#0066ff,#00c6ff);
+background-size:600% 600%;
+animation:gradientMove 10s infinite;
+
+}
+
+.theme-pink{
+
+background:linear-gradient(270deg,#ff4fa3,#ff7eb3,#ff2e63);
+background-size:600% 600%;
+animation:gradientMove 10s infinite;
+
+}
+
+.theme-dark{
+
+background:linear-gradient(270deg,#0f2027,#203a43,#2c5364);
+background-size:600% 600%;
+animation:gradientMove 10s infinite;
 
 }
 
@@ -20,24 +38,80 @@ color:white;
 
 }
 
-.card{
+header{
 
-background:rgba(255,255,255,0.15);
-
-backdrop-filter:blur(10px);
-
+display:flex;
+justify-content:space-between;
 padding:20px;
-
-border-radius:12px;
-
-box-shadow:0 10px 30px rgba(0,0,0,0.3);
-
-transition:0.3s;
 
 }
 
-.card:hover{
+.container{
 
-transform:translateY(-5px);
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:20px;
+padding:20px;
+
+}
+
+.card{
+
+background:rgba(255,255,255,0.15);
+padding:20px;
+border-radius:12px;
+backdrop-filter:blur(10px);
+
+}
+
+input,select{
+
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border:none;
+border-radius:5px;
+
+}
+
+button{
+
+padding:10px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+background:#000;
+color:white;
+
+}
+
+.bankCard{
+
+background:linear-gradient(135deg,#ff4fa3,#0066ff);
+padding:20px;
+border-radius:12px;
+margin-top:10px;
+
+}
+
+#timeline{
+
+list-style:none;
+padding:10px;
+background:#00000040;
+border-radius:10px;
+max-height:200px;
+overflow:auto;
+
+}
+
+#toast{
+
+position:fixed;
+bottom:20px;
+right:20px;
+background:black;
+padding:10px;
+display:none;
 
 }
