@@ -1,8 +1,8 @@
-const express = require("express")
-const axios = require("axios")
-const cors = require("cors")
+const express=require("express")
+const axios=require("axios")
+const cors=require("cors")
 
-const app = express()
+const app=express()
 
 app.use(express.json())
 app.use(cors())
@@ -16,29 +16,26 @@ app.post("/createAccount",async(req,res)=>{
 
 try{
 
-const {FullName,dateOfBirth,mobileNumber,email,address,adharNumber,bankName}=req.body
-
 const response=await axios.post(
-`${API}/accounts?adharNumber=${adharNumber}&bankName=${bankName}`,
+`${API}/accounts?adharNumber=${req.body.adharNumber}&bankName=${req.body.bankName}`,
 {
-FullName,
-dateOfBirth,
-mobileNumber,
-email,
-address
+FullName:req.body.FullName,
+dateOfBirth:req.body.dateOfBirth,
+mobileNumber:req.body.mobileNumber,
+email:req.body.email,
+address:req.body.address
 })
 
 res.json(response.data)
 
 }catch(err){
 
-console.log(err.response?.data)
-
 res.status(500).json(err.response?.data||err.message)
 
 }
 
 })
+
 
 
 // GET ACCOUNT
@@ -59,21 +56,29 @@ res.status(500).json(err.response?.data||err.message)
 })
 
 
-// UPDATE ACCOUNT
+
+// UPDATE ACCOUNT (FIXED)
 app.patch("/updateAccount/:id",async(req,res)=>{
 
 try{
 
+const id=req.params.id
+
+// first fetch existing account
+const existing=await axios.get(`${API}/accounts/${id}`)
+
+const acc=existing.data.account_data
+
 const payload={
 
-FullName:req.body.FullName,
-email:req.body.email,
-mobileNumber:req.body.mobileNumber
+FullName:req.body.FullName || acc.FullName,
+email:req.body.email || acc.email,
+mobileNumber:req.body.mobileNumber || acc.mobileNumber
 
 }
 
 const response=await axios.patch(
-`${API}/accounts/${req.params.id}`,
+`${API}/accounts/${id}`,
 payload
 )
 
@@ -88,6 +93,7 @@ res.status(500).json(err.response?.data||err.message)
 }
 
 })
+
 
 
 // DELETE ACCOUNT
@@ -106,6 +112,7 @@ res.status(500).json(err.response?.data||err.message)
 }
 
 })
+
 
 
 app.listen(3000,()=>{
