@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Bank-account-dashboard</title>
+  <title>NeoBank — Blue/Pink Animated UI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b1024" />
   <link rel="stylesheet" href="style.css" />
@@ -17,8 +17,8 @@
     <div class="brand">
       <div class="logo">🏦</div>
       <div>
-        <div class="brand-title">Bank-account-dashboard</div>
-        <div class="brand-sub">user friendly bank portal</div>
+        <div class="brand-title">NeoBank Control Center</div>
+        <div class="brand-sub">Blue × Pink Animated Experience</div>
       </div>
     </div>
     <div class="status" id="status">
@@ -28,10 +28,10 @@
   </header>
 
   <nav class="tabs">
-    <button class="tab-btn active" data-tab="create">Create</button>
-    <button class="tab-btn" data-tab="search">Search</button>
-    <button class="tab-btn" data-tab="update">Update</button>
-    <button class="tab-btn" data-tab="delete">Delete</button>
+    <button class="tab-btn active magnetic" data-tab="create">Create</button>
+    <button class="tab-btn magnetic" data-tab="search">Search</button>
+    <button class="tab-btn magnetic" data-tab="update">Update</button>
+    <button class="tab-btn magnetic" data-tab="delete">Delete</button>
   </nav>
 
   <main class="container">
@@ -71,7 +71,7 @@
       <!-- Sticky action bar on mobile -->
       <div class="action-bar" data-for="create">
         <div class="action-bar-inner">
-          <button id="btnCreate" class="primary">Create Account</button>
+          <button id="btnCreate" class="primary magnetic">Create Account</button>
         </div>
       </div>
 
@@ -89,14 +89,19 @@
 
       <div class="action-bar" data-for="search">
         <div class="action-bar-inner">
-          <button id="btnSearch" class="primary">Search</button>
+          <button id="btnSearch" class="primary magnetic">Search</button>
         </div>
       </div>
 
-      <div id="bankCard" class="bankCard placeholder">
-        <div class="skeleton title"></div>
-        <div class="skeleton line"></div>
-        <div class="skeleton line"></div>
+      <!-- Glassmorphism Card Carousel -->
+      <div class="carousel" id="cardCarousel">
+        <button class="carousel-nav left magnetic" id="carPrev" aria-label="Previous">‹</button>
+        <div class="carousel-viewport">
+          <div class="carousel-track" id="carTrack">
+            <!-- cards injected here -->
+          </div>
+        </div>
+        <button class="carousel-nav right magnetic" id="carNext" aria-label="Next">›</button>
       </div>
     </section>
 
@@ -120,7 +125,7 @@
 
       <div class="action-bar" data-for="update">
         <div class="action-bar-inner">
-          <button id="btnUpdate" class="primary">Update</button>
+          <button id="btnUpdate" class="primary magnetic">Update</button>
         </div>
       </div>
 
@@ -138,7 +143,7 @@
 
       <div class="action-bar" data-for="delete">
         <div class="action-bar-inner">
-          <button id="btnDelete" class="danger">Delete</button>
+          <button id="btnDelete" class="danger magnetic">Delete</button>
         </div>
       </div>
 
