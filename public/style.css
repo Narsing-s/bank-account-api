@@ -1,101 +1,129 @@
 body{
+
 font-family:Arial;
 margin:0;
 
-background:linear-gradient(270deg,#001f4d,#0066ff,#ff4fa3,#2c5364);
-background-size:800% 800%;
-
-animation:gradientMove 15s infinite;
+background:linear-gradient(135deg,#003f8c,#0066ff,#ff4fa3);
 
 color:white;
-}
 
-@keyframes gradientMove{
-0%{background-position:0% 50%}
-50%{background-position:100% 50%}
-100%{background-position:0% 50%}
 }
 
 header{
-display:flex;
-justify-content:space-between;
+
 padding:20px;
 background:#0005;
+
 }
 
 .container{
+
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
 gap:20px;
+
 padding:30px;
+
 }
 
 .card{
+
 background:#ffffff20;
+
 padding:20px;
+
 border-radius:10px;
+
 }
 
 input,select{
+
 width:100%;
+
 padding:10px;
+
 margin-bottom:10px;
+
 border-radius:6px;
+
 border:none;
+
 }
 
 button{
+
 padding:10px;
+
 background:linear-gradient(45deg,#0066ff,#ff4fa3);
+
 border:none;
+
 color:white;
+
 border-radius:6px;
+
 cursor:pointer;
+
+}
+
+table{
+
+width:100%;
+
+background:white;
+
+color:black;
+
+border-collapse:collapse;
+
+}
+
+th,td{
+
+padding:8px;
+
+border-bottom:1px solid #ccc;
+
 }
 
 .bankCard{
 
 background:linear-gradient(135deg,#ff4fa3,#0066ff);
+
 padding:20px;
+
 border-radius:15px;
+
 margin-top:10px;
-color:white;
+
 }
 
 .chip{
 
 width:40px;
-height:30px;
+
+height:25px;
+
 background:gold;
-border-radius:5px;
+
+border-radius:4px;
+
 margin-bottom:10px;
 
 }
 
 #timeline{
+
 list-style:none;
+
 padding:0;
+
 }
 
 #timeline li{
-padding:5px 0;
+
+padding:5px;
+
 border-bottom:1px solid #ffffff30;
-}
 
-#toast{
-
-visibility:hidden;
-position:fixed;
-bottom:30px;
-left:50%;
-transform:translateX(-50%);
-
-background:black;
-padding:15px;
-border-radius:8px;
-
-}
-
-#toast.show{
-visibility:visible;
 }
