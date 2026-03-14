@@ -3,7 +3,26 @@
 const CACHE = "bank-ui-v1";
 const SHELL = ["/", "/index.html", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
 
-self.addEventListener("install", (e) => {
+self.addEventListener("install", (e) => const CACHE="bank-ui";
+
+self.addEventListener("install",e=>{
+e.waitUntil(
+caches.open(CACHE).then(cache=>{
+return cache.addAll([
+"/",
+"/index.html"
+])
+})
+)
+})
+
+self.addEventListener("fetch",e=>{
+e.respondWith(
+caches.match(e.request).then(res=>{
+return res || fetch(e.request)
+})
+)
+}){
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)));
   self.skipWaiting();
 });
