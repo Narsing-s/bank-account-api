@@ -7,8 +7,6 @@
 
 <link rel="stylesheet" href="style.css">
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 </head>
 
 <body>
@@ -17,10 +15,25 @@
 
 🏦 Banking Dashboard
 
+<nav>
+
+<button onclick="showTab('create')">Create</button>
+<button onclick="showTab('search')">Search</button>
+<button onclick="showTab('update')">Update</button>
+<button onclick="showTab('delete')">Delete</button>
+
+</nav>
+
 </header>
+
+
 
 <div class="container">
 
+
+<!-- CREATE ACCOUNT -->
+
+<div id="create" class="tab">
 
 <div class="card">
 
@@ -32,6 +45,7 @@
 <input id="email" placeholder="Email">
 <input id="address" placeholder="Address">
 <input id="adhar" placeholder="Aadhar">
+
 <select id="bank">
 
 <option>SBI</option>
@@ -41,13 +55,19 @@
 
 </select>
 
-<button onclick="createAccount()">Create</button>
+<button onclick="createAccount()">Create Account</button>
 
 <pre id="createResult"></pre>
 
 </div>
 
+</div>
 
+
+
+<!-- SEARCH ACCOUNT -->
+
+<div id="search" class="tab">
 
 <div class="card">
 
@@ -61,7 +81,13 @@
 
 </div>
 
+</div>
 
+
+
+<!-- UPDATE ACCOUNT -->
+
+<div id="update" class="tab">
 
 <div class="card">
 
@@ -78,7 +104,13 @@
 
 </div>
 
+</div>
 
+
+
+<!-- DELETE ACCOUNT -->
+
+<div id="delete" class="tab">
 
 <div class="card">
 
@@ -92,19 +124,13 @@
 
 </div>
 
-
-
-<div class="card">
-
-<h2>Analytics</h2>
-
-<canvas id="chart"></canvas>
-
 </div>
+
 
 </div>
 
 <script src="script.js"></script>
 
 </body>
+
 </html>
