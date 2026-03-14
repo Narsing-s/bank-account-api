@@ -5,6 +5,19 @@ document.body.className=e.target.value
 })
 
 
+async function checkAPI(){
+
+const res = await fetch("/status")
+const data = await res.json()
+
+document.getElementById("apiStatus").innerText=data.status
+
+}
+
+checkAPI()
+
+
+
 function convertDOB(d){
 
 const y=d.substring(0,4)
@@ -33,7 +46,7 @@ t.className=""
 
 
 
-let searchHistory=JSON.parse(localStorage.getItem("accounts"))||[]
+let searchHistory = JSON.parse(localStorage.getItem("accounts")) || []
 
 
 function saveHistory(acc){
@@ -87,42 +100,60 @@ box.appendChild(div)
 
 
 
+function renderCards(data){
+
+const acc=data.account_data||{}
+
+document.getElementById("accountCards").innerHTML=`
+
+<div class="dashboardCards">
+
+<div class="dashCard">
+Account
+<h3>${data.accountNumber}</h3>
+</div>
+
+<div class="dashCard">
+Mobile
+<h3>${acc.MOBILENUMBER}</h3>
+</div>
+
+<div class="dashCard">
+Email
+<h3>${acc.EMAIL}</h3>
+</div>
+
+</div>
+
+`
+
+}
+
+
+
 function renderChart(data){
 
 const acc=data.account_data||{}
 
 const values=[
 
-data.accountNumber?.length||0,
-acc.MOBILENUMBER?.length||0,
-acc.EMAIL?.length||0
+data.accountNumber.length,
+acc.MOBILENUMBER.length,
+acc.EMAIL.length
 
 ]
 
 const ctx=document.getElementById("accountChart")
 
-if(chart){
-
-chart.destroy()
-
-}
+if(chart) chart.destroy()
 
 chart=new Chart(ctx,{
 
 type:"bar",
 
 data:{
-
 labels:["Account","Mobile","Email"],
-
-datasets:[{
-
-label:"Account Data Stats",
-
-data:values
-
-}]
-
+datasets:[{label:"Account Data",data:values}]
 }
 
 })
@@ -149,11 +180,11 @@ document.getElementById("getResult").innerHTML=`
 
 <tr>
 
-<td>${data.accountNumber||""}</td>
-<td>${acc.FULLNAME||""}</td>
-<td>${acc.MOBILENUMBER||""}</td>
-<td>${acc.EMAIL||""}</td>
-<td>${acc.ADDRESS||""}</td>
+<td>${data.accountNumber}</td>
+<td>${acc.FULLNAME}</td>
+<td>${acc.MOBILENUMBER}</td>
+<td>${acc.EMAIL}</td>
+<td>${acc.ADDRESS}</td>
 
 </tr>
 
@@ -164,6 +195,8 @@ Copy Account
 </button>
 
 `
+
+renderCards(data)
 
 renderChart(data)
 
