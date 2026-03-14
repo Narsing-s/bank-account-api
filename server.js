@@ -50,7 +50,6 @@ app.get("/api/accounts/:id", (req, res) => proxy("GET", `/accounts/${encodeURICo
 app.patch("/api/accounts/:id", (req, res) => proxy("PATCH", `/accounts/${encodeURIComponent(req.params.id)}`, req, res));
 app.delete("/api/accounts/:id", (req, res) => proxy("DELETE", `/accounts/${encodeURIComponent(req.params.id)}`, req, res));
 
-// Local health
 app.get("/api/ping", (_req, res) => res.json({ ok: true, ts: Date.now(), target: API_BASE }));
 
 app.listen(PORT, () => {
