@@ -34,15 +34,6 @@ setInterval(()=>{
   setOnline(online);
 }, 4000);
 
-// Hover shimmer position
-document.addEventListener("pointermove", e => {
-  document.querySelectorAll("button").forEach(btn=>{
-    const rect = btn.getBoundingClientRect();
-    btn.style.setProperty("--x", `${e.clientX - rect.left}px`);
-    btn.style.setProperty("--y", `${e.clientY - rect.top}px`);
-  });
-});
-
 function convertDOB(d){
   if(!d) return "";
   const s = String(d).trim();
@@ -78,6 +69,55 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
   });
 });
 
+// Hover shimmer — keep the cursor glow centered
+document.addEventListener("pointermove", e => {
+  document.querySelectorAll("button").forEach(btn=>{
+    const rect = btn.getBoundingClientRect();
+    btn.style.setProperty("--x", `${e.clientX - rect.left}px`);
+    btn.style.setProperty("--y", `${e.clientY - rect.top}px`);
+  });
+});
+
+// Magnetic buttons
+function initMagnetic(){
+  const magnets = document.querySelectorAll(".magnetic");
+  const strength = 0.25;      // attraction
+  const maxShift = 16;        // px
+
+  magnets.forEach(el=>{
+    let raf = null;
+
+    function onMove(e){
+      const rect = el.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      const cx = rect.width / 2;
+      const cy = rect.height / 2;
+      const dx = (mx - cx) / cx;  // -1..1
+      const dy = (my - cy) / cy;  // -1..1
+
+      const tx = Math.max(-1, Math.min(1, dx)) * maxShift;
+      const ty = Math.max(-1, Math.min(1, dy)) * maxShift;
+
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(()=>{
+        el.style.transform = `translate(${tx*strength}px, ${ty*strength}px)`;
+      });
+    }
+
+    function onLeave(){
+      if (raf) cancelAnimationFrame(raf);
+      el.style.transform = `translate(0,0)`;
+    }
+
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", onLeave);
+    el.addEventListener("touchstart", ()=> el.style.transform = "scale(0.98)");
+    el.addEventListener("touchend", ()=> el.style.transform = "scale(1)");
+  });
+}
+initMagnetic();
+
 // Confetti (blue & pink)
 function launchConfetti(count=60){
   const colors = ["#00c6ff","#2bd2ff","#ff61d2","#ff78e1"];
@@ -103,14 +143,6 @@ function launchConfetti(count=60){
   }
 }
 
-// Add keyframes for confetti at runtime if not present
-(function ensureConfettiKeyframes(){
-  const style = document.createElement("style");
-  style.textContent = `
-  @keyframes fall { to { transform: translateY(110vh) rotate(360deg) } }`;
-  document.head.appendChild(style);
-})();
-
 // Common fetch wrapper
 async function doFetch(url, options){
   const res = await fetch(url, options);
@@ -119,7 +151,114 @@ async function doFetch(url, options){
   return {res, data};
 }
 
-// ---------- CREATE ----------
+/* ====================== CAROUSEL (glassmorphism) ====================== */
+const carTrack = $("carTrack");
+const carPrev = $("carPrev");
+const carNext = $("carNext");
+let carItems = [];       // {accountNumber, fullName, mobileNumber, email, dateOfBirth, address, bankName}
+let carIndex = 0;
+let carCardWidth = 0;
+
+function renderCarousel(){
+  carTrack.innerHTML = carItems.map(item => {
+    const fullName = item.FullName || item.fullName || "(No Name)";
+    return `
+      <div class="gcard">
+        <h3>${fullName}</h3>
+        <p><strong>Account:</strong> ${item.accountNumber ?? "(unknown)"}</p>
+        <p><strong>Mobile:</strong> ${item.mobileNumber ?? "(unknown)"}</p>
+        <p><strong>Email:</strong> ${item.email ?? "(unknown)"}</p>
+        <p><strong>DOB:</strong> ${item.dateOfBirth ?? "(unknown)"}</p>
+        <p><strong>Address:</strong> ${item.address ?? "(unknown)"}</p>
+        <p><strong>Bank:</strong> ${item.bankName ?? "(unknown)"}</p>
+      </div>
+    `;
+  }).join("");
+
+  // measure first card for width
+  const first = carTrack.querySelector(".gcard");
+  if (first) {
+    const style = getComputedStyle(carTrack);
+    const gap = parseFloat(style.columnGap || style.gap || 16);
+    carCardWidth = first.getBoundingClientRect().width + gap;
+  } else {
+    carCardWidth = 0;
+  }
+  updateCarousel();
+}
+
+function updateCarousel(){
+  if (carItems.length === 0 || carCardWidth === 0){
+    carTrack.style.transform = `translateX(0px)`;
+    return;
+  }
+  carIndex = Math.max(0, Math.min(carIndex, carItems.length - 1));
+  const offset = -carIndex * carCardWidth;
+  carTrack.style.transform = `translateX(${offset}px)`;
+}
+
+carPrev?.addEventListener("click", ()=>{
+  carIndex = Math.max(0, carIndex - 1);
+  updateCarousel();
+});
+carNext?.addEventListener("click", ()=>{
+  carIndex = Math.min(carItems.length - 1, carIndex + 1);
+  updateCarousel();
+});
+window.addEventListener("resize", ()=>{ renderCarousel(); });
+
+// Drag / Swipe support
+(function initCarouselDrag(){
+  let isDown = false;
+  let startX = 0;
+  let startOffset = 0;
+
+  const viewport = document.querySelector(".carousel-viewport");
+  if (!viewport) return;
+
+  function currentOffset(){
+    const m = /translateX\((-?\d+(\.\d+)?)px\)/.exec(carTrack.style.transform || "");
+    return m ? parseFloat(m[1]) : 0;
+  }
+
+  const onDown = (e)=>{
+    isDown = true;
+    startX = (e.touches?.[0]?.clientX ?? e.clientX);
+    startOffset = currentOffset();
+    carTrack.style.transition = "none";
+  };
+  const onMove = (e)=>{
+    if(!isDown) return;
+    const x = (e.touches?.[0]?.clientX ?? e.clientX);
+    const dx = x - startX;
+    carTrack.style.transform = `translateX(${startOffset + dx}px)`;
+    e.preventDefault();
+  };
+  const onUp = (e)=>{
+    if(!isDown) return;
+    isDown = false;
+    carTrack.style.transition = "transform .35s ease";
+
+    const endX = (e.changedTouches?.[0]?.clientX ?? e.clientX ?? startX);
+    const dx = endX - startX;
+    const threshold = 60; // px
+    if (dx > threshold) carIndex = Math.max(0, carIndex - 1);
+    else if (dx < -threshold) carIndex = Math.min(carItems.length - 1, carIndex + 1);
+    updateCarousel();
+  };
+
+  viewport.addEventListener("mousedown", onDown);
+  viewport.addEventListener("mousemove", onMove);
+  window.addEventListener("mouseup", onUp);
+
+  viewport.addEventListener("touchstart", onDown, {passive:false});
+  viewport.addEventListener("touchmove", onMove, {passive:false});
+  viewport.addEventListener("touchend", onUp);
+})();
+
+/* ====================== API actions ====================== */
+
+// CREATE
 $("btnCreate").addEventListener("click", async ()=>{
   blurActive();
   const FullName = ($("name").value || "").trim();
@@ -165,15 +304,21 @@ $("btnCreate").addEventListener("click", async ()=>{
   }
 });
 
-// ---------- SEARCH ----------
+// SEARCH → adds cards to carousel
 $("btnSearch").addEventListener("click", async ()=>{
   blurActive();
   const id = ($("getAcc").value || "").trim();
   if(!id){ toast("Account number is required", "err"); return; }
 
-  const cardWrap = $("bankCard");
-  cardWrap.classList.remove("placeholder");
-  cardWrap.innerHTML = `<div class="skeleton title"></div><div class="skeleton line"></div><div class="skeleton line"></div>`;
+  // Show a temporary placeholder card while loading (optional)
+  if (carItems.length === 0){
+    carTrack.innerHTML = `
+      <div class="gcard">
+        <div class="skeleton title"></div>
+        <div class="skeleton line"></div>
+        <div class="skeleton line"></div>
+      </div>`;
+  }
 
   showLoader(true);
   try{
@@ -181,27 +326,39 @@ $("btnSearch").addEventListener("click", async ()=>{
     if(!res.ok){
       throw new Error((data && data.message) || `HTTP ${res.status}`);
     }
-    const fullName = data.FullName || data.fullName || "(No Name)";
-    const card = document.createElement("div"); card.className = "bankCard";
-    const h3 = document.createElement("h3"); h3.textContent = fullName;
-    const pAcc = document.createElement("p"); pAcc.textContent = `Account: ${data.accountNumber ?? "(unknown)"}`;
-    const pMob = document.createElement("p"); pMob.textContent = `Mobile: ${data.mobileNumber ?? "(unknown)"}`;
-    const pEmail = document.createElement("p"); pEmail.textContent = `Email: ${data.email ?? "(unknown)"}`;
-    const pDob = document.createElement("p"); pDob.textContent = `DOB: ${data.dateOfBirth ?? "(unknown)"}`;
-    const pAddr = document.createElement("p"); pAddr.textContent = `Address: ${data.address ?? "(unknown)"}`;
-    card.append(h3,pAcc,pMob,pEmail,pDob,pAddr);
-    cardWrap.innerHTML = ""; cardWrap.appendChild(card);
-    toast("Account fetched");
+
+    // Normalize and push if not present
+    const normalized = {
+      accountNumber: data.accountNumber,
+      FullName: data.FullName,
+      fullName: data.fullName, // handle either
+      dateOfBirth: data.dateOfBirth,
+      mobileNumber: data.mobileNumber,
+      email: data.email,
+      address: data.address,
+      bankName: data.bankName
+    };
+
+    const existsIdx = carItems.findIndex(x => x.accountNumber === normalized.accountNumber);
+    if (existsIdx === -1) {
+      carItems.push(normalized);
+      carIndex = carItems.length - 1;
+    } else {
+      carItems[existsIdx] = normalized;
+      carIndex = existsIdx;
+    }
+
+    renderCarousel();
+    toast("Account added to carousel");
     lastSuccess = Date.now();
   }catch(e){
-    cardWrap.textContent = `Error: ${e.message}`;
     toast(e.message, "err");
   }finally{
     showLoader(false); updateStickyHeight();
   }
 });
 
-// ---------- UPDATE ----------
+// UPDATE
 $("btnUpdate").addEventListener("click", async ()=>{
   blurActive();
   const id = ($("updateAcc").value || "").trim();
@@ -240,7 +397,7 @@ $("btnUpdate").addEventListener("click", async ()=>{
   }
 });
 
-// ---------- DELETE ----------
+// DELETE
 $("btnDelete").addEventListener("click", async ()=>{
   blurActive();
   const id = ($("deleteAcc").value || "").trim();
@@ -256,6 +413,15 @@ $("btnDelete").addEventListener("click", async ()=>{
     $("deleteResult").textContent = JSON.stringify(data, null, 2);
     toast("Account deleted");
     launchConfetti(40);
+
+    // Remove from carousel if present
+    const idx = carItems.findIndex(x => String(x.accountNumber) === id);
+    if (idx !== -1){
+      carItems.splice(idx, 1);
+      carIndex = Math.max(0, Math.min(carIndex, carItems.length - 1));
+      renderCarousel();
+    }
+
     lastSuccess = Date.now();
   }catch(e){
     $("deleteResult").textContent = `Error: ${e.message}`;
@@ -266,4 +432,7 @@ $("btnDelete").addEventListener("click", async ()=>{
 });
 
 // Initial compute of sticky area
-window.addEventListener("load", updateStickyHeight);
+window.addEventListener("load", ()=>{
+  updateStickyHeight();
+  renderCarousel(); // empty at start
+});
