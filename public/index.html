@@ -1,35 +1,29 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="auto">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>NeoBank Control Center</title>
+  <title>NeoBank — Blue/Pink Animated UI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0f1020" />
-  style.css
+  <meta name="theme-color" content="#0b1024" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Animated layers -->
-  <div class="bg-orb"></div>
+  <!-- Animated background layers -->
+  <div class="bg-gradient"></div>
   <div class="bg-aurora"></div>
-  <div class="bg-dots"></div>
+  <div class="bg-particles" aria-hidden="true"></div>
 
   <header class="topbar">
     <div class="brand">
       <div class="logo">🏦</div>
       <div>
         <div class="brand-title">NeoBank Control Center</div>
-        <div class="brand-sub">Real‑time Account Management</div>
+        <div class="brand-sub">Blue × Pink Animated Experience</div>
       </div>
     </div>
-    <div class="topbar-right">
-      <button id="themeToggle" class="icon-btn" aria-label="Toggle theme" title="Toggle theme">
-        <span id="themeIcon">🌙</span>
-      </button>
-      <button id="debugToggle" class="icon-btn" aria-label="Toggle debug" title="Toggle debug">🛠️</button>
-      <div class="status" id="status">
-        <span class="dot offline" id="statusDot"></span>
-        <span id="statusText">Offline</span>
-      </div>
+    <div class="status" id="status">
+      <span class="dot offline" id="statusDot"></span>
+      <span id="statusText">Offline</span>
     </div>
   </header>
 
@@ -160,33 +154,13 @@
     <div class="spinner"></div>
   </div>
 
-  <!-- FX Layer -->
+  <!-- Confetti Layer -->
   <div id="fx"></div>
 
-  <!-- Debug Overlay -->
-  <aside id="debug" class="debug hidden" aria-live="polite">
-    <div class="debug-head">
-      <strong>Debug</strong>
-      <button id="debugClose" class="icon-btn" title="Close">✖</button>
-    </div>
-    <div class="debug-body">
-      <div><b>Last URL:</b> <code id="dbgUrl">—</code></div>
-      <div><b>Status:</b> <code id="dbgStatus">—</code></div>
-      <div><b>Method:</b> <code id="dbgMethod">—</code></div>
-      <div><b>Request Body:</b>
-        <pre id="dbgReq">—</pre>
-      </div>
-      <div><b>Response Body:</b>
-        <pre id="dbgRes">—</pre>
-      </div>
-    </div>
-  </aside>
-
   <script>
-    // Frontend will call /api/* (proxied by server.js to your CloudHub URL)
+    // All fetches go via the local proxy to avoid CORS
     window.API_PREFIX = "/api";
   </script>
-  script.js</script>
+  <script src="script.js"></script>
 </body>
 </html>
-``
