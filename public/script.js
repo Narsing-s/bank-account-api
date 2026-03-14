@@ -1,56 +1,7 @@
-// THEME SWITCH
-
 document.getElementById("themeSelect").addEventListener("change",(e)=>{
 document.body.className=e.target.value
 })
 
-
-
-// LANGUAGE SWITCH
-
-const translations={
-
-en:{
-title:"Bank Account Dashboard",
-create:"Create Account",
-get:"Get Account",
-update:"Update Account",
-delete:"Delete Account"
-},
-
-hi:{
-title:"बैंक खाता डैशबोर्ड",
-create:"खाता बनाएं",
-get:"खाता देखें",
-update:"खाता अपडेट करें",
-delete:"खाता हटाएं"
-},
-
-te:{
-title:"బ్యాంక్ ఖాతా డ్యాష్‌బోర్డ్",
-create:"ఖాతా సృష్టించండి",
-get:"ఖాతా చూడండి",
-update:"ఖాతా నవీకరించండి",
-delete:"ఖాతా తొలగించండి"
-}
-
-}
-
-document.getElementById("langSelect").addEventListener("change",(e)=>{
-
-const lang=e.target.value
-
-document.getElementById("title").innerText=translations[lang].title
-document.getElementById("createLabel").innerText=translations[lang].create
-document.getElementById("getLabel").innerText=translations[lang].get
-document.getElementById("updateLabel").innerText=translations[lang].update
-document.getElementById("deleteLabel").innerText=translations[lang].delete
-
-})
-
-
-
-// DOB FORMAT (YYYYMMDD -> yyyy-MM-dd)
 
 function convertDOB(dob){
 
@@ -63,15 +14,12 @@ return `${y}-${m}-${d}`
 }
 
 
-
-// CREATE ACCOUNT
-
 async function createAccount(){
 
 const bank=document.getElementById("bank").value
 
 if(!bank){
-alert("Please select a bank")
+alert("Select bank")
 return
 }
 
@@ -110,8 +58,6 @@ JSON.stringify(data,null,2)
 
 
 
-// GET ACCOUNT
-
 async function getAccount(){
 
 const acc=document.getElementById("getAcc").value
@@ -126,8 +72,6 @@ JSON.stringify(data,null,2)
 }
 
 
-
-// UPDATE ACCOUNT
 
 async function updateAccount(){
 
@@ -159,8 +103,6 @@ JSON.stringify(data,null,2)
 }
 
 
-
-// DELETE ACCOUNT
 
 async function deleteAccount(){
 
