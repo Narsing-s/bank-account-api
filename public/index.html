@@ -1,136 +1,140 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
-<title>Bank Dashboard</title>
-
-<link rel="stylesheet" href="style.css">
-
+  <meta charset="utf-8" />
+  <title>NeoBank Control Center</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
+  <div class="bg-orb"></div>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">🏦</div>
+      <div>
+        <div class="brand-title">NeoBank Control Center</div>
+        <div class="brand-sub">Real‑time Account Management</div>
+      </div>
+    </div>
+    <div class="status" id="status">
+      <span class="dot offline" id="statusDot"></span>
+      <span id="statusText">Offline</span>
+    </div>
+  </header>
 
-<header>
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="create">Create</button>
+    <button class="tab-btn" data-tab="search">Search</button>
+    <button class="tab-btn" data-tab="update">Update</button>
+    <button class="tab-btn" data-tab="delete">Delete</button>
+  </nav>
 
-🏦 Banking Dashboard
+  <main class="container">
+    <!-- CREATE -->
+    <section id="create" class="panel active">
+      <h2>Create Account</h2>
+      <div class="grid">
+        <label>Full Name
+          <input id="name" placeholder="e.g., Jane Doe" maxlength="80" required />
+        </label>
+        <label>Date of Birth (YYYYMMDD)
+          <input id="dob" placeholder="19900131" maxlength="8" inputmode="numeric" />
+        </label>
+        <label>Mobile
+          <input id="mobile" placeholder="10-digit number" maxlength="15" inputmode="tel" />
+        </label>
+        <label>Email
+          <input id="email" placeholder="name@example.com" type="email" />
+        </label>
+        <label>Address
+          <input id="address" placeholder="Street, City" />
+        </label>
+        <label>Aadhaar
+          <input id="aadhaar" placeholder="12-digit" maxlength="12" inputmode="numeric" />
+        </label>
+        <label>Bank
+          <select id="bank">
+            <option>SBI</option>
+            <option>HDFC</option>
+            <option>ICICI</option>
+            <option>AXIS</option>
+          </select>
+        </label>
+      </div>
+      <div class="actions">
+        <button id="btnCreate" class="primary">Create Account</button>
+      </div>
+      <pre id="createResult" class="result"></pre>
+    </section>
 
-<nav>
+    <!-- SEARCH -->
+    <section id="search" class="panel">
+      <h2>Search Account</h2>
+      <div class="grid">
+        <label>Account Number
+          <input id="getAcc" placeholder="Enter account number" />
+        </label>
+      </div>
+      <div class="actions">
+        <button id="btnSearch" class="primary">Search</button>
+      </div>
+      <div id="bankCard" class="bankCard placeholder">
+        <div class="skeleton title"></div>
+        <div class="skeleton line"></div>
+        <div class="skeleton line"></div>
+      </div>
+    </section>
 
-<button onclick="showTab('create')">Create</button>
-<button onclick="showTab('search')">Search</button>
-<button onclick="showTab('update')">Update</button>
-<button onclick="showTab('delete')">Delete</button>
+    <!-- UPDATE -->
+    <section id="update" class="panel">
+      <h2>Update Account</h2>
+      <div class="grid">
+        <label>Account Number
+          <input id="updateAcc" placeholder="Enter account number" />
+        </label>
+        <label>Full Name
+          <input id="updateName" placeholder="New full name" />
+        </label>
+        <label>Email
+          <input id="updateEmail" placeholder="name@example.com" type="email" />
+        </label>
+        <label>Mobile
+          <input id="updateMobile" placeholder="10-digit number" inputmode="tel" />
+        </label>
+      </div>
+      <div class="actions">
+        <button id="btnUpdate" class="primary">Update</button>
+      </div>
+      <pre id="updateResult" class="result"></pre>
+    </section>
 
-</nav>
+    <!-- DELETE -->
+    <section id="delete" class="panel">
+      <h2>Delete Account</h2>
+      <div class="grid">
+        <label>Account Number
+          <input id="deleteAcc" placeholder="Enter account number" />
+        </label>
+      </div>
+      <div class="actions">
+        <button id="btnDelete" class="danger">Delete</button>
+      </div>
+      <pre id="deleteResult" class="result"></pre>
+    </section>
+  </main>
 
-</header>
+  <!-- Toasts -->
+  <div id="toasts" class="toasts"></div>
 
+  <!-- Loader -->
+  <div id="loader" class="loader hidden">
+    <div class="spinner"></div>
+  </div>
 
-
-<div class="container">
-
-
-<!-- CREATE ACCOUNT -->
-
-<div id="create" class="tab">
-
-<div class="card">
-
-<h2>Create Account</h2>
-
-<input id="name" placeholder="Full Name">
-<input id="dob" placeholder="YYYYMMDD">
-<input id="mobile" placeholder="Mobile">
-<input id="email" placeholder="Email">
-<input id="address" placeholder="Address">
-<input id="adhar" placeholder="Aadhar">
-
-<select id="bank">
-
-<option>SBI</option>
-<option>HDFC</option>
-<option>ICICI</option>
-<option>AXIS</option>
-
-</select>
-
-<button onclick="createAccount()">Create Account</button>
-
-<pre id="createResult"></pre>
-
-</div>
-
-</div>
-
-
-
-<!-- SEARCH ACCOUNT -->
-
-<div id="search" class="tab">
-
-<div class="card">
-
-<h2>Search Account</h2>
-
-<input id="getAcc" placeholder="Account Number">
-
-<button onclick="getAccount()">Search</button>
-
-<div id="bankCard"></div>
-
-</div>
-
-</div>
-
-
-
-<!-- UPDATE ACCOUNT -->
-
-<div id="update" class="tab">
-
-<div class="card">
-
-<h2>Update Account</h2>
-
-<input id="updateAcc" placeholder="Account Number">
-<input id="updateName" placeholder="Full Name">
-<input id="updateEmail" placeholder="Email">
-<input id="updateMobile" placeholder="Mobile">
-
-<button onclick="updateAccount()">Update</button>
-
-<pre id="updateResult"></pre>
-
-</div>
-
-</div>
-
-
-
-<!-- DELETE ACCOUNT -->
-
-<div id="delete" class="tab">
-
-<div class="card">
-
-<h2>Delete Account</h2>
-
-<input id="deleteAcc" placeholder="Account Number">
-
-<button onclick="deleteAccount()">Delete</button>
-
-<pre id="deleteResult"></pre>
-
-</div>
-
-</div>
-
-
-</div>
-
-<script src="script.js"></script>
-
+  <script>
+    // Frontend will call /api/* (proxied by server.js)
+    window.API_PREFIX = "/api";
+  </script>
+  <script src="script.js"></script>
 </body>
-
 </html>
