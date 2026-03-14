@@ -5,7 +5,10 @@ const API = (path) => `${window.API_PREFIX || ""}${path}`;
 const statusDot = $("statusDot");
 const statusText = $("statusText");
 const loader = $("loader");
+const themeToggle = $("themeToggle");
+const themeIcon = $("themeIcon");
 
+// Toasts
 function toast(msg, type="ok"){
   const wrap = $("toasts");
   const el = document.createElement("div");
@@ -19,6 +22,7 @@ function toast(msg, type="ok"){
 }
 
 function showLoader(on){ loader.classList.toggle("hidden", !on); }
+function blurActive(){ if (document.activeElement?.blur) document.activeElement.blur(); }
 
 function convertDOB(d){
   if(!d) return "";
@@ -33,16 +37,74 @@ function setOnline(online){
   statusText.textContent = online ? "Online" : "Offline";
 }
 
-// Simple heartbeat (optional). If you have a health endpoint, point to it.
-// Here we just mark based on navigator and last successful call.
+// Maintain last success to drive Online badge
+let lastSuccess = 0;
 setOnline(navigator.onLine);
 window.addEventListener("online", ()=> setOnline(true));
 window.addEventListener("offline", ()=> setOnline(false));
-let lastSuccess = 0;
 setInterval(()=>{
   const online = navigator.onLine && (Date.now()-lastSuccess < 15000);
   setOnline(online);
 }, 4000);
+
+// ---------- Sticky action bar height -> CSS var to lift toasts ----------
+function updateStickyHeight(){
+  const activePanel = document.querySelector(".panel.active");
+  const bar = activePanel?.querySelector(".action-bar");
+  let h = 0;
+  if (bar) {
+    const rect = bar.getBoundingClientRect();
+    const viewportH = window.innerHeight;
+    if (rect.bottom > viewportH - 4) {
+      h = Math.max(0, rect.height);
+    }
+  }
+  document.documentElement.style.setProperty("--stickyH", `${h}px`);
+}
+window.addEventListener("resize", updateStickyHeight);
+window.addEventListener("scroll", updateStickyHeight);
+setInterval(updateStickyHeight, 500);
+
+// ---------- Theme handling ----------
+const THEME_KEY = "nb_theme";
+function getSystemTheme(){
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+function applyTheme(mode){ // mode: "light" | "dark" | "auto"
+  const html = document.documentElement;
+  if (mode === "auto") {
+    const sys = getSystemTheme();
+    html.setAttribute("data-theme", "auto");
+    html.setAttribute("data-theme-active", sys);
+    if (sys === "light") html.setAttribute("data-theme","light"); else html.setAttribute("data-theme","dark");
+  } else {
+    html.setAttribute("data-theme", mode);
+    html.setAttribute("data-theme-active", mode);
+  }
+  // Update icon
+  const active = html.getAttribute("data-theme-active");
+  themeIcon.textContent = active === "light" ? "🌙" : "☀️";
+  // Theme color meta
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", active === "light" ? "#f6f7fb" : "#0f1020");
+}
+function loadTheme(){
+  const saved = localStorage.getItem(THEME_KEY) || "auto";
+  applyTheme(saved);
+}
+function cycleTheme(){
+  const current = localStorage.getItem(THEME_KEY) || "auto";
+  const next = current === "auto" ? "light" : current === "light" ? "dark" : "auto";
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
+  toast(`Theme: ${next}`, "ok");
+}
+themeToggle.addEventListener("click", cycleTheme);
+window.matchMedia?.("(prefers-color-scheme: dark)").addEventListener?.("change", ()=>{
+  const saved = localStorage.getItem(THEME_KEY) || "auto";
+  if (saved === "auto") applyTheme("auto");
+});
+loadTheme();
 
 // ---------- Tabs ----------
 document.querySelectorAll(".tab-btn").forEach(btn=>{
@@ -51,17 +113,20 @@ document.querySelectorAll(".tab-btn").forEach(btn=>{
     document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
     btn.classList.add("active");
     $(btn.dataset.tab).classList.add("active");
+    setTimeout(()=> $(btn.dataset.tab)?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    setTimeout(updateStickyHeight, 150);
   });
 });
 
 // ---------- CREATE ----------
 $("btnCreate").addEventListener("click", async ()=>{
+  blurActive();
   const FullName = ($("name").value || "").trim();
   const dateOfBirth = convertDOB(($("dob").value || "").trim());
   const mobileNumber = ($("mobile").value || "").trim();
   const email = ($("email").value || "").trim();
   const address = ($("address").value || "").trim();
-  const aadhaar = ($("aadhaar").value || "").trim(); // renamed to aadhaar in UI
+  const aadhaar = ($("aadhaar").value || "").trim();
   const bankName = ($("bank").value || "").trim();
 
   if(!FullName){
@@ -70,14 +135,14 @@ $("btnCreate").addEventListener("click", async ()=>{
     return;
   }
 
-  // If your RAML expects 'aadhaarNumber' or 'adharNumber', map accordingly:
+  // If your RAML expects aadhaarNumber instead of adharNumber, change key here:
   const payload = {
     FullName,
-    dateOfBirth,      // ensure RAML expects YYYY-MM-DD or change here
+    dateOfBirth,
     mobileNumber,
     email,
     address,
-    adharNumber: aadhaar, // change to aadhaarNumber if your API requires that exact key
+    adharNumber: aadhaar,
     bankName
   };
 
@@ -102,12 +167,13 @@ $("btnCreate").addEventListener("click", async ()=>{
     $("createResult").textContent = `Error: ${e.message}`;
     toast(e.message, "err");
   }finally{
-    btn.disabled = false; showLoader(false);
+    btn.disabled = false; showLoader(false); updateStickyHeight();
   }
 });
 
 // ---------- SEARCH ----------
 $("btnSearch").addEventListener("click", async ()=>{
+  blurActive();
   const id = ($("getAcc").value || "").trim();
   if(!id){ toast("Account number is required", "err"); return; }
 
@@ -125,7 +191,6 @@ $("btnSearch").addEventListener("click", async ()=>{
       throw new Error(data?.message || data?.error || `HTTP ${res.status}`);
     }
     const acc = data?.account_data || {};
-    // Safe rendering (avoid innerHTML for user data)
     const card = document.createElement("div");
     card.className = "bankCard";
     const h3 = document.createElement("h3"); h3.textContent = acc.FullName || "(No Name)";
@@ -140,12 +205,13 @@ $("btnSearch").addEventListener("click", async ()=>{
     cardWrap.textContent = `Error: ${e.message}`;
     toast(e.message, "err");
   }finally{
-    showLoader(false);
+    showLoader(false); updateStickyHeight();
   }
 });
 
 // ---------- UPDATE ----------
 $("btnUpdate").addEventListener("click", async ()=>{
+  blurActive();
   const id = ($("updateAcc").value || "").trim();
   if(!id){ toast("Account number is required", "err"); return; }
 
@@ -154,7 +220,6 @@ $("btnUpdate").addEventListener("click", async ()=>{
     email: ($("updateEmail").value || "").trim(),
     mobileNumber: ($("updateMobile").value || "").trim()
   };
-  // Remove empty fields to avoid overwriting with empty strings
   Object.keys(payload).forEach(k => payload[k] === "" && delete payload[k]);
   if(Object.keys(payload).length === 0){
     toast("Provide at least one field to update", "err"); return;
@@ -181,12 +246,13 @@ $("btnUpdate").addEventListener("click", async ()=>{
     $("updateResult").textContent = `Error: ${e.message}`;
     toast(e.message, "err");
   }finally{
-    btn.disabled = false; showLoader(false);
+    btn.disabled = false; showLoader(false); updateStickyHeight();
   }
 });
 
 // ---------- DELETE ----------
 $("btnDelete").addEventListener("click", async ()=>{
+  blurActive();
   const id = ($("deleteAcc").value || "").trim();
   if(!id){ toast("Account number is required", "err"); return; }
 
@@ -207,6 +273,9 @@ $("btnDelete").addEventListener("click", async ()=>{
     $("deleteResult").textContent = `Error: ${e.message}`;
     toast(e.message, "err");
   }finally{
-    btn.disabled = false; showLoader(false);
+    btn.disabled = false; showLoader(false); updateStickyHeight();
   }
 });
+
+// Initial compute of sticky area
+window.addEventListener("load", updateStickyHeight);
