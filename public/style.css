@@ -3,8 +3,6 @@ body{
 font-family:Arial;
 margin:0;
 
-/* animated gradient */
-
 background:linear-gradient(270deg,#001f4d,#0066ff,#ff4fa3,#2c5364);
 background-size:800% 800%;
 
@@ -37,7 +35,6 @@ background:rgba(0,0,0,0.3);
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
 gap:25px;
-
 padding:30px;
 
 }
@@ -45,11 +42,8 @@ padding:30px;
 .card{
 
 background:rgba(255,255,255,0.15);
-
 padding:20px;
-
 border-radius:12px;
-
 backdrop-filter:blur(10px);
 
 }
@@ -68,7 +62,6 @@ border-radius:6px;
 button{
 
 padding:10px;
-
 border:none;
 
 background:linear-gradient(45deg,#0066ff,#ff4fa3);
@@ -84,9 +77,7 @@ cursor:pointer;
 table{
 
 width:100%;
-
 background:white;
-
 color:black;
 
 border-collapse:collapse;
@@ -96,7 +87,6 @@ border-collapse:collapse;
 th,td{
 
 padding:8px;
-
 border-bottom:1px solid #ccc;
 
 }
@@ -104,8 +94,34 @@ border-bottom:1px solid #ccc;
 th{
 
 background:#0066ff;
-
 color:white;
+
+}
+
+.searchBox{
+position:relative;
+}
+
+#suggestions{
+
+position:absolute;
+background:white;
+color:black;
+width:100%;
+border-radius:6px;
+
+}
+
+#suggestions div{
+
+padding:8px;
+cursor:pointer;
+
+}
+
+#suggestions div:hover{
+
+background:#eee;
 
 }
 
@@ -114,9 +130,7 @@ color:white;
 visibility:hidden;
 
 position:fixed;
-
 bottom:30px;
-
 left:50%;
 
 transform:translateX(-50%);
@@ -124,7 +138,6 @@ transform:translateX(-50%);
 background:black;
 
 padding:15px;
-
 border-radius:8px;
 
 }
