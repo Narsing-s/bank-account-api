@@ -15,14 +15,21 @@
 
 <header>
 
-<h1>🏦 Bank Dashboard</h1>
+<h1 id="title">🏦 Bank Dashboard</h1>
+
+<div>
+
+<select id="language" onchange="changeLanguage()">
+<option value="en">English</option>
+<option value="te">Telugu</option>
+<option value="hi">Hindi</option>
+</select>
+
+<button onclick="toggleTheme()">Theme</button>
+
+</div>
 
 </header>
-
-
-<div class="status">
-API STATUS : <span id="apiStatus">Checking...</span>
-</div>
 
 
 <div class="container">
@@ -60,7 +67,6 @@ API STATUS : <span id="apiStatus">Checking...</span>
 </div>
 
 
-
 <div class="card">
 
 <h2>Search Account</h2>
@@ -74,7 +80,6 @@ API STATUS : <span id="apiStatus">Checking...</span>
 <div id="getResult"></div>
 
 </div>
-
 
 
 <div class="card">
@@ -96,7 +101,6 @@ API STATUS : <span id="apiStatus">Checking...</span>
 </div>
 
 
-
 <div class="card">
 
 <h2>Delete Account</h2>
@@ -110,15 +114,13 @@ API STATUS : <span id="apiStatus">Checking...</span>
 </div>
 
 
-
 <div class="card">
 
-<h2>Transaction Timeline</h2>
+<h2>Timeline</h2>
 
 <ul id="timeline"></ul>
 
 </div>
-
 
 
 <div class="card">
