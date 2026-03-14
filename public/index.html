@@ -11,7 +11,7 @@
 
 </head>
 
-<body>
+<body class="theme-blue">
 
 <header>
 
@@ -19,13 +19,9 @@
 
 <div>
 
-<select id="language" onchange="changeLanguage()">
-<option value="en">English</option>
-<option value="te">Telugu</option>
-<option value="hi">Hindi</option>
-</select>
-
-<button onclick="toggleTheme()">Theme</button>
+<button onclick="setTheme('blue')">Blue</button>
+<button onclick="setTheme('pink')">Pink</button>
+<button onclick="setTheme('dark')">Dark</button>
 
 </div>
 
@@ -40,24 +36,17 @@
 <h2>Create Account</h2>
 
 <input id="name" placeholder="Full Name">
-
 <input id="dob" placeholder="YYYYMMDD">
-
 <input id="mobile" placeholder="Mobile">
-
 <input id="email" placeholder="Email">
-
 <input id="address" placeholder="Address">
-
 <input id="adhar" placeholder="Aadhar">
 
 <select id="bank">
-
 <option>SBI</option>
 <option>HDFC</option>
 <option>ICICI</option>
 <option>AXIS</option>
-
 </select>
 
 <button onclick="createAccount()">Create</button>
@@ -87,11 +76,8 @@
 <h2>Update Account</h2>
 
 <input id="updateAcc" placeholder="Account Number">
-
 <input id="updateName" placeholder="Full Name">
-
 <input id="updateAddress" placeholder="Address">
-
 <input id="updateMobile" placeholder="Mobile">
 
 <button onclick="updateAccount()">Update</button>
