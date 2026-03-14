@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>NeoBank — Blue/Pink Animated UI</title>
+  <title>NeoBank — Blue/Pink Animated UI (Voice Enabled)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b1024" />
-  <link rel="stylesheet" href="style.css" />
+  style.css
 </head>
 <body>
   <!-- Animated background layers -->
@@ -18,9 +18,34 @@
       <div class="logo">🏦</div>
       <div>
         <div class="brand-title">NeoBank Control Center</div>
-        <div class="brand-sub">Blue × Pink Animated Experience</div>
+        <div class="brand-sub">Blue × Pink Animated Experience + Voice</div>
       </div>
     </div>
+
+    <!-- Voice Panel -->
+    <div class="voice-panel" role="group" aria-label="Voice controls">
+      <label class="switch" title="Text-to-Speech">
+        <input type="checkbox" id="ttsToggle" checked />
+        <span class="slider"></span>
+        <span class="switch-label">Speak</span>
+      </label>
+
+      <select id="voiceSelect" aria-label="TTS voice">
+        <option value="">Auto Voice</option>
+      </select>
+
+      <select id="langSelect" aria-label="Recognition language">
+        <option value="en-US" selected>English (US)</option>
+        <option value="en-IN">English (India)</option>
+        <option value="en-GB">English (UK)</option>
+        <option value="hi-IN">Hindi (India)</option>
+      </select>
+
+      <button id="micBtn" class="icon-btn magnetic" aria-label="Start/Stop voice input" title="Voice input">
+        🎤
+      </button>
+    </div>
+
     <div class="status" id="status">
       <span class="dot offline" id="statusDot"></span>
       <span id="statusText">Offline</span>
@@ -68,14 +93,13 @@
         </label>
       </div>
 
-      <!-- Sticky action bar on mobile -->
       <div class="action-bar" data-for="create">
         <div class="action-bar-inner">
           <button id="btnCreate" class="primary magnetic">Create Account</button>
         </div>
       </div>
 
-      <pre id="createResult" class="result"></pre>
+      <pre id="createResult" class="result" aria-live="polite"></pre>
     </section>
 
     <!-- SEARCH -->
@@ -97,7 +121,7 @@
       <div class="carousel" id="cardCarousel">
         <button class="carousel-nav left magnetic" id="carPrev" aria-label="Previous">‹</button>
         <div class="carousel-viewport">
-          <div class="carousel-track" id="carTrack">
+          <div class="carousel-track" id="carTrack" aria-live="polite">
             <!-- cards injected here -->
           </div>
         </div>
@@ -129,7 +153,7 @@
         </div>
       </div>
 
-      <pre id="updateResult" class="result"></pre>
+      <pre id="updateResult" class="result" aria-live="polite"></pre>
     </section>
 
     <!-- DELETE -->
@@ -147,12 +171,12 @@
         </div>
       </div>
 
-      <pre id="deleteResult" class="result"></pre>
+      <pre id="deleteResult" class="result" aria-live="polite"></pre>
     </section>
   </main>
 
   <!-- Toasts -->
-  <div id="toasts" class="toasts"></div>
+  <div id="toasts" class="toasts" aria-live="assertive"></div>
 
   <!-- Loader -->
   <div id="loader" class="loader hidden">
@@ -163,9 +187,8 @@
   <div id="fx"></div>
 
   <script>
-    // All fetches go via the local proxy to avoid CORS
     window.API_PREFIX = "/api";
   </script>
-  <script src="script.js"></script>
+  script.js</script>
 </body>
 </html>
