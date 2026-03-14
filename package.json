@@ -1,13 +1,9 @@
 {
-  "name": "bank-account-ui",
+  "name": "bank-ui",
   "version": "1.0.0",
-  "description": "Modern Bank UI with MuleSoft API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
-  },
-  "engines": {
-    "node": "20.x"
   },
   "dependencies": {
     "express": "^4.18.2"
