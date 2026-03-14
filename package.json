@@ -1,7 +1,7 @@
 {
   "name": "bank-dashboard",
   "version": "1.0.0",
-  "description": "Animated Banking UI for MuleSoft API",
+  "description": "Bank Dashboard UI for MuleSoft API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
