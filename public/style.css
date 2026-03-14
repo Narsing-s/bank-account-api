@@ -1,18 +1,15 @@
 /* ============ THEME TOKENS ============ */
 :root{
-  /* Base palette (dark default) */
   --bg1:#0f1020; --bg2:#151739;
   --glass:rgba(255,255,255,0.08);
   --primary:#6ee7ff; --accent:#a78bfa; --danger:#ff6b6b; --ok:#30e88c;
   --text:#e8edf3; --muted:#9aa5b1; --border:rgba(255,255,255,.10);
   --shadow:0 20px 40px rgba(0,0,0,.35);
 
-  /* Light theme overrides (applied via [data-theme="light"]) */
   --lt-bg1:#f6f7fb; --lt-bg2:#eaf0ff;
   --lt-glass:rgba(0,0,0,0.06);
   --lt-text:#111827; --lt-muted:#4b5563; --lt-border:rgba(0,0,0,.08);
 
-  /* Fluid sizes */
   --fs-12: clamp(11px, 1.6vw, 12px);
   --fs-14: clamp(12px, 1.8vw, 14px);
   --fs-16: clamp(14px, 2.2vw, 16px);
@@ -20,7 +17,6 @@
   --radius: 16px;
   --pad: clamp(12px, 3.5vw, 22px);
 
-  /* Sticky bar height (updated by JS) */
   --stickyH: 0px;
 }
 
@@ -124,7 +120,7 @@ html[data-theme="light"] .icon-btn{ background:var(--lt-glass); border-color:var
 
 h2{margin:4px 0 8px; letter-spacing:.3px; font-size:var(--fs-18)}
 
-/* Grid form (1 col on phones, 2+ on wider) */
+/* Grid form */
 .grid{
   display:grid; grid-template-columns: 1fr; gap:12px; margin-top:8px;
 }
