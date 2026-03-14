@@ -1,16 +1,14 @@
 {
   "name": "bank-account-app",
   "version": "1.0.0",
-  "description": "Bank Account UI with MuleSoft API + Passkeys (WebAuthn)",
+  "description": "Bank Account UI with MuleSoft API + Passkeys",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "build": "echo \"No build step required for this app\""
+    "start": "node server.js"
   },
   "engines": {
     "node": "20.x"
   },
-  "license": "MIT",
   "dependencies": {
     "@simplewebauthn/server": "^10.0.0",
     "cookie-session": "^2.0.0",
