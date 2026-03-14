@@ -5,7 +5,7 @@ const axios = require("axios");
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// ✅ Your CloudHub base (already includes /api)
+// ✅ CloudHub base (already includes /api)
 const API_BASE = process.env.API_BASE || "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api";
 
 app.use(cors());
@@ -17,15 +17,12 @@ async function proxy(method, path, req, res) {
     const qs = new URLSearchParams(req.query || {}).toString();
     const url = `${API_BASE}${path}${qs ? `?${qs}` : ""}`;
 
-    const fwdHeaders = { ...req.headers };
-    delete fwdHeaders.host;
-    delete fwdHeaders["content-length"];
-    fwdHeaders["content-type"] = "application/json";
+    const headers = { "Content-Type": "application/json" };
 
     const ax = await axios({
       method,
       url,
-      headers: fwdHeaders,
+      headers,
       data: ["POST", "PUT", "PATCH"].includes(method) ? req.body : undefined,
       timeout: 30000,
       validateStatus: () => true
@@ -44,13 +41,12 @@ async function proxy(method, path, req, res) {
   }
 }
 
-/** === RESTful routes mapping 1:1 to your RAML === */
+/** === RESTful routes per RAML === */
 app.post("/api/accounts", (req, res) => proxy("POST", "/accounts", req, res));
 app.get("/api/accounts/:id", (req, res) => proxy("GET", `/accounts/${encodeURIComponent(req.params.id)}`, req, res));
 app.patch("/api/accounts/:id", (req, res) => proxy("PATCH", `/accounts/${encodeURIComponent(req.params.id)}`, req, res));
 app.delete("/api/accounts/:id", (req, res) => proxy("DELETE", `/accounts/${encodeURIComponent(req.params.id)}`, req, res));
 
-// Local health
 app.get("/api/ping", (_req, res) => res.json({ ok: true, ts: Date.now(), target: API_BASE }));
 
 app.listen(PORT, () => {
