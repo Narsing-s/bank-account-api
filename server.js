@@ -1,122 +1,51 @@
-const express=require("express")
-const axios=require("axios")
-const cors=require("cors")
+const express = require("express");
+const cors = require("cors");
+const axios = require("axios");
 
-const app=express()
+const app = express();
+const PORT = process.env.PORT || 8080;
 
-app.use(express.json())
-app.use(cors())
-app.use(express.static("public"))
+// Change this to your Mule base URL
+// e.g. http://localhost:8081  or  https://your-domain/mule
+const API_BASE = process.env.API_BASE || "http://localhost:8081";
 
-const API="https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api"
+app.use(cors());
+app.use(express.json());
+app.use(express.static("public"));
 
+// ---- Proxy endpoints (map UI calls to Mule API) ----
+// If your RAML uses REST routes, adjust here.
+// Option A (your current UI semantics):
+app.post("/api/createAccount", (req, res) => proxy("POST", "/createAccount", req, res));
+app.get("/api/getAccount/:id", (req, res) => proxy("GET", `/getAccount/${encodeURIComponent(req.params.id)}`, req, res));
+app.patch("/api/updateAccount/:id", (req, res) => proxy("PATCH", `/updateAccount/${encodeURIComponent(req.params.id)}`, req, res));
+app.delete("/api/deleteAccount/:id", (req, res) => proxy("DELETE", `/deleteAccount/${encodeURIComponent(req.params.id)}`, req, res));
 
-// CREATE ACCOUNT
-app.post("/createAccount",async(req,res)=>{
+// Option B (if RAML is RESTy — uncomment and use these instead):
+// app.post("/api/accounts", (req, res) => proxy("POST", "/accounts", req, res));
+// app.get("/api/accounts/:id", (req, res) => proxy("GET", `/accounts/${encodeURIComponent(req.params.id)}`, req, res));
+// app.patch("/api/accounts/:id", (req, res) => proxy("PATCH", `/accounts/${encodeURIComponent(req.params.id)}`, req, res));
+// app.delete("/api/accounts/:id", (req, res) => proxy("DELETE", `/accounts/${encodeURIComponent(req.params.id)}`, req, res));
 
-try{
-
-const response=await axios.post(
-`${API}/accounts?adharNumber=${req.body.adharNumber}&bankName=${req.body.bankName}`,
-{
-FullName:req.body.FullName,
-dateOfBirth:req.body.dateOfBirth,
-mobileNumber:req.body.mobileNumber,
-email:req.body.email,
-address:req.body.address
-})
-
-res.json(response.data)
-
-}catch(err){
-
-res.status(500).json(err.response?.data||err.message)
-
+async function proxy(method, path, req, res) {
+  try {
+    const url = `${API_BASE}${path}`;
+    const ax = await axios({
+      method,
+      url,
+      headers: { "Content-Type": "application/json", ...(req.headers || {}) },
+      data: ["POST", "PUT", "PATCH"].includes(method) ? req.body : undefined,
+      validateStatus: () => true // forward status as-is
+    });
+    res.status(ax.status).json(ax.data);
+  } catch (e) {
+    console.error("Proxy error:", e.message);
+    res.status(502).json({ error: "Bad Gateway", message: e.message });
+    return;
+  }
 }
 
-})
-
-
-
-// GET ACCOUNT
-app.get("/getAccount/:id",async(req,res)=>{
-
-try{
-
-const response=await axios.get(`${API}/accounts/${req.params.id}`)
-
-res.json(response.data)
-
-}catch(err){
-
-res.status(500).json(err.response?.data||err.message)
-
-}
-
-})
-
-
-
-// UPDATE ACCOUNT (FIXED)
-app.patch("/updateAccount/:id",async(req,res)=>{
-
-try{
-
-const id=req.params.id
-
-// first fetch existing account
-const existing=await axios.get(`${API}/accounts/${id}`)
-
-const acc=existing.data.account_data
-
-const payload={
-
-FullName:req.body.FullName || acc.FullName,
-email:req.body.email || acc.email,
-mobileNumber:req.body.mobileNumber || acc.mobileNumber
-
-}
-
-const response=await axios.patch(
-`${API}/accounts/${id}`,
-payload
-)
-
-res.json(response.data)
-
-}catch(err){
-
-console.log(err.response?.data)
-
-res.status(500).json(err.response?.data||err.message)
-
-}
-
-})
-
-
-
-// DELETE ACCOUNT
-app.delete("/deleteAccount/:id",async(req,res)=>{
-
-try{
-
-const response=await axios.delete(`${API}/accounts/${req.params.id}`)
-
-res.json(response.data)
-
-}catch(err){
-
-res.status(500).json(err.response?.data||err.message)
-
-}
-
-})
-
-
-
-app.listen(3000,()=>{
-
-console.log("🚀 Server running → http://localhost:3000")
-
-})
+app.listen(PORT, () => {
+  console.log(`UI running on http://localhost:${PORT}`);
+  console.log(`Proxying API to ${API_BASE}`);
+});
