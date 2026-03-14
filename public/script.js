@@ -1,122 +1,56 @@
-document.getElementById("themeSelect").addEventListener("change",(e)=>{
-document.body.className=e.target.value
-})
+function showToast(message){
 
+const toast=document.getElementById("toast")
 
-function convertDOB(dob){
+toast.innerText=message
+toast.className="show"
 
-const y=dob.substring(0,4)
-const m=dob.substring(4,6)
-const d=dob.substring(6,8)
+setTimeout(()=>{
 
-return `${y}-${m}-${d}`
+toast.className=toast.className.replace("show","")
+
+},3000)
 
 }
 
 
-async function createAccount(){
 
-const bank=document.getElementById("bank").value
+function renderTable(data){
 
-if(!bank){
-alert("Select bank")
+const container=document.getElementById("getResult")
+
+if(!data){
+
+container.innerHTML="No Data"
 return
 }
 
-const payload={
+container.innerHTML=`
 
-FullName:document.getElementById("name").value,
+<table>
 
-dateOfBirth:convertDOB(document.getElementById("dob").value),
+<tr>
+<th>Account Number</th>
+<th>Name</th>
+<th>Mobile</th>
+<th>Email</th>
+<th>Address</th>
+</tr>
 
-mobileNumber:document.getElementById("mobile").value,
+<tr>
+<td>${data.accountNumber || ""}</td>
+<td>${data.FullName || data.FULLNAME || ""}</td>
+<td>${data.mobileNumber || data.MOBILENUMBER || ""}</td>
+<td>${data.email || data.EMAIL || ""}</td>
+<td>${data.address || data.ADDRESS || ""}</td>
+</tr>
 
-email:document.getElementById("email").value,
+</table>
 
-address:document.getElementById("address").value,
+<button onclick="copyAccount('${data.accountNumber}')">
+Copy Account Number
+</button>
 
-adharNumber:document.getElementById("adhar").value,
-
-bankName:bank
-
-}
-
-const res=await fetch("/createAccount",{
-
-method:"POST",
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify(payload)
-
-})
-
-const data=await res.json()
-
-document.getElementById("createResult").innerText=
-JSON.stringify(data,null,2)
-
-}
-
-
-
-async function getAccount(){
-
-const acc=document.getElementById("getAcc").value
-
-const res=await fetch(`/getAccount/${acc}`)
-
-const data=await res.json()
-
-document.getElementById("getResult").innerText=
-JSON.stringify(data,null,2)
-
-}
-
-
-
-async function updateAccount(){
-
-const acc=document.getElementById("updateAcc").value
-
-const payload={
-
-FullName:document.getElementById("updateName").value,
-
-email:document.getElementById("updateAddress").value,
-
-mobileNumber:document.getElementById("updateMobile").value
-
-}
-
-const res=await fetch(`/updateAccount/${acc}`,{
-
-method:"PATCH",
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify(payload)
-
-})
-
-const data=await res.json()
-
-document.getElementById("updateResult").innerText=
-JSON.stringify(data,null,2)
-
-}
-
-
-
-async function deleteAccount(){
-
-const acc=document.getElementById("deleteAcc").value
-
-const res=await fetch(`/deleteAccount/${acc}`,{
-
-method:"DELETE"
-
-})
-
-const data=await res.json()
-
-document.getElementById("deleteResult").innerText=
-JSON.stringify(data,null,2)
+`
 
 }
