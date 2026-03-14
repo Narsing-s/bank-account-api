@@ -1,12 +1,13 @@
-// ========= Config & Utilities =========
+// ========= Utilities =========
 const $ = (id) => document.getElementById(id);
-const q = (sel) => document.querySelector(sel);
 const qa = (sel) => Array.from(document.querySelectorAll(sel));
 
-function getApiUrl(path){
-  const mode = window.AppConfig?.mode || "web";
-  if (mode === "android") return `${window.AppConfig.ANDROID_BASE}${path}`;
-  return `${window.AppConfig.WEB_PREFIX || ""}${path}`;
+function API(path) {
+  // Respect Android base if mode=android; otherwise use proxy prefix
+  const cfg = window.AppConfig || { mode: "web", WEB_PREFIX: "/api", ANDROID_BASE: "" };
+  if (cfg.mode === "android" && cfg.ANDROID_BASE) return `${cfg.ANDROID_BASE}${path}`;
+  const prefix = window.API_PREFIX || cfg.WEB_PREFIX || "/api";
+  return `${prefix}${path}`;
 }
 
 const statusDot = $("statusDot");
@@ -15,51 +16,6 @@ const loader = $("loader");
 const respOverlay = $("respOverlay");
 const respBody = $("respBody");
 
-// ===== I18N =====
-const I18N = { en: null, te: null, hi: null };
-let currentLang = localStorage.getItem("lang") || "en";
-
-async function loadLang(lang){
-  if (!I18N[lang]) {
-    const res = await fetch(`/i18n/${lang}.json`);
-    I18N[lang] = await res.json();
-  }
-  currentLang = lang;
-  localStorage.setItem("lang", lang);
-  applyLang();
-}
-
-function t(key){
-  return (I18N[currentLang] && I18N[currentLang][key]) || key;
-}
-
-function applyLang(){
-  qa("[data-i18n]").forEach(el => {
-    const key = el.getAttribute("data-i18n");
-    el.textContent = t(key);
-  });
-}
-
-// ===== THEME & SETTINGS =====
-function applyTheme(theme){
-  const html = document.documentElement;
-  if (theme === "system") {
-    html.removeAttribute("data-theme");
-  } else {
-    html.setAttribute("data-theme", theme);
-  }
-  localStorage.setItem("theme", theme);
-}
-function applyMotion(reduce){
-  document.documentElement.classList.toggle("rm", !!reduce);
-  localStorage.setItem("reduceMotion", reduce ? "1" : "0");
-}
-function applyContrast(hc){
-  document.documentElement.classList.toggle("hc", !!hc);
-  localStorage.setItem("highContrast", hc ? "1" : "0");
-}
-
-// ===== UI Helpers =====
 function toast(msg, type="ok"){
   const wrap = $("toasts");
   const el = document.createElement("div");
@@ -73,6 +29,7 @@ function toast(msg, type="ok"){
 }
 function showLoader(on){ loader.classList.toggle("hidden", !on); }
 function blurActive(){ if (document.activeElement?.blur) document.activeElement.blur(); }
+
 function setOnline(online){
   statusDot.classList.toggle("online", online);
   statusDot.classList.toggle("offline", !online);
@@ -87,7 +44,7 @@ setInterval(()=>{
   setOnline(online);
 }, 4000);
 
-// Shimmer hover
+// Button shimmer
 document.addEventListener("pointermove", e => {
   document.querySelectorAll("button").forEach(btn=>{
     const rect = btn.getBoundingClientRect();
@@ -96,6 +53,7 @@ document.addEventListener("pointermove", e => {
   });
 });
 
+// Convert YYYYMMDD to YYYY-MM-DD
 function convertDOB(d){
   if(!d) return "";
   const s = String(d).trim();
@@ -188,20 +146,29 @@ $("btnCopyResp").addEventListener("click", async ()=>{
   }
 });
 
-// Settings
+// Settings (languages removed; keep theme/motion/contrast)
 const settings = $("settings");
 $("btnSettings").addEventListener("click", ()=> settings.classList.remove("hidden"));
 $("btnCloseSettings").addEventListener("click", ()=> settings.classList.add("hidden"));
-qa('[data-theme]').forEach(btn=>{
+function applyTheme(theme){
+  const html = document.documentElement;
+  if (theme === "system") html.removeAttribute("data-theme");
+  else html.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
+}
+function applyMotion(reduce){
+  document.documentElement.classList.toggle("rm", !!reduce);
+  localStorage.setItem("reduceMotion", reduce ? "1" : "0");
+}
+function applyContrast(hc){
+  document.documentElement.classList.toggle("hc", !!hc);
+  localStorage.setItem("highContrast", hc ? "1" : "0");
+}
+document.querySelectorAll('[data-theme]').forEach(btn=>{
   btn.addEventListener("click", ()=> applyTheme(btn.dataset.theme));
-});
-qa('[data-lang]').forEach(btn=>{
-  btn.addEventListener("click", ()=> loadLang(btn.dataset.lang));
 });
 $("toggleMotion").addEventListener("change", (e)=> applyMotion(e.target.checked));
 $("toggleContrast").addEventListener("change", (e)=> applyContrast(e.target.checked));
-
-// Init settings
 (function initSettings(){
   const theme = localStorage.getItem("theme") || "system";
   const reduce = localStorage.getItem("reduceMotion") === "1";
@@ -211,27 +178,45 @@ $("toggleContrast").addEventListener("change", (e)=> applyContrast(e.target.chec
   $("toggleContrast").checked = hc;
 })();
 
-// Load language and apply
-loadLang(currentLang).catch(console.error);
+// Parallax tilt for floating panels
+(function enableParallaxTilt(){
+  const maxTilt = 6; // degrees
+  const cards = qa(".float-card");
+  cards.forEach(c => c.classList.add("parallax-tilt"));
+  document.addEventListener("pointermove", (e) => {
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+    const dx = (e.clientX - cx) / cx; // -1 .. 1
+    const dy = (e.clientY - cy) / cy; // -1 .. 1
+    const rx = (dy * maxTilt);
+    const ry = (-dx * maxTilt);
+    cards.forEach(c => {
+      c.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-2px)`;
+    });
+  });
+  document.addEventListener("pointerleave", () => {
+    cards.forEach(c => c.style.transform = "");
+  });
+})();
 
 // ---------- CREATE ----------
 $("btnCreate").addEventListener("click", async ()=>{
   blurActive();
-  const FullName = ($("name").value || "").trim();
-  const dateOfBirth = convertDOB(($("dob").value || "").trim());
-  const mobileNumber = ($("mobile").value || "").trim();
-  const email = ($("email").value || "").trim();
-  const address = ($("address").value || "").trim();
-  const adharNumber = ($("aadhaar").value || "").trim();
-  const bankName = ($("bank").value || "").trim();
+  const FullName = ($("#name").value || "").trim();
+  const dateOfBirth = convertDOB(($("#dob").value || "").trim());
+  const mobileNumber = ($("#mobile").value || "").trim();
+  const email = ($("#email").value || "").trim();
+  const address = ($("#address").value || "").trim();
+  const adharNumber = ($("#aadhaar").value || "").trim();
+  const bankName = ($("#bank").value || "").trim();
 
-  if(!FullName){ toast(t("toast.required.fullName"), "err"); $("name").focus(); return; }
-  if(!dateOfBirth){ toast(t("toast.required.dob"), "err"); $("dob").focus(); return; }
-  if(!mobileNumber){ toast(t("toast.required.mobile"), "err"); $("mobile").focus(); return; }
-  if(!email){ toast(t("toast.required.email"), "err"); $("email").focus(); return; }
-  if(!address){ toast(t("toast.required.address"), "err"); $("address").focus(); return; }
-  if(!/^\d{12}$/.test(adharNumber)){ toast(t("toast.invalid.aadhaar"), "err"); $("aadhaar").focus(); return; }
-  if(!["SBI","HDFC","APGIVB","AXIS","ICICI"].includes(bankName)){ toast(t("toast.invalid.bank"), "err"); $("bank").focus(); return; }
+  if(!FullName){ toast("FullName is required", "err"); $("#name").focus(); return; }
+  if(!dateOfBirth){ toast("dateOfBirth must be YYYYMMDD", "err"); $("#dob").focus(); return; }
+  if(!mobileNumber){ toast("mobileNumber is required", "err"); $("#mobile").focus(); return; }
+  if(!email){ toast("email is required", "err"); $("#email").focus(); return; }
+  if(!address){ toast("address is required", "err"); $("#address").focus(); return; }
+  if(!/^\d{12}$/.test(adharNumber)){ toast("Aadhaar (adharNumber) must be 12 digits", "err"); $("#aadhaar").focus(); return; }
+  if(!["SBI","HDFC","APGIVB","AXIS","ICICI"].includes(bankName)){ toast("Select a valid bank", "err"); $("#bank").focus(); return; }
 
   const payload = { FullName, dateOfBirth, mobileNumber, email, address };
 
@@ -239,7 +224,7 @@ $("btnCreate").addEventListener("click", async ()=>{
   btn.disabled = true; showLoader(true);
   try{
     const qs = new URLSearchParams({ adharNumber, bankName }).toString();
-    const {res, data, text} = await doFetch(getApiUrl(`/accounts?${qs}`), {
+    const {res, data, text} = await doFetch(API(`/accounts?${qs}`), {
       method: "POST",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload)
@@ -250,7 +235,7 @@ $("btnCreate").addEventListener("click", async ()=>{
       throw new Error((data && data.message) || `HTTP ${res.status}`);
     }
     showResponse(data);
-    toast(t("toast.created"));
+    toast("Account created successfully");
     launchConfetti(80);
     lastSuccess = Date.now();
   }catch(e){
@@ -263,8 +248,8 @@ $("btnCreate").addEventListener("click", async ()=>{
 // ---------- SEARCH ----------
 $("btnSearch").addEventListener("click", async ()=>{
   blurActive();
-  const id = ($("getAcc").value || "").trim();
-  if(!id){ toast(t("toast.required.acc"), "err"); return; }
+  const id = ($("#getAcc").value || "").trim();
+  if(!id){ toast("Account number is required", "err"); return; }
 
   const cardWrap = $("bankCard");
   cardWrap.classList.remove("placeholder");
@@ -272,13 +257,13 @@ $("btnSearch").addEventListener("click", async ()=>{
 
   showLoader(true);
   try{
-    const {res, data, text} = await doFetch(getApiUrl(`/accounts/${encodeURIComponent(id)}`), { method:"GET" });
+    const {res, data, text} = await doFetch(API(`/accounts/${encodeURIComponent(id)}`), { method:"GET" });
     if(!res.ok){
       showResponse(text || data);
       throw new Error((data && data.message) || `HTTP ${res.status}`);
     }
     const fullName = data.FullName || data.fullName || "(No Name)";
-    const card = document.createElement("div"); card.className = "bankCard";
+    const card = document.createElement("div"); card.className = "bankCard float-card";
     const h3 = document.createElement("h3"); h3.textContent = fullName;
     const pAcc = document.createElement("p"); pAcc.textContent = `Account: ${data.accountNumber ?? "(unknown)"}`;
     const pMob = document.createElement("p"); pMob.textContent = `Mobile: ${data.mobileNumber ?? "(unknown)"}`;
@@ -288,7 +273,7 @@ $("btnSearch").addEventListener("click", async ()=>{
     card.append(h3,pAcc,pMob,pEmail,pDob,pAddr);
     cardWrap.innerHTML = ""; cardWrap.appendChild(card);
     showResponse(data);
-    toast(t("toast.fetched"));
+    toast("Account fetched");
     lastSuccess = Date.now();
   }catch(e){
     toast(e.message, "err");
@@ -300,13 +285,13 @@ $("btnSearch").addEventListener("click", async ()=>{
 // ---------- UPDATE ----------
 $("btnUpdate").addEventListener("click", async ()=>{
   blurActive();
-  const id = ($("updateAcc").value || "").trim();
-  if(!id){ toast(t("toast.required.acc"), "err"); return; }
+  const id = ($("#updateAcc").value || "").trim();
+  if(!id){ toast("Account number is required", "err"); return; }
 
   const payload = {
-    FullName: ($("updateName").value || "").trim(),
-    email: ($("updateEmail").value || "").trim(),
-    mobileNumber: ($("updateMobile").value || "").trim()
+    FullName: ($("#updateName").value || "").trim(),
+    email: ($("#updateEmail").value || "").trim(),
+    mobileNumber: ($("#updateMobile").value || "").trim()
   };
   Object.keys(payload).forEach(k => payload[k] === "" && delete payload[k]);
   if(Object.keys(payload).length === 0){
@@ -316,7 +301,7 @@ $("btnUpdate").addEventListener("click", async ()=>{
   const btn = $("btnUpdate");
   btn.disabled = true; showLoader(true);
   try{
-    const {res, data, text} = await doFetch(getApiUrl(`/accounts/${encodeURIComponent(id)}`), {
+    const {res, data, text} = await doFetch(API(`/accounts/${encodeURIComponent(id)}`), {
       method: "PATCH",
       headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload)
@@ -326,7 +311,7 @@ $("btnUpdate").addEventListener("click", async ()=>{
       throw new Error((data && data.message) || `HTTP ${res.status}`);
     }
     showResponse(data);
-    toast(t("toast.updated"));
+    toast("Account updated");
     launchConfetti(50);
     lastSuccess = Date.now();
   }catch(e){
@@ -339,19 +324,19 @@ $("btnUpdate").addEventListener("click", async ()=>{
 // ---------- DELETE ----------
 $("btnDelete").addEventListener("click", async ()=>{
   blurActive();
-  const id = ($("deleteAcc").value || "").trim();
-  if(!id){ toast(t("toast.required.acc"), "err"); return; }
+  const id = ($("#deleteAcc").value || "").trim();
+  if(!id){ toast("Account number is required", "err"); return; }
 
   const btn = $("btnDelete");
   btn.disabled = true; showLoader(true);
   try{
-    const {res, data, text} = await doFetch(getApiUrl(`/accounts/${encodeURIComponent(id)}`), { method:"DELETE" });
+    const {res, data, text} = await doFetch(API(`/accounts/${encodeURIComponent(id)}`), { method:"DELETE" });
     if(!res.ok){
       showResponse(text || data);
       throw new Error((data && data.message) || `HTTP ${res.status}`);
     }
     showResponse(data);
-    toast(t("toast.deleted"));
+    toast("Account deleted");
     launchConfetti(40);
     lastSuccess = Date.now();
   }catch(e){
@@ -362,4 +347,3 @@ $("btnDelete").addEventListener("click", async ()=>{
 });
 
 window.addEventListener("load", updateStickyHeight);
-``
