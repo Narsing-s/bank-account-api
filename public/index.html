@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>NeoBank — Blue/Pink Animated UI (Voice Enabled)</title>
+  <title id="titleText">NeoBank — Blue/Pink Animated UI (Voice + Multi-language)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b1024" />
   style.css
@@ -17,30 +17,42 @@
     <div class="brand">
       <div class="logo">🏦</div>
       <div>
-        <div class="brand-title">NeoBank Control Center</div>
-        <div class="brand-sub">Blue × Pink Animated Experience + Voice</div>
+        <div class="brand-title" id="brandTitle">NeoBank Control Center</div>
+        <div class="brand-sub" id="brandSub">Blue × Pink Animated Experience + Voice</div>
       </div>
     </div>
 
-    <!-- Voice Panel -->
-    <div class="voice-panel" role="group" aria-label="Voice controls">
+    <!-- Language + Voice Panel -->
+    <div class="voice-panel" role="group" aria-label="Language and voice controls">
+      <!-- UI language -->
+      <select id="uiLangSelect" aria-label="UI language">
+        <option value="auto" selected>🌐 Auto</option>
+        <option value="en">English</option>
+        <option value="hi">हिन्दी</option>
+        <option value="te">తెలుగు</option>
+      </select>
+
+      <!-- TTS toggle -->
       <label class="switch" title="Text-to-Speech">
         <input type="checkbox" id="ttsToggle" checked />
         <span class="slider"></span>
-        <span class="switch-label">Speak</span>
+        <span class="switch-label" id="speakLabel">Speak</span>
       </label>
 
+      <!-- TTS voice -->
       <select id="voiceSelect" aria-label="TTS voice">
         <option value="">Auto Voice</option>
       </select>
 
+      <!-- STT language -->
       <select id="langSelect" aria-label="Recognition language">
-        <option value="en-US" selected>English (US)</option>
-        <option value="en-IN">English (India)</option>
-        <option value="en-GB">English (UK)</option>
-        <option value="hi-IN">Hindi (India)</option>
+        <option value="en-US" selected>Mic: English (US)</option>
+        <option value="en-IN">Mic: English (India)</option>
+        <option value="hi-IN">Mic: Hindi (India)</option>
+        <option value="te-IN">Mic: Telugu (India)</option>
       </select>
 
+      <!-- Mic -->
       <button id="micBtn" class="icon-btn magnetic" aria-label="Start/Stop voice input" title="Voice input">
         🎤
       </button>
@@ -53,36 +65,36 @@
   </header>
 
   <nav class="tabs">
-    <button class="tab-btn active magnetic" data-tab="create">Create</button>
-    <button class="tab-btn magnetic" data-tab="search">Search</button>
-    <button class="tab-btn magnetic" data-tab="update">Update</button>
-    <button class="tab-btn magnetic" data-tab="delete">Delete</button>
+    <button class="tab-btn active magnetic" data-tab="create" id="tabCreate">Create</button>
+    <button class="tab-btn magnetic" data-tab="search" id="tabSearch">Search</button>
+    <button class="tab-btn magnetic" data-tab="update" id="tabUpdate">Update</button>
+    <button class="tab-btn magnetic" data-tab="delete" id="tabDelete">Delete</button>
   </nav>
 
   <main class="container">
     <!-- CREATE -->
     <section id="create" class="panel active">
-      <h2>Create Account</h2>
+      <h2 id="createTitle">Create Account</h2>
       <div class="grid">
-        <label>Full Name
+        <label id="lblFullName">Full Name
           <input id="name" placeholder="e.g., Jane Doe" maxlength="80" required />
         </label>
-        <label>Date of Birth (YYYYMMDD)
+        <label id="lblDob">Date of Birth (YYYYMMDD)
           <input id="dob" placeholder="19900131" maxlength="8" inputmode="numeric" />
         </label>
-        <label>Mobile
+        <label id="lblMobile">Mobile
           <input id="mobile" placeholder="10-digit number" maxlength="15" inputmode="tel" />
         </label>
-        <label>Email
+        <label id="lblEmail">Email
           <input id="email" placeholder="name@example.com" type="email" />
         </label>
-        <label>Address
+        <label id="lblAddress">Address
           <input id="address" placeholder="Street, City" />
         </label>
-        <label>Aadhaar (12 digits)
+        <label id="lblAadhaar">Aadhaar (12 digits)
           <input id="aadhaar" placeholder="123412341234" maxlength="12" inputmode="numeric" />
         </label>
-        <label>Bank
+        <label id="lblBank">Bank
           <select id="bank">
             <option>SBI</option>
             <option>HDFC</option>
@@ -93,6 +105,7 @@
         </label>
       </div>
 
+      <!-- Sticky action bar on mobile -->
       <div class="action-bar" data-for="create">
         <div class="action-bar-inner">
           <button id="btnCreate" class="primary magnetic">Create Account</button>
@@ -104,9 +117,9 @@
 
     <!-- SEARCH -->
     <section id="search" class="panel">
-      <h2>Search Account</h2>
+      <h2 id="searchTitle">Search Account</h2>
       <div class="grid">
-        <label>Account Number
+        <label id="lblSearchAcc">Account Number
           <input id="getAcc" placeholder="Enter account number" />
         </label>
       </div>
@@ -131,18 +144,18 @@
 
     <!-- UPDATE -->
     <section id="update" class="panel">
-      <h2>Update Account</h2>
+      <h2 id="updateTitle">Update Account</h2>
       <div class="grid">
-        <label>Account Number
+        <label id="lblUpdateAcc">Account Number
           <input id="updateAcc" placeholder="Enter account number" />
         </label>
-        <label>Full Name
+        <label id="lblUpdateName">Full Name
           <input id="updateName" placeholder="New full name" />
         </label>
-        <label>Email
+        <label id="lblUpdateEmail">Email
           <input id="updateEmail" placeholder="name@example.com" type="email" />
         </label>
-        <label>Mobile
+        <label id="lblUpdateMobile">Mobile
           <input id="updateMobile" placeholder="10-digit number" inputmode="tel" />
         </label>
       </div>
@@ -158,9 +171,9 @@
 
     <!-- DELETE -->
     <section id="delete" class="panel">
-      <h2>Delete Account</h2>
+      <h2 id="deleteTitle">Delete Account</h2>
       <div class="grid">
-        <label>Account Number
+        <label id="lblDeleteAcc">Account Number
           <input id="deleteAcc" placeholder="Enter account number" />
         </label>
       </div>
