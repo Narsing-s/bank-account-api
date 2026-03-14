@@ -8,23 +8,7 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static("public"))
 
-const API="https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api"
-
-
-app.get("/status", async(req,res)=>{
-
-try{
-
-await axios.get(`${API}/accounts/856974569971`)
-res.json({status:"ONLINE"})
-
-}catch{
-
-res.json({status:"OFFLINE"})
-
-}
-
-})
+const API = "https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api"
 
 
 app.post("/createAccount", async(req,res)=>{
@@ -79,8 +63,8 @@ const {FullName,email,mobileNumber}=req.body
 
 const response=await axios.patch(`${API}/accounts/${req.params.id}`,{
 FullName,
-ADDRESS:email,
-MOBILENUMBER:mobileNumber
+email,
+mobileNumber
 })
 
 res.json(response.data)
