@@ -1,25 +1,21 @@
 let chart
 
-
-async function checkAPI(){
-
-const res=await fetch("/status")
-const data=await res.json()
-
-document.getElementById("apiStatus").innerText=data.status
-
-}
-
-checkAPI()
-
-
-
 function convertDOB(d){
 
 return `${d.substring(0,4)}-${d.substring(4,6)}-${d.substring(6,8)}`
 
 }
 
+function toast(msg){
+
+const t=document.getElementById("toast")
+
+t.innerText=msg
+t.style.display="block"
+
+setTimeout(()=>t.style.display="none",3000)
+
+}
 
 
 function addTimeline(action){
@@ -28,22 +24,19 @@ const li=document.createElement("li")
 
 li.innerText=new Date().toLocaleTimeString()+" - "+action
 
-document.getElementById("timeline").prepend(li)
+timeline.prepend(li)
 
 }
-
 
 
 function renderCard(data){
 
 const acc=data.account_data||{}
 
-document.getElementById("bankCard").innerHTML=
+bankCard.innerHTML=
 
 `
 <div class="bankCard">
-
-<div class="chip"></div>
 
 <h3>${acc.FullName||""}</h3>
 
@@ -57,13 +50,13 @@ document.getElementById("bankCard").innerHTML=
 }
 
 
-
 function renderTable(data){
 
 const acc=data.account_data||{}
 
-document.getElementById("getResult").innerHTML=`
+getResult.innerHTML=
 
+`
 <table>
 
 <tr>
@@ -85,11 +78,9 @@ document.getElementById("getResult").innerHTML=`
 </tr>
 
 </table>
-
 `
 
 }
-
 
 
 function renderChart(data){
@@ -107,32 +98,20 @@ const values=[
 if(chart) chart.destroy()
 
 chart=new Chart(accountChart,{
+
 type:"bar",
+
 data:{
+
 labels:["Account","Mobile","Email"],
+
 datasets:[{data:values}]
+
 }
+
 })
 
 }
-
-
-
-async function getAccount(){
-
-const acc=getAcc.value
-
-const res=await fetch(`/getAccount/${acc}`)
-const data=await res.json()
-
-renderCard(data)
-renderTable(data)
-renderChart(data)
-
-addTimeline("Account searched "+acc)
-
-}
-
 
 
 async function createAccount(){
@@ -152,7 +131,9 @@ bankName:bank.value
 const res=await fetch("/createAccount",{
 
 method:"POST",
+
 headers:{"Content-Type":"application/json"},
+
 body:JSON.stringify(payload)
 
 })
@@ -161,10 +142,36 @@ const data=await res.json()
 
 createResult.innerText=JSON.stringify(data,null,2)
 
+toast("Account Created")
+
 addTimeline("Account created")
 
 }
 
+
+async function getAccount(){
+
+const acc=getAcc.value
+
+if(acc.length!==12){
+
+toast("Account number must be 12 digits")
+
+return
+
+}
+
+const res=await fetch(`/getAccount/${acc}`)
+
+const data=await res.json()
+
+renderCard(data)
+renderTable(data)
+renderChart(data)
+
+addTimeline("Account searched")
+
+}
 
 
 async function updateAccount(){
@@ -180,7 +187,9 @@ mobileNumber:updateMobile.value
 const res=await fetch(`/updateAccount/${updateAcc.value}`,{
 
 method:"PATCH",
+
 headers:{"Content-Type":"application/json"},
+
 body:JSON.stringify(payload)
 
 })
@@ -189,10 +198,11 @@ const data=await res.json()
 
 updateResult.innerText=JSON.stringify(data,null,2)
 
+toast("Account Updated")
+
 addTimeline("Account updated")
 
 }
-
 
 
 async function deleteAccount(){
@@ -207,6 +217,28 @@ const data=await res.json()
 
 deleteResult.innerText=JSON.stringify(data,null,2)
 
+toast("Account Deleted")
+
 addTimeline("Account deleted")
+
+}
+
+
+function toggleTheme(){
+
+document.body.classList.toggle("dark")
+
+}
+
+
+function changeLanguage(){
+
+const lang=language.value
+
+if(lang==="te") title.innerText="బ్యాంక్ డాష్‌బోర్డ్"
+
+if(lang==="hi") title.innerText="बैंक डैशबोर्ड"
+
+if(lang==="en") title.innerText="🏦 Bank Dashboard"
 
 }
