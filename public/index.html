@@ -1,34 +1,57 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+<title>Bank Account Management</title>
 
-<meta charset="UTF-8">
-<title>Pink Blue Bank UI</title>
+<style>
 
-<meta name="viewport" content="width=device-width,initial-scale=1">
+body{
+font-family:Arial;
+background:linear-gradient(135deg,#ff4fa3,#3b82ff);
+color:white;
+padding:40px;
+}
 
-<link rel="stylesheet" href="style.css">
+.card{
+background:rgba(255,255,255,0.2);
+padding:20px;
+border-radius:15px;
+margin-bottom:20px;
+width:320px;
+}
+
+input{
+width:100%;
+padding:10px;
+margin:6px 0;
+border:none;
+border-radius:8px;
+}
+
+button{
+width:100%;
+padding:10px;
+border:none;
+border-radius:10px;
+background:black;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+opacity:0.8;
+}
+
+</style>
 
 </head>
 
 <body>
 
-<header class="header">
+<h1>Bank Account Management</h1>
 
-<h1>💳 My Bank</h1>
-
-</header>
-
-<div class="container">
-
-<div class="card balance">
-
-<h2>Total Balance</h2>
-
-<p id="balance">₹0</p>
-
-</div>
-
+<!-- CREATE ACCOUNT -->
 
 <div class="card">
 
@@ -36,67 +59,224 @@
 
 <input id="name" placeholder="Full Name">
 
-<input id="email" placeholder="Email">
+<input id="address" placeholder="Address">
+
+<input id="mobile" placeholder="Mobile Number">
 
 <input id="dob" type="date">
 
-<input id="mobile" placeholder="Mobile">
+<input id="aadhaar" placeholder="Aadhar Number">
 
-<input id="aadhaar" placeholder="Aadhaar">
-
-<select id="bank">
-
-<option>SBI</option>
-
-<option>HDFC</option>
-
-<option>ICICI</option>
-
-<option>AXIS</option>
-
-</select>
+<input id="bank" placeholder="Bank Name">
 
 <button onclick="createAccount()">Create Account</button>
 
 </div>
 
+
+<!-- GET ACCOUNT -->
+
 <div class="card">
 
 <h3>Get Account</h3>
 
-<input id="getAcct" placeholder="Account Number">
+<input id="getId" placeholder="Account Number (12 digits)">
 
 <button onclick="getAccount()">Get Account</button>
 
 </div>
 
-<div class="card">
 
-<h3>Update</h3>
-
-<input id="updAcct" placeholder="Account Number">
-
-<input id="updName" placeholder="New Name">
-
-<button onclick="updateAccount()">Update</button>
-
-</div>
+<!-- UPDATE ACCOUNT -->
 
 <div class="card">
 
-<h3>Delete</h3>
+<h3>Update Account</h3>
 
-<input id="delAcct" placeholder="Account Number">
+<input id="updateId" placeholder="Account Number">
 
-<button onclick="deleteAccount()">Delete</button>
+<input id="updateName" placeholder="Full Name">
+
+<input id="updateAddress" placeholder="Address">
+
+<input id="updateMobile" placeholder="Mobile Number">
+
+<button onclick="updateAccount()">Update Account</button>
 
 </div>
+
+
+<!-- DELETE ACCOUNT -->
+
+<div class="card">
+
+<h3>Delete Account</h3>
+
+<input id="deleteId" placeholder="Account Number">
+
+<button onclick="deleteAccount()">Delete Account</button>
 
 </div>
 
 <pre id="result"></pre>
 
-<script src="app.js"></script>
+
+<script>
+
+const result=document.getElementById("result")
+
+function validateAccount(id){
+
+if(id.length!==12){
+
+alert("Account number must be 12 digits")
+
+return false
+
+}
+
+return true
+
+}
+
+/* Convert Date to yyyy-MM-dd */
+
+function formatDate(date){
+
+const d=new Date(date)
+
+const year=d.getFullYear()
+
+let month=(d.getMonth()+1).toString().padStart(2,"0")
+
+let day=d.getDate().toString().padStart(2,"0")
+
+return `${year}-${month}-${day}`
+
+}
+
+/* CREATE ACCOUNT */
+
+async function createAccount(){
+
+const dobInput=document.getElementById("dob").value
+
+if(!dobInput){
+
+alert("Please select Date of Birth")
+
+return
+
+}
+
+const formattedDOB=formatDate(dobInput)
+
+const body={
+
+adharNumber:document.getElementById("aadhaar").value,
+
+bankName:document.getElementById("bank").value,
+
+FullName:document.getElementById("name").value,
+
+email:document.getElementById("address").value,
+
+mobileNumber:document.getElementById("mobile").value,
+
+dateOfBirth:formattedDOB
+
+}
+
+const res=await fetch("/accounts",{
+
+method:"POST",
+
+headers:{"Content-Type":"application/json"},
+
+body:JSON.stringify(body)
+
+})
+
+const data=await res.text()
+
+result.innerText=data
+
+}
+
+
+/* GET ACCOUNT */
+
+async function getAccount(){
+
+const id=document.getElementById("getId").value
+
+if(!validateAccount(id)) return
+
+const res=await fetch(`/accounts/${id}`)
+
+const data=await res.text()
+
+result.innerText=data
+
+}
+
+
+/* UPDATE ACCOUNT */
+
+async function updateAccount(){
+
+const id=document.getElementById("updateId").value
+
+if(!validateAccount(id)) return
+
+const body={
+
+FullName:document.getElementById("updateName").value,
+
+email:document.getElementById("updateAddress").value,
+
+mobileNumber:document.getElementById("updateMobile").value
+
+}
+
+const res=await fetch(`/accounts/${id}`,{
+
+method:"PUT",
+
+headers:{"Content-Type":"application/json"},
+
+body:JSON.stringify(body)
+
+})
+
+const data=await res.text()
+
+result.innerText=data
+
+}
+
+
+/* DELETE ACCOUNT */
+
+async function deleteAccount(){
+
+const id=document.getElementById("deleteId").value
+
+if(!validateAccount(id)) return
+
+const res=await fetch(`/accounts/${id}`,{
+
+method:"DELETE"
+
+})
+
+const data=await res.text()
+
+result.innerText=data
+
+}
+
+</script>
 
 </body>
 
