@@ -25,8 +25,15 @@ header{
 display:flex;
 justify-content:space-between;
 padding:20px;
-
 background:rgba(0,0,0,0.3);
+
+}
+
+.status{
+
+padding:10px;
+text-align:center;
+font-weight:bold;
 
 }
 
@@ -53,7 +60,6 @@ input,select{
 width:100%;
 padding:10px;
 margin-bottom:10px;
-
 border:none;
 border-radius:6px;
 
@@ -98,9 +104,7 @@ color:white;
 
 }
 
-.searchBox{
-position:relative;
-}
+.searchBox{position:relative;}
 
 #suggestions{
 
@@ -108,7 +112,6 @@ position:absolute;
 background:white;
 color:black;
 width:100%;
-border-radius:6px;
 
 }
 
@@ -125,10 +128,27 @@ background:#eee;
 
 }
 
+.dashboardCards{
+
+display:flex;
+gap:10px;
+margin-bottom:15px;
+
+}
+
+.dashCard{
+
+background:#ffffff20;
+padding:15px;
+border-radius:10px;
+text-align:center;
+flex:1;
+
+}
+
 #toast{
 
 visibility:hidden;
-
 position:fixed;
 bottom:30px;
 left:50%;
@@ -136,7 +156,6 @@ left:50%;
 transform:translateX(-50%);
 
 background:black;
-
 padding:15px;
 border-radius:8px;
 
