@@ -2,6 +2,7 @@
 <html>
 
 <head>
+
 <title>Bank Account Management</title>
 
 <style>
@@ -18,7 +19,7 @@ background:rgba(255,255,255,0.2);
 padding:20px;
 border-radius:15px;
 margin-bottom:20px;
-width:320px;
+width:340px;
 }
 
 input{
@@ -41,6 +42,25 @@ cursor:pointer;
 
 button:hover{
 opacity:0.8;
+}
+
+table{
+margin-top:30px;
+width:100%;
+border-collapse:collapse;
+background:white;
+color:black;
+}
+
+th,td{
+padding:10px;
+border:1px solid #ddd;
+text-align:left;
+}
+
+th{
+background:#333;
+color:white;
 }
 
 </style>
@@ -118,6 +138,31 @@ opacity:0.8;
 
 </div>
 
+
+<h2>Account Details</h2>
+
+<table id="accountTable">
+
+<thead>
+
+<tr>
+
+<th>Account Number</th>
+<th>Full Name</th>
+<th>Address</th>
+<th>Mobile</th>
+<th>Date Of Birth</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+</tbody>
+
+</table>
+
 <pre id="result"></pre>
 
 
@@ -139,7 +184,7 @@ return true
 
 }
 
-/* Convert Date to yyyy-MM-dd */
+/* FORMAT DATE */
 
 function formatDate(date){
 
@@ -155,7 +200,7 @@ return `${year}-${month}-${day}`
 
 }
 
-/* CREATE ACCOUNT */
+/* CREATE */
 
 async function createAccount(){
 
@@ -163,13 +208,11 @@ const dobInput=document.getElementById("dob").value
 
 if(!dobInput){
 
-alert("Please select Date of Birth")
+alert("Select Date Of Birth")
 
 return
 
 }
-
-const formattedDOB=formatDate(dobInput)
 
 const body={
 
@@ -183,7 +226,7 @@ email:document.getElementById("address").value,
 
 mobileNumber:document.getElementById("mobile").value,
 
-dateOfBirth:formattedDOB
+dateOfBirth:formatDate(dobInput)
 
 }
 
@@ -203,7 +246,6 @@ result.innerText=data
 
 }
 
-
 /* GET ACCOUNT */
 
 async function getAccount(){
@@ -214,14 +256,39 @@ if(!validateAccount(id)) return
 
 const res=await fetch(`/accounts/${id}`)
 
-const data=await res.text()
+const data=await res.json()
 
-result.innerText=data
+displayAccount(data)
 
 }
 
+/* DISPLAY ACCOUNT IN TABLE */
 
-/* UPDATE ACCOUNT */
+function displayAccount(data){
+
+const table=document.querySelector("#accountTable tbody")
+
+table.innerHTML=""
+
+const row=`<tr>
+
+<td>${data.accountNumber || ""}</td>
+
+<td>${data.FULLNAME || ""}</td>
+
+<td>${data.ADDRESS || ""}</td>
+
+<td>${data.MOBILENUMBER || ""}</td>
+
+<td>${data.DATEOFBIRTH || ""}</td>
+
+</tr>`
+
+table.innerHTML=row
+
+}
+
+/* UPDATE */
 
 async function updateAccount(){
 
@@ -255,8 +322,7 @@ result.innerText=data
 
 }
 
-
-/* DELETE ACCOUNT */
+/* DELETE */
 
 async function deleteAccount(){
 
@@ -279,5 +345,4 @@ result.innerText=data
 </script>
 
 </body>
-
 </html>
