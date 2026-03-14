@@ -1,13 +1,32 @@
-function showToast(message){
+document.getElementById("theme").addEventListener("change",(e)=>{
 
-const toast=document.getElementById("toast")
+document.body.className=e.target.value
 
-toast.innerText=message
-toast.className="show"
+})
+
+
+function convertDOB(d){
+
+const y=d.substring(0,4)
+const m=d.substring(4,6)
+const day=d.substring(6,8)
+
+return `${y}-${m}-${day}`
+
+}
+
+
+function toast(msg){
+
+const t=document.getElementById("toast")
+
+t.innerText=msg
+
+t.className="show"
 
 setTimeout(()=>{
 
-toast.className=toast.className.replace("show","")
+t.className=""
 
 },3000)
 
@@ -15,22 +34,64 @@ toast.className=toast.className.replace("show","")
 
 
 
-function renderTable(data){
+async function createAccount(){
 
-const container=document.getElementById("getResult")
+const bank=document.getElementById("bank").value
 
-if(!data){
+if(!bank){
 
-container.innerHTML="No Data"
+toast("Select bank")
+
 return
+
 }
 
-container.innerHTML=`
+const payload={
 
+FullName:document.getElementById("name").value,
+
+dateOfBirth:convertDOB(document.getElementById("dob").value),
+
+mobileNumber:document.getElementById("mobile").value,
+
+email:document.getElementById("email").value,
+
+address:document.getElementById("address").value,
+
+adharNumber:document.getElementById("adhar").value,
+
+bankName:bank
+
+}
+
+const res=await fetch("/createAccount",{
+
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(payload)
+
+})
+
+const data=await res.json()
+
+document.getElementById("createResult").innerText=
+JSON.stringify(data,null,2)
+
+toast("Account Created")
+
+}
+
+
+
+function renderTable(d){
+
+document.getElementById("getResult").innerHTML=
+
+`
 <table>
 
 <tr>
-<th>Account Number</th>
+<th>Account</th>
 <th>Name</th>
 <th>Mobile</th>
 <th>Email</th>
@@ -38,19 +99,106 @@ container.innerHTML=`
 </tr>
 
 <tr>
-<td>${data.accountNumber || ""}</td>
-<td>${data.FullName || data.FULLNAME || ""}</td>
-<td>${data.mobileNumber || data.MOBILENUMBER || ""}</td>
-<td>${data.email || data.EMAIL || ""}</td>
-<td>${data.address || data.ADDRESS || ""}</td>
+
+<td>${d.accountNumber}</td>
+<td>${d.FULLNAME||d.FullName}</td>
+<td>${d.MOBILENUMBER}</td>
+<td>${d.EMAIL}</td>
+<td>${d.ADDRESS}</td>
+
 </tr>
 
 </table>
 
-<button onclick="copyAccount('${data.accountNumber}')">
-Copy Account Number
-</button>
+<button onclick="copyAcc('${d.accountNumber}')">Copy Account</button>
 
 `
+
+}
+
+
+async function getAccount(){
+
+const acc=document.getElementById("getAcc").value
+
+if(acc.length!==12){
+
+toast("Account must be 12 digits")
+
+return
+
+}
+
+const res=await fetch(`/getAccount/${acc}`)
+
+const data=await res.json()
+
+renderTable(data)
+
+toast("Account Loaded")
+
+}
+
+
+
+async function updateAccount(){
+
+const acc=document.getElementById("updateAcc").value
+
+const payload={
+
+FullName:document.getElementById("updateName").value,
+
+email:document.getElementById("updateAddress").value,
+
+mobileNumber:document.getElementById("updateMobile").value
+
+}
+
+const res=await fetch(`/updateAccount/${acc}`,{
+
+method:"PATCH",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(payload)
+
+})
+
+const data=await res.json()
+
+document.getElementById("updateResult").innerText=
+JSON.stringify(data,null,2)
+
+toast("Account Updated")
+
+}
+
+
+
+async function deleteAccount(){
+
+const acc=document.getElementById("deleteAcc").value
+
+const res=await fetch(`/deleteAccount/${acc}`,{
+
+method:"DELETE"
+
+})
+
+const data=await res.json()
+
+document.getElementById("deleteResult").innerText=
+JSON.stringify(data,null,2)
+
+toast("Account Deleted")
+
+}
+
+
+
+function copyAcc(a){
+
+navigator.clipboard.writeText(a)
+
+toast("Account Copied")
 
 }
