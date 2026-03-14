@@ -2,60 +2,46 @@
 <html>
 <head>
 <title>Bank Account UI</title>
-
-<style>
-
-body{
-font-family:Arial;
-background:#f2f2f2;
-padding:40px;
-}
-
-.container{
-background:white;
-padding:25px;
-margin-bottom:25px;
-border-radius:8px;
-box-shadow:0 0 8px rgba(0,0,0,0.1);
-width:450px;
-}
-
-input{
-width:100%;
-padding:8px;
-margin-top:6px;
-margin-bottom:10px;
-}
-
-button{
-padding:10px;
-background:#2e7d32;
-color:white;
-border:none;
-cursor:pointer;
-}
-
-.result{
-margin-top:10px;
-color:blue;
-}
-
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="blue">
 
-<h2>Bank Account Management</h2>
+<header>
 
-<!-- CREATE ACCOUNT -->
+<h1 id="title">Bank Account Dashboard</h1>
+
+<div class="settings">
+
+<label>Theme</label>
+<select id="themeSelect">
+<option value="blue">Blue</option>
+<option value="pink">Pink</option>
+</select>
+
+<label>Language</label>
+<select id="langSelect">
+<option value="en">English</option>
+<option value="hi">Hindi</option>
+<option value="te">Telugu</option>
+</select>
+
+</div>
+
+</header>
+
 
 <div class="container">
 
-<h3>Create Account</h3>
+<!-- CREATE ACCOUNT -->
 
-<input id="fullName" placeholder="Full Name">
+<div class="card">
 
-<input id="dob" placeholder="DOB MM-DD-YYYY">
+<h2 id="createLabel">Create Account</h2>
+
+<input id="name" placeholder="Full Name">
+
+<input id="dob" placeholder="YYYYMMDD">
 
 <input id="mobile" placeholder="Mobile Number">
 
@@ -65,37 +51,37 @@ color:blue;
 
 <input id="adhar" placeholder="Aadhar Number">
 
-<input id="bankName" placeholder="Bank Name">
+<input id="bank" placeholder="Bank Name">
 
 <button onclick="createAccount()">Create</button>
 
-<div class="result" id="createResult"></div>
+<pre id="createResult"></pre>
 
 </div>
 
 
 <!-- GET ACCOUNT -->
 
-<div class="container">
+<div class="card">
 
-<h3>Get Account</h3>
+<h2 id="getLabel">Get Account</h2>
 
-<input id="getAccountNumber" placeholder="12 Digit Account Number">
+<input id="getAcc" placeholder="Account Number">
 
 <button onclick="getAccount()">Get</button>
 
-<div class="result" id="getResult"></div>
+<pre id="getResult"></pre>
 
 </div>
 
 
 <!-- UPDATE ACCOUNT -->
 
-<div class="container">
+<div class="card">
 
-<h3>Update Account</h3>
+<h2 id="updateLabel">Update Account</h2>
 
-<input id="updateAccountNumber" placeholder="Account Number">
+<input id="updateAcc" placeholder="Account Number">
 
 <input id="updateName" placeholder="Full Name">
 
@@ -105,167 +91,28 @@ color:blue;
 
 <button onclick="updateAccount()">Update</button>
 
-<div class="result" id="updateResult"></div>
+<pre id="updateResult"></pre>
 
 </div>
 
 
 <!-- DELETE ACCOUNT -->
 
-<div class="container">
+<div class="card">
 
-<h3>Delete Account</h3>
+<h2 id="deleteLabel">Delete Account</h2>
 
-<input id="deleteAccountNumber" placeholder="Account Number">
+<input id="deleteAcc" placeholder="Account Number">
 
 <button onclick="deleteAccount()">Delete</button>
 
-<div class="result" id="deleteResult"></div>
+<pre id="deleteResult"></pre>
 
 </div>
 
+</div>
 
-<script>
-
-const BASE_URL="http://localhost:8081/api";
-
-
-function convertDOB(dob){
-
-const parts=dob.split("-")
-
-const mm=parts[0]
-const dd=parts[1]
-const yyyy=parts[2]
-
-return yyyy+"-"+mm+"-"+dd
-
-}
-
-
-function createAccount(){
-
-const dobInput=document.getElementById("dob").value
-
-const payload={
-
-FullName:document.getElementById("fullName").value,
-
-dateOfBirth:convertDOB(dobInput),
-
-mobileNumber:document.getElementById("mobile").value,
-
-email:document.getElementById("email").value,
-
-address:document.getElementById("address").value
-
-}
-
-const adhar=document.getElementById("adhar").value
-const bank=document.getElementById("bankName").value
-
-fetch(`${BASE_URL}/accounts?adharNumber=${adhar}&bankName=${bank}`,{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify(payload)
-
-})
-
-.then(res=>res.json())
-
-.then(data=>{
-
-document.getElementById("createResult").innerText=
-JSON.stringify(data,null,2)
-
-})
-
-}
-
-
-function getAccount(){
-
-const acc=document.getElementById("getAccountNumber").value
-
-fetch(`${BASE_URL}/accounts/${acc}`)
-
-.then(res=>res.json())
-
-.then(data=>{
-
-document.getElementById("getResult").innerText=
-JSON.stringify(data,null,2)
-
-})
-
-}
-
-
-function updateAccount(){
-
-const acc=document.getElementById("updateAccountNumber").value
-
-const payload={
-
-FullName:document.getElementById("updateName").value,
-
-ADDRESS:document.getElementById("updateAddress").value,
-
-MOBILENUMBER:document.getElementById("updateMobile").value
-
-}
-
-fetch(`${BASE_URL}/accounts/${acc}`,{
-
-method:"PATCH",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify(payload)
-
-})
-
-.then(res=>res.json())
-
-.then(data=>{
-
-document.getElementById("updateResult").innerText=
-JSON.stringify(data,null,2)
-
-})
-
-}
-
-
-function deleteAccount(){
-
-const acc=document.getElementById("deleteAccountNumber").value
-
-fetch(`${BASE_URL}/accounts/${acc}`,{
-
-method:"DELETE"
-
-})
-
-.then(res=>res.json())
-
-.then(data=>{
-
-document.getElementById("deleteResult").innerText=
-JSON.stringify(data,null,2)
-
-})
-
-}
-
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
