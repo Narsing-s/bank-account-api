@@ -1,10 +1,8 @@
-<!-- public/config.js -->
-<script>
-  // Default: use local proxy in web
-  window.AppConfig = {
-    mode: "web", // "web" | "android"
-    WEB_PREFIX: "/api",
-    ANDROID_BASE: "https://bank-account-api-xxxxx.5sc6y6-1.usa-e2.cloudhub.io/api"
-    // NOTE: never put client secrets here
-  };
-</script>
+// public/config.js (static)
+// If you add this file, you can remove the /config.js route from server.js.
+// Do NOT put secrets here; it's shipped to the browser.
+window.AppConfig = {
+  mode: "web",         // "web" uses the proxy (/api), "android" would use ANDROID_BASE
+  WEB_PREFIX: "/api",  // proxy prefix for the web UI
+  ANDROID_BASE: ""     // set this only for Android builds
+};
