@@ -3,7 +3,7 @@
 
 <head>
 
-<title>Bank Dashboard</title>
+<title>Enterprise Bank Dashboard</title>
 
 <link rel="stylesheet" href="style.css">
 
@@ -15,9 +15,9 @@
 
 <header>
 
-<h1>Bank Account Dashboard</h1>
+<h1>🏦 Bank Dashboard</h1>
 
-<div class="settings">
+<div>
 
 <select id="theme">
 <option value="">Gradient</option>
@@ -36,6 +36,14 @@
 </header>
 
 
+<div class="status">
+
+API STATUS :
+<span id="apiStatus">Checking...</span>
+
+</div>
+
+
 <div class="container">
 
 <div class="card">
@@ -46,7 +54,7 @@
 
 <input id="dob" placeholder="YYYYMMDD">
 
-<input id="mobile" placeholder="Mobile Number">
+<input id="mobile" placeholder="Mobile">
 
 <input id="email" placeholder="Email">
 
@@ -56,13 +64,13 @@
 
 <select id="bank">
 <option value="">Select Bank</option>
-<option value="SBI">SBI</option>
-<option value="HDFC">HDFC</option>
-<option value="ICICI">ICICI</option>
-<option value="AXIS">AXIS</option>
+<option>SBI</option>
+<option>HDFC</option>
+<option>ICICI</option>
+<option>AXIS</option>
 </select>
 
-<button onclick="createAccount()">Create Account</button>
+<button onclick="createAccount()">Create</button>
 
 <pre id="createResult"></pre>
 
@@ -82,7 +90,9 @@
 
 </div>
 
-<button onclick="getAccount()">Get Account</button>
+<button onclick="getAccount()">Search</button>
+
+<div id="accountCards"></div>
 
 <div id="getResult"></div>
 
@@ -92,7 +102,7 @@
 
 <div class="card">
 
-<h2>Account Dashboard</h2>
+<h2>Account Analytics</h2>
 
 <canvas id="accountChart"></canvas>
 
