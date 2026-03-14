@@ -1,8 +1,10 @@
-// public/config.js (static)
-// If you add this file, you can remove the /config.js route from server.js.
-// Do NOT put secrets here; it's shipped to the browser.
+// android/app/src/main/assets/public/config.js
+// This file overrides the web config for the Android build ONLY.
+// DO NOT store any secrets here.
+
 window.AppConfig = {
-  mode: "web",         // "web" uses the proxy (/api), "android" would use ANDROID_BASE
-  WEB_PREFIX: "/api",  // proxy prefix for the web UI
-  ANDROID_BASE: ""     // set this only for Android builds
+  mode: "android", // ensures your script uses ANDROID_BASE and not WEB_PREFIX
+  WEB_PREFIX: "/api",  // unused in android mode, but safe to keep
+  // TODO: Replace with your CloudHub base (must include /api)
+  ANDROID_BASE: "https://<your-cloudhub-app>.cloudhub.io/api"
 };
