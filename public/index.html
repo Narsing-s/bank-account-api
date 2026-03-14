@@ -3,7 +3,7 @@
 
 <head>
 
-<title>Enterprise Bank Dashboard</title>
+<title>Bank Dashboard</title>
 
 <link rel="stylesheet" href="style.css">
 
@@ -17,22 +17,6 @@
 
 <h1>🏦 Bank Dashboard</h1>
 
-<div>
-
-<select id="theme">
-<option value="">Gradient</option>
-<option value="blue">Blue</option>
-<option value="pink">Pink</option>
-</select>
-
-<select>
-<option>English</option>
-<option>Hindi</option>
-<option>Telugu</option>
-</select>
-
-</div>
-
 </header>
 
 
@@ -43,23 +27,30 @@ API STATUS : <span id="apiStatus">Checking...</span>
 
 <div class="container">
 
+
 <div class="card">
 
 <h2>Create Account</h2>
 
 <input id="name" placeholder="Full Name">
+
 <input id="dob" placeholder="YYYYMMDD">
+
 <input id="mobile" placeholder="Mobile">
+
 <input id="email" placeholder="Email">
+
 <input id="address" placeholder="Address">
-<input id="adhar" placeholder="Aadhar Number">
+
+<input id="adhar" placeholder="Aadhar">
 
 <select id="bank">
-<option value="">Select Bank</option>
+
 <option>SBI</option>
 <option>HDFC</option>
 <option>ICICI</option>
 <option>AXIS</option>
+
 </select>
 
 <button onclick="createAccount()">Create</button>
@@ -74,18 +65,47 @@ API STATUS : <span id="apiStatus">Checking...</span>
 
 <h2>Search Account</h2>
 
-<div class="searchBox">
-
-<input id="getAcc" placeholder="Account Number" onkeyup="showSuggestions()">
-<div id="suggestions"></div>
-
-</div>
+<input id="getAcc" placeholder="Account Number">
 
 <button onclick="getAccount()">Search</button>
 
 <div id="bankCard"></div>
 
 <div id="getResult"></div>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>Update Account</h2>
+
+<input id="updateAcc" placeholder="Account Number">
+
+<input id="updateName" placeholder="Full Name">
+
+<input id="updateAddress" placeholder="Address">
+
+<input id="updateMobile" placeholder="Mobile">
+
+<button onclick="updateAccount()">Update</button>
+
+<pre id="updateResult"></pre>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>Delete Account</h2>
+
+<input id="deleteAcc" placeholder="Account Number">
+
+<button onclick="deleteAccount()">Delete</button>
+
+<pre id="deleteResult"></pre>
 
 </div>
 
