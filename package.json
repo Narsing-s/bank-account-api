@@ -1,6 +1,6 @@
 {
-  "name": "bank-dashboard",
-  "version": "1.2.0",
+  "name": "bank-account-api",
+  "version": "1.2.1",
   "description": "Bank Dashboard UI for MuleSoft API",
   "private": true,
   "main": "server.js",
