@@ -49,7 +49,7 @@ const res=await fetch(`/getAccount/${acc}`)
 
 const data=await res.json()
 
-const accData=data.account_data||{}
+const accData=data.account_data
 
 bankCard.innerHTML=`
 
@@ -63,46 +63,11 @@ bankCard.innerHTML=`
 </div>
 `
 
-getResult.innerHTML=`<pre>${JSON.stringify(data,null,2)}</pre>`
-
-renderChart(data)
-
-}
-
-
-
-function renderChart(data){
-
-const acc=data.account_data||{}
-
-const values=[
-
-(data.accountNumber||"").length,
-(acc.mobileNumber||"").length,
-(acc.email||"").length
-
-]
-
-if(chart) chart.destroy()
-
-chart=new Chart(accountChart,{
-
-type:"doughnut",
-
-data:{
-labels:["Account","Mobile","Email"],
-datasets:[{data:values}]
-}
-
-})
-
 }
 
 
 
 async function updateAccount(){
-
-const acc=updateAcc.value
 
 const payload={
 
@@ -112,7 +77,7 @@ mobileNumber:updateMobile.value
 
 }
 
-const res=await fetch(`/updateAccount/${acc}`,{
+const res=await fetch(`/updateAccount/${updateAcc.value}`,{
 
 method:"PATCH",
 headers:{"Content-Type":"application/json"},
@@ -130,9 +95,7 @@ updateResult.innerText=JSON.stringify(data,null,2)
 
 async function deleteAccount(){
 
-const acc=deleteAcc.value
-
-const res=await fetch(`/deleteAccount/${acc}`,{
+const res=await fetch(`/deleteAccount/${deleteAcc.value}`,{
 
 method:"DELETE"
 
