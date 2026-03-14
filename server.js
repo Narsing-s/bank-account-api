@@ -64,11 +64,13 @@ app.patch("/updateAccount/:id",async(req,res)=>{
 
 try{
 
-const payload={}
+const payload={
 
-if(req.body.FullName) payload.FullName=req.body.FullName
-if(req.body.email) payload.email=req.body.email
-if(req.body.mobileNumber) payload.mobileNumber=req.body.mobileNumber
+FullName:req.body.FullName,
+email:req.body.email,
+mobileNumber:req.body.mobileNumber
+
+}
 
 const response=await axios.patch(
 `${API}/accounts/${req.params.id}`,
@@ -108,6 +110,6 @@ res.status(500).json(err.response?.data||err.message)
 
 app.listen(3000,()=>{
 
-console.log("Server running → http://localhost:3000")
+console.log("🚀 Server running → http://localhost:3000")
 
 })
