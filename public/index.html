@@ -8,7 +8,117 @@
   <!-- PWA -->
   /manifest.webmanifest
   <meta name="theme-color" content="#0b1225" />
-  /icons/icon-192.png
+  /icons/icon-192.png<!DOCTYPE html>
+<html>
+<head>
+
+<title>Bank Account UI</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+body{
+font-family:Arial;
+background:#0b1225;
+color:white;
+padding:40px;
+}
+
+/* PINK BLUE THEME */
+
+:root{
+--primary:#ff4fa3;
+--primary2:#3b82ff;
+}
+
+h1{
+background:linear-gradient(135deg,var(--primary),var(--primary2));
+-webkit-background-clip:text;
+color:transparent;
+}
+
+input{
+padding:12px;
+margin:8px;
+border-radius:8px;
+border:1px solid #444;
+width:250px;
+}
+
+button{
+padding:12px 20px;
+border:none;
+border-radius:10px;
+background:linear-gradient(135deg,var(--primary),var(--primary2));
+color:white;
+cursor:pointer;
+}
+
+.card{
+background:#111a33;
+padding:30px;
+border-radius:20px;
+width:350px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Bank Account UI</h1>
+
+<div class="card">
+
+<input id="name" placeholder="Full Name">
+
+<input id="email" placeholder="Email">
+
+<input id="dob" type="date">
+
+<input id="mobile" placeholder="Mobile">
+
+<input id="aadhaar" placeholder="Aadhaar">
+
+<input id="bank" placeholder="Bank">
+
+<button onclick="createAccount()">Create</button>
+
+</div>
+
+<pre id="result"></pre>
+
+<script>
+
+async function createAccount(){
+
+const body={
+adharNumber:document.getElementById("aadhaar").value,
+bankName:document.getElementById("bank").value,
+FullName:document.getElementById("name").value,
+email:document.getElementById("email").value,
+dateOfBirth:document.getElementById("dob").value,
+mobileNumber:document.getElementById("mobile").value
+}
+
+const res=await fetch("/accounts",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify(body)
+})
+
+const data=await res.text()
+
+document.getElementById("result").innerText=data
+
+}
+
+</script>
+
+</body>
+</html>
   <style>
     :root{
       --bg:#0b1225; --surface:#111a33; --surface-2:#0f1530;
