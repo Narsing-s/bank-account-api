@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Bank-account-dashboard</title>
+  <title>Bank Account Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b1024" />
+  <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -17,47 +18,50 @@
     <div class="brand">
       <div class="logo" aria-hidden="true">🏦</div>
       <div>
-        <div class="brand-title">Bank-account-dashboard</div>
-        <div class="brand-sub">User friendly bank portal</div>
+        <div class="brand-title" data-i18n="app.title">Bank Account Dashboard</div>
+        <div class="brand-sub" data-i18n="app.subtitle">User friendly bank portal</div>
       </div>
     </div>
-    <div class="status" id="status" aria-live="polite">
-      <span class="dot offline" id="statusDot" aria-hidden="true"></span>
-      <span id="statusText">Offline</span>
+    <div class="actions">
+      <button id="btnSettings" class="icon-btn" aria-label="Settings">⚙️</button>
+      <div class="status" id="status" aria-live="polite">
+        <span class="dot offline" id="statusDot" aria-hidden="true"></span>
+        <span id="statusText">Offline</span>
+      </div>
     </div>
   </header>
 
   <nav class="tabs" role="tablist" aria-label="Operations">
-    <button class="tab-btn active" data-tab="create" role="tab" aria-selected="true">Create</button>
-    <button class="tab-btn" data-tab="search" role="tab">Search</button>
-    <button class="tab-btn" data-tab="update" role="tab">Update</button>
-    <button class="tab-btn" data-tab="delete" role="tab">Delete</button>
+    <button class="tab-btn active" data-tab="create" role="tab" aria-selected="true" data-i18n="tab.create">Create</button>
+    <button class="tab-btn" data-tab="search" role="tab" data-i18n="tab.search">Search</button>
+    <button class="tab-btn" data-tab="update" role="tab" data-i18n="tab.update">Update</button>
+    <button class="tab-btn" data-tab="delete" role="tab" data-i18n="tab.delete">Delete</button>
   </nav>
 
   <main class="container">
     <!-- CREATE -->
-    <section id="create" class="panel active" role="tabpanel" aria-labelledby="Create Account">
-      <h2>Create Account</h2>
+    <section id="create" class="panel active" role="tabpanel">
+      <h2 data-i18n="create.title">Create Account</h2>
       <div class="grid">
-        <label>Full Name
+        <label data-i18n="field.fullname">Full Name
           <input id="name" placeholder="e.g., Jane Doe" maxlength="80" required />
         </label>
-        <label>Date of Birth (YYYYMMDD)
+        <label data-i18n="field.dob">Date of Birth (YYYYMMDD)
           <input id="dob" placeholder="19900131" maxlength="8" inputmode="numeric" />
         </label>
-        <label>Mobile
+        <label data-i18n="field.mobile">Mobile
           <input id="mobile" placeholder="10-digit number" maxlength="15" inputmode="tel" />
         </label>
-        <label>Email
+        <label data-i18n="field.email">Email
           <input id="email" placeholder="name@example.com" type="email" />
         </label>
-        <label>Address
+        <label data-i18n="field.address">Address
           <input id="address" placeholder="Street, City" />
         </label>
-        <label>Aadhaar (12 digits)
+        <label data-i18n="field.aadhaar">Aadhaar (12 digits)
           <input id="aadhaar" placeholder="123412341234" maxlength="12" inputmode="numeric" />
         </label>
-        <label>Bank
+        <label data-i18n="field.bank">Bank
           <select id="bank" aria-label="Bank Name">
             <option>SBI</option>
             <option>HDFC</option>
@@ -67,28 +71,25 @@
           </select>
         </label>
       </div>
-
       <div class="action-bar" data-for="create">
         <div class="action-bar-inner">
-          <button id="btnCreate" class="primary">Create Account</button>
+          <button id="btnCreate" class="primary" data-i18n="btn.create">Create Account</button>
         </div>
       </div>
-
-      <pre id="createResult" class="result" aria-live="polite"></pre>
     </section>
 
     <!-- SEARCH -->
     <section id="search" class="panel" role="tabpanel">
-      <h2>Search Account</h2>
+      <h2 data-i18n="search.title">Search Account</h2>
       <div class="grid">
-        <label>Account Number
+        <label data-i18n="field.accountNumber">Account Number
           <input id="getAcc" placeholder="Enter account number" />
         </label>
       </div>
 
       <div class="action-bar" data-for="search">
         <div class="action-bar-inner">
-          <button id="btnSearch" class="primary">Search</button>
+          <button id="btnSearch" class="primary" data-i18n="btn.search">Search</button>
         </div>
       </div>
 
@@ -101,47 +102,43 @@
 
     <!-- UPDATE -->
     <section id="update" class="panel" role="tabpanel">
-      <h2>Update Account</h2>
+      <h2 data-i18n="update.title">Update Account</h2>
       <div class="grid">
-        <label>Account Number
+        <label data-i18n="field.accountNumber">Account Number
           <input id="updateAcc" placeholder="Enter account number" />
         </label>
-        <label>Full Name
+        <label data-i18n="field.fullname">Full Name
           <input id="updateName" placeholder="New full name" />
         </label>
-        <label>Email
+        <label data-i18n="field.email">Email
           <input id="updateEmail" placeholder="name@example.com" type="email" />
         </label>
-        <label>Mobile
+        <label data-i18n="field.mobile">Mobile
           <input id="updateMobile" placeholder="10-digit number" inputmode="tel" />
         </label>
       </div>
 
       <div class="action-bar" data-for="update">
         <div class="action-bar-inner">
-          <button id="btnUpdate" class="primary">Update</button>
+          <button id="btnUpdate" class="primary" data-i18n="btn.update">Update</button>
         </div>
       </div>
-
-      <pre id="updateResult" class="result" aria-live="polite"></pre>
     </section>
 
     <!-- DELETE -->
     <section id="delete" class="panel" role="tabpanel">
-      <h2>Delete Account</h2>
+      <h2 data-i18n="delete.title">Delete Account</h2>
       <div class="grid">
-        <label>Account Number
+        <label data-i18n="field.accountNumber">Account Number
           <input id="deleteAcc" placeholder="Enter account number" />
         </label>
       </div>
 
       <div class="action-bar" data-for="delete">
         <div class="action-bar-inner">
-          <button id="btnDelete" class="danger">Delete</button>
+          <button id="btnDelete" class="danger" data-i18n="btn.delete">Delete</button>
         </div>
       </div>
-
-      <pre id="deleteResult" class="result" aria-live="polite"></pre>
     </section>
   </main>
 
@@ -153,13 +150,73 @@
     <div class="spinner"></div>
   </div>
 
+  <!-- Response Viewer (always in UI) -->
+  <div id="respOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="respTitle">
+    <div class="overlay-card">
+      <div class="overlay-head">
+        <h3 id="respTitle" data-i18n="responseviewer.title">Response</h3>
+        <div class="overlay-actions">
+          <button id="btnCopyResp" class="chip" data-i18n="responseviewer.copy">Copy</button>
+          <button id="btnCloseResp" class="chip" data-i18n="responseviewer.close">Close</button>
+        </div>
+      </div>
+      <pre id="respBody" class="result"></pre>
+    </div>
+  </div>
+
+  <!-- Settings Drawer -->
+  <aside id="settings" class="settings hidden" aria-labelledby="settingsTitle" role="dialog" aria-modal="true">
+    <div class="settings-card">
+      <div class="settings-head">
+        <h3 id="settingsTitle" data-i18n="settings.title">Settings</h3>
+        <button id="btnCloseSettings" class="chip" data-i18n="settings.close">Close</button>
+      </div>
+
+      <div class="settings-group">
+        <label data-i18n="settings.theme">Theme</label>
+        <div class="chips">
+          <button class="chip" data-theme="system" data-i18n="settings.theme.system">System</button>
+          <button class="chip" data-theme="light" data-i18n="settings.theme.light">Light</button>
+          <button class="chip" data-theme="dark" data-i18n="settings.theme.dark">Dark</button>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <label data-i18n="settings.language">Language</label>
+        <div class="chips">
+          <button class="chip" data-lang="en">English</button>
+          <button class="chip" data-lang="te">తెలుగు</button>
+          <button class="chip" data-lang="hi">हिन्दी</button>
+        </div>
+      </div>
+
+      <div class="settings-group toggles">
+        <label>
+          <input type="checkbox" id="toggleMotion" />
+          <span data-i18n="settings.motion">Reduce Motion</span>
+        </label>
+        <label>
+          <input type="checkbox" id="toggleContrast" />
+          <span data-i18n="settings.contrast">High Contrast</span>
+        </label>
+      </div>
+    </div>
+  </aside>
+
   <!-- Confetti Layer -->
   <div id="fx"></div>
 
-  <script>
-    // All fetches go via the local proxy to avoid CORS
-    window.API_PREFIX = "/api";
-  </script>
+  <!-- Config & App scripts -->
+  <script src="config.js"></script>
   <script src="script.js"></script>
+
+  <!-- Register SW -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(console.error);
+      });
+    }
+  </script>
 </body>
 </html>
