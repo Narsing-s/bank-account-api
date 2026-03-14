@@ -1,9 +1,7 @@
 // THEME SWITCH
 
 document.getElementById("themeSelect").addEventListener("change",(e)=>{
-
 document.body.className=e.target.value
-
 })
 
 
@@ -38,8 +36,6 @@ delete:"ఖాతా తొలగించండి"
 
 }
 
-
-
 document.getElementById("langSelect").addEventListener("change",(e)=>{
 
 const lang=e.target.value
@@ -54,7 +50,7 @@ document.getElementById("deleteLabel").innerText=translations[lang].delete
 
 
 
-// DOB FORMAT CONVERSION (YYYYMMDD -> yyyy-MM-dd)
+// DOB FORMAT (YYYYMMDD -> yyyy-MM-dd)
 
 function convertDOB(dob){
 
@@ -72,6 +68,13 @@ return `${y}-${m}-${d}`
 
 async function createAccount(){
 
+const bank=document.getElementById("bank").value
+
+if(!bank){
+alert("Please select a bank")
+return
+}
+
 const payload={
 
 FullName:document.getElementById("name").value,
@@ -86,16 +89,14 @@ address:document.getElementById("address").value,
 
 adharNumber:document.getElementById("adhar").value,
 
-bankName:document.getElementById("bank").value
+bankName:bank
 
 }
 
 const res=await fetch("/createAccount",{
 
 method:"POST",
-
 headers:{'Content-Type':'application/json'},
-
 body:JSON.stringify(payload)
 
 })
@@ -145,9 +146,7 @@ mobileNumber:document.getElementById("updateMobile").value
 const res=await fetch(`/updateAccount/${acc}`,{
 
 method:"PATCH",
-
 headers:{'Content-Type':'application/json'},
-
 body:JSON.stringify(payload)
 
 })
