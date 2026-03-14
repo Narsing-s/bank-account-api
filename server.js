@@ -12,16 +12,23 @@ const API="https://bank-account-api-jik9pb.5sc6y6-1.usa-e2.cloudhub.io/api"
 
 
 app.get("/status", async(req,res)=>{
+
 try{
+
 await axios.get(`${API}/accounts/856974569971`)
 res.json({status:"ONLINE"})
-}catch(e){
+
+}catch{
+
 res.json({status:"OFFLINE"})
+
 }
+
 })
 
 
 app.post("/createAccount", async(req,res)=>{
+
 try{
 
 const {FullName,dateOfBirth,mobileNumber,email,address,adharNumber,bankName}=req.body
@@ -39,12 +46,16 @@ address
 res.json(response.data)
 
 }catch(err){
+
 res.status(500).json(err.response?.data||err.message)
+
 }
+
 })
 
 
 app.get("/getAccount/:id", async(req,res)=>{
+
 try{
 
 const response=await axios.get(`${API}/accounts/${req.params.id}`)
@@ -52,12 +63,16 @@ const response=await axios.get(`${API}/accounts/${req.params.id}`)
 res.json(response.data)
 
 }catch(err){
+
 res.status(500).json(err.response?.data||err.message)
+
 }
+
 })
 
 
 app.patch("/updateAccount/:id", async(req,res)=>{
+
 try{
 
 const {FullName,email,mobileNumber}=req.body
@@ -71,12 +86,16 @@ MOBILENUMBER:mobileNumber
 res.json(response.data)
 
 }catch(err){
+
 res.status(500).json(err.response?.data||err.message)
+
 }
+
 })
 
 
 app.delete("/deleteAccount/:id", async(req,res)=>{
+
 try{
 
 const response=await axios.delete(`${API}/accounts/${req.params.id}`)
@@ -84,8 +103,11 @@ const response=await axios.delete(`${API}/accounts/${req.params.id}`)
 res.json(response.data)
 
 }catch(err){
+
 res.status(500).json(err.response?.data||err.message)
+
 }
+
 })
 
 
