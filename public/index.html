@@ -2,18 +2,22 @@
 <html lang="en" data-theme="auto">
 <head>
   <meta charset="utf-8" />
-  <title>Bank-account-dashboard</title>
+  <title>NeoBank Control Center</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0f1020" />
-  <link rel="stylesheet" href="style.css" />
+  style.css
 </head>
 <body>
+  <!-- Animated layers -->
   <div class="bg-orb"></div>
+  <div class="bg-aurora"></div>
+  <div class="bg-dots"></div>
+
   <header class="topbar">
     <div class="brand">
       <div class="logo">🏦</div>
       <div>
-        <div class="brand-title">Bank-account-dashboard</div>
+        <div class="brand-title">NeoBank Control Center</div>
         <div class="brand-sub">Real‑time Account Management</div>
       </div>
     </div>
@@ -21,6 +25,7 @@
       <button id="themeToggle" class="icon-btn" aria-label="Toggle theme" title="Toggle theme">
         <span id="themeIcon">🌙</span>
       </button>
+      <button id="debugToggle" class="icon-btn" aria-label="Toggle debug" title="Toggle debug">🛠️</button>
       <div class="status" id="status">
         <span class="dot offline" id="statusDot"></span>
         <span id="statusText">Offline</span>
@@ -55,8 +60,8 @@
         <label>Address
           <input id="address" placeholder="Street, City" />
         </label>
-        <label>Aadhaar
-          <input id="aadhaar" placeholder="12-digit" maxlength="12" inputmode="numeric" />
+        <label>Aadhaar (12 digits)
+          <input id="aadhaar" placeholder="123412341234" maxlength="12" inputmode="numeric" />
         </label>
         <label>Bank
           <select id="bank">
@@ -155,10 +160,33 @@
     <div class="spinner"></div>
   </div>
 
+  <!-- FX Layer -->
+  <div id="fx"></div>
+
+  <!-- Debug Overlay -->
+  <aside id="debug" class="debug hidden" aria-live="polite">
+    <div class="debug-head">
+      <strong>Debug</strong>
+      <button id="debugClose" class="icon-btn" title="Close">✖</button>
+    </div>
+    <div class="debug-body">
+      <div><b>Last URL:</b> <code id="dbgUrl">—</code></div>
+      <div><b>Status:</b> <code id="dbgStatus">—</code></div>
+      <div><b>Method:</b> <code id="dbgMethod">—</code></div>
+      <div><b>Request Body:</b>
+        <pre id="dbgReq">—</pre>
+      </div>
+      <div><b>Response Body:</b>
+        <pre id="dbgRes">—</pre>
+      </div>
+    </div>
+  </aside>
+
   <script>
     // Frontend will call /api/* (proxied by server.js to your CloudHub URL)
     window.API_PREFIX = "/api";
   </script>
-  <script src="script.js"></script>
+  script.js</script>
 </body>
 </html>
+``
