@@ -1,14 +1,9 @@
 let chart
 
-document.getElementById("theme").addEventListener("change",(e)=>{
-document.body.className=e.target.value
-})
-
-
 async function checkAPI(){
 
-const res = await fetch("/status")
-const data = await res.json()
+const res=await fetch("/status")
+const data=await res.json()
 
 document.getElementById("apiStatus").innerText=data.status
 
@@ -20,13 +15,10 @@ checkAPI()
 
 function convertDOB(d){
 
-const y=d.substring(0,4)
-const m=d.substring(4,6)
-const day=d.substring(6,8)
-
-return `${y}-${m}-${day}`
+return `${d.substring(0,4)}-${d.substring(4,6)}-${d.substring(6,8)}`
 
 }
+
 
 
 function toast(msg){
@@ -36,95 +28,42 @@ const t=document.getElementById("toast")
 t.innerText=msg
 t.className="show"
 
-setTimeout(()=>{
-
-t.className=""
-
-},3000)
+setTimeout(()=>{t.className=""},3000)
 
 }
 
 
 
-let searchHistory = JSON.parse(localStorage.getItem("accounts")) || []
+function addTimeline(action){
 
+const li=document.createElement("li")
 
-function saveHistory(acc){
+li.innerText=new Date().toLocaleTimeString()+" - "+action
 
-if(!searchHistory.includes(acc)){
-
-searchHistory.unshift(acc)
-
-if(searchHistory.length>5){
-
-searchHistory.pop()
-
-}
-
-localStorage.setItem("accounts",JSON.stringify(searchHistory))
-
-}
+document.getElementById("timeline").prepend(li)
 
 }
 
 
 
-function showSuggestions(){
-
-const input=document.getElementById("getAcc").value
-
-const box=document.getElementById("suggestions")
-
-box.innerHTML=""
-
-searchHistory
-.filter(a=>a.startsWith(input))
-.forEach(acc=>{
-
-const div=document.createElement("div")
-
-div.innerText=acc
-
-div.onclick=()=>{
-
-document.getElementById("getAcc").value=acc
-box.innerHTML=""
-
-}
-
-box.appendChild(div)
-
-})
-
-}
-
-
-
-function renderCards(data){
+function renderCard(data){
 
 const acc=data.account_data||{}
 
-document.getElementById("accountCards").innerHTML=`
+document.getElementById("bankCard").innerHTML=
 
-<div class="dashboardCards">
+`
+<div class="bankCard">
 
-<div class="dashCard">
-Account
-<h3>${data.accountNumber}</h3>
-</div>
+<div class="chip"></div>
 
-<div class="dashCard">
-Mobile
-<h3>${acc.MOBILENUMBER}</h3>
-</div>
+<h3>${acc.FULLNAME}</h3>
 
-<div class="dashCard">
-Email
-<h3>${acc.EMAIL}</h3>
-</div>
+<p>${data.accountNumber}</p>
+
+<span>${acc.MOBILENUMBER}</span>
 
 </div>
-
 `
 
 }
@@ -143,62 +82,15 @@ acc.EMAIL.length
 
 ]
 
-const ctx=document.getElementById("accountChart")
-
 if(chart) chart.destroy()
 
-chart=new Chart(ctx,{
-
+chart=new Chart(accountChart,{
 type:"bar",
-
 data:{
 labels:["Account","Mobile","Email"],
-datasets:[{label:"Account Data",data:values}]
+datasets:[{data:values}]
 }
-
 })
-
-}
-
-
-
-function renderTable(data){
-
-const acc=data.account_data||{}
-
-document.getElementById("getResult").innerHTML=`
-
-<table>
-
-<tr>
-<th>Account</th>
-<th>Name</th>
-<th>Mobile</th>
-<th>Email</th>
-<th>Address</th>
-</tr>
-
-<tr>
-
-<td>${data.accountNumber}</td>
-<td>${acc.FULLNAME}</td>
-<td>${acc.MOBILENUMBER}</td>
-<td>${acc.EMAIL}</td>
-<td>${acc.ADDRESS}</td>
-
-</tr>
-
-</table>
-
-<button onclick="copyAcc('${data.accountNumber}')">
-Copy Account
-</button>
-
-`
-
-renderCards(data)
-
-renderChart(data)
 
 }
 
@@ -206,7 +98,7 @@ renderChart(data)
 
 async function getAccount(){
 
-const acc=document.getElementById("getAcc").value
+const acc=getAcc.value
 
 if(acc.length!==12){
 
@@ -215,13 +107,15 @@ return
 
 }
 
-saveHistory(acc)
-
 const res=await fetch(`/getAccount/${acc}`)
 
 const data=await res.json()
 
-renderTable(data)
+renderCard(data)
+
+renderChart(data)
+
+addTimeline("Account searched "+acc)
 
 toast("Account Loaded")
 
@@ -243,7 +137,7 @@ bankName:bank.value
 
 }
 
-const res=await fetch("/createAccount",{
+await fetch("/createAccount",{
 
 method:"POST",
 headers:{"Content-Type":"application/json"},
@@ -251,66 +145,8 @@ body:JSON.stringify(payload)
 
 })
 
-const data=await res.json()
-
-createResult.innerText=JSON.stringify(data,null,2)
+addTimeline("Account created")
 
 toast("Account Created")
-
-}
-
-
-
-async function updateAccount(){
-
-const payload={
-
-FullName:updateName.value,
-email:updateAddress.value,
-mobileNumber:updateMobile.value
-
-}
-
-const res=await fetch(`/updateAccount/${updateAcc.value}`,{
-
-method:"PATCH",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(payload)
-
-})
-
-const data=await res.json()
-
-updateResult.innerText=JSON.stringify(data,null,2)
-
-toast("Account Updated")
-
-}
-
-
-
-async function deleteAccount(){
-
-const res=await fetch(`/deleteAccount/${deleteAcc.value}`,{
-
-method:"DELETE"
-
-})
-
-const data=await res.json()
-
-deleteResult.innerText=JSON.stringify(data,null,2)
-
-toast("Account Deleted")
-
-}
-
-
-
-function copyAcc(a){
-
-navigator.clipboard.writeText(a)
-
-toast("Account Copied")
 
 }
