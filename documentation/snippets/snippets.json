@@ -1,0 +1,13 @@
+{
+  "endpoints": {
+    "/api/accounts": {
+      "post": "import { AccountCreationRequest, BankAccountApiSdk } from 'bank-account-api-sdk';\n\n(async () => {\n  const bankAccountApiSdk = new BankAccountApiSdk({});\n\n  \n  const accountCreationRequest: AccountCreationRequest = {\t\n    fullName: \"Anjali boddeda\",\n    dateOfBirth: \"2000-08-06\",\n    mobileNumber: \"9074561230\",\n    email: \"narsingbeesetti22@gmail.com\",\n    address: \"Chowduvada, 123/5\"\n  };\n\n  const data = await bankAccountApiSdk.bankAccountApiSdk.accountCreation(\n  accountCreationRequest,\n  {\n      adharNumber: \"890874376430\",\n      bankName: \"SBI\",\n  }\n);\n\n  console.log(data);\n})();\n"
+    },
+    "/api/accounts/856974574178": {
+      "get": "import { BankAccountApiSdk } from 'bank-account-api-sdk';\n\n(async () => {\n  const bankAccountApiSdk = new BankAccountApiSdk({});\n\n  const data = await bankAccountApiSdk.bankAccountApiSdk.accountDetailes();\n\n  console.log(data);\n})();\n",
+      "patch": "import { BankAccountApiSdk, UpdateAccountDetailesRequest } from 'bank-account-api-sdk';\n\n(async () => {\n  const bankAccountApiSdk = new BankAccountApiSdk({});\n\n  \n  const updateAccountDetailesRequest: UpdateAccountDetailesRequest = {\t\n    fullName: \"Narsi Beesetti\",\n    address: \"CVD\",\n    mobileNumber: \"9856742613\"\n  };\n\n  const data = await bankAccountApiSdk.bankAccountApiSdk.updateAccountDetailes(updateAccountDetailesRequest);\n\n  console.log(data);\n})();\n",
+      "delete": "import { BankAccountApiSdk } from 'bank-account-api-sdk';\n\n(async () => {\n  const bankAccountApiSdk = new BankAccountApiSdk({});\n\n  const data = await bankAccountApiSdk.bankAccountApiSdk.deleteAccount();\n\n  console.log(data);\n})();\n"
+    }
+  },
+  "example": "import { BankAccountApiSdk } from 'bank-account-api-sdk';\n\n(async () => {\n  const bankAccountApiSdk = new BankAccountApiSdk({});\n\n  const data = await bankAccountApiSdk.bankAccountApiSdk.accountDetailes();\n\n  console.log(data);\n})();\n"
+}

@@ -1,0 +1,247 @@
+{
+  "sdkGenVersion": "1.4.0",
+  "date": "2026-06-06T05:00:03.327Z",
+  "config": {
+    "sdkVersion": "1.1.0",
+    "languages": [
+      "typescript"
+    ],
+    "deliveryMethods": [
+      "zip"
+    ],
+    "sdkName": "bank-account-api-sdk",
+    "languageOptions": {
+      "python": {
+        "alwaysInitializeOptionals": false,
+        "ignoreFiles": [],
+        "liblabVersion": "2"
+      },
+      "typescript": {
+        "bundle": true,
+        "exportClassDefault": false,
+        "httpClient": "fetch",
+        "ignoreFiles": [],
+        "liblabVersion": "2",
+        "generateEnumAs": "union"
+      },
+      "go": {
+        "ignoreFiles": [],
+        "liblabVersion": "2"
+      },
+      "java": {
+        "ignoreFiles": [],
+        "liblabVersion": "2"
+      },
+      "php": {
+        "ignoreFiles": [],
+        "liblabVersion": "2"
+      },
+      "csharp": {
+        "ignoreFiles": [],
+        "liblabVersion": "2",
+        "renameIllegalModelProperties": true,
+        "useOptionalWrapper": true,
+        "validateResponses": false
+      },
+      "cli": {
+        "ignoreFiles": [],
+        "liblabVersion": "2"
+      },
+      "kotlin": {
+        "ignoreFiles": [],
+        "liblabVersion": "2"
+      },
+      "ruby": {
+        "ignoreFiles": [],
+        "liblabVersion": "2"
+      },
+      "rust": {
+        "ignoreFiles": [],
+        "liblabVersion": "2"
+      }
+    },
+    "customCode": {
+      "trackChanges": true
+    },
+    "httpClient": "fetch",
+    "bundle": true,
+    "exportClassDefault": false,
+    "ignoreFiles": [],
+    "liblabVersion": "2",
+    "generateEnumAs": "union",
+    "language": "typescript",
+    "deliveryMethod": "zip",
+    "hooks": {
+      "enabled": false,
+      "sourceDir": ""
+    },
+    "typescriptVersion": "5.3.3",
+    "zodVersion": "3.22.0",
+    "compilerOptions": {
+      "target": "es6",
+      "module": "Node16",
+      "lib": [
+        "es2018",
+        "dom",
+        "DOM.Iterable"
+      ]
+    },
+    "namingStrategy": "base",
+    "usesFormData": false,
+    "authentication": {},
+    "environmentVariables": [],
+    "fileOutput": "/tmp",
+    "inferServiceNames": false,
+    "httpLibrary": {
+      "name": "fetch",
+      "packages": {},
+      "languages": [
+        "typescript"
+      ],
+      "types": {
+        "packageName": "@types/isomorphic-fetch",
+        "version": "^0.0.36"
+      }
+    },
+    "auth": [],
+    "retry": {
+      "enabled": true,
+      "maxAttempts": 3,
+      "retryDelay": 150,
+      "maxDelay": 5000,
+      "retryDelayJitter": 50,
+      "backOffFactor": 2,
+      "httpMethodsToRetry": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "HEAD",
+        "OPTIONS"
+      ]
+    },
+    "multiTenant": false,
+    "customQueries": {
+      "paths": [],
+      "rawQueries": [],
+      "queriesData": []
+    },
+    "devContainer": false,
+    "ai": false,
+    "includeOptionalSnippetParameters": true,
+    "responseHeaders": false,
+    "specType": "postman",
+    "deprecatedOperations": {
+      "include": true
+    },
+    "multipleResponses": {
+      "enabled": false
+    }
+  },
+  "files": [
+    "package.json",
+    "tsconfig.json",
+    "examples/tsconfig.json",
+    ".gitignore",
+    "scripts/prepublish.sh",
+    ".env.example",
+    "examples/package.json",
+    "examples/README.md",
+    "examples/src/index.ts",
+    "src/http/client.ts",
+    "src/http/types.ts",
+    "src/http/error.ts",
+    "src/http/handlers/terminating-handler.ts",
+    "src/http/handlers/response-validation-handler.ts",
+    "src/http/handlers/request-validation-handler.ts",
+    "src/http/transport/request.ts",
+    "src/http/transport/request-builder.ts",
+    "src/http/transport/request-fetch-adapter.ts",
+    "src/http/transport/transport-hook-adapter.ts",
+    "src/http/errors/throwable-error.ts",
+    "src/http/handlers/retry-handler.ts",
+    "src/services/bank-account-api-sdk/models/account-creation-request.ts",
+    "src/services/bank-account-api-sdk/models/update-account-detailes-request.ts",
+    "documentation/models/AccountCreationRequest.md",
+    "documentation/models/UpdateAccountDetailesRequest.md",
+    "src/services/base-service.ts",
+    "src/services/bank-account-api-sdk/bank-account-api-sdk-service.ts",
+    "src/index.ts",
+    "src/services/bank-account-api-sdk/models/index.ts",
+    "src/services/bank-account-api-sdk/index.ts",
+    "src/http/index.ts",
+    "src/http/handlers/handler-chain.ts",
+    "documentation/snippets/snippets.json",
+    "src/services/bank-account-api-sdk/request-params.ts",
+    "src/http/handlers/hook-handler.ts",
+    "src/http/hooks/custom-hook.ts",
+    "src/http/hooks/hook.ts",
+    "src/http/environment.ts",
+    "src/http/serialization/base-serializer.ts",
+    "src/http/serialization/query-serializer.ts",
+    "src/http/serialization/path-serializer.ts",
+    "src/http/serialization/header-serializer.ts",
+    "src/http/serialization/cookie-serializer.ts",
+    "src/http/transport/types.ts",
+    "src/http/utils/line-decoder.ts",
+    "src/http/utils/response-matcher.ts",
+    "src/http/utils/content-type.ts",
+    "src/http/errors/validation-error.ts",
+    "documentation/services/BankAccountApiSdkService.md",
+    "README.md"
+  ],
+  "fileHashes": {
+    ".env.example": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".gitignore": "5f515684cbf8243009414e638b28e93a70a884b81e3e16c38bb01124419e44b2",
+    "README.md": "f58b0da0a0e33ddc2e91471c8f605ee6aa3a430e1df7a0a8ee0361250bb7178c",
+    "documentation/models/AccountCreationRequest.md": "6afb73db60d44507b7a1450a4f3f7f99bf89c24caef0f56910c0b66cd6c1f87f",
+    "documentation/models/UpdateAccountDetailesRequest.md": "59be9c4a98a17a3a5f1db8ce6b35fd28b151ab7bd3a51bb06a79325366fa6805",
+    "documentation/services/BankAccountApiSdkService.md": "f83d81a759acded09e436a7c194c86c7effd494f33e09eab620d98accfc8c152",
+    "documentation/snippets/snippets.json": "20a4af39d4b49e8461fbe87c45275f8f37ef8d9a7c384c57d17df8cb3dceb0cc",
+    "examples/README.md": "37db0e404922fa6b3dec615dfc572b5286c0d30820532c44e990805cd61cff84",
+    "examples/package.json": "25db3135d4b85f8f3bafc412809b5b7c45ab1ca71470b02d7c7d855f35ac1dfc",
+    "examples/src/index.ts": "c986bc7a95a3457de718f1239e497e8b8c32ecf586c7270561bbfac91ea47633",
+    "examples/tsconfig.json": "e579a7e4376879a28f9efc87311e036b44acef879d2851690d26526509856d63",
+    "package.json": "d74906d9de19f9f8aef4060fa63c23be3373cef5ed7287aefcb35f8659712e8a",
+    "prettier.config.js": "2fe33fda52344779fcf235afa8152cfd356880dc3161da09403dc26231bc72d9",
+    "scripts/prepublish.sh": "651cd87546cc25d69210f55dc4310d47007c53b719da1da8b3bd9acb098defcf",
+    "src/http/client.ts": "349c2725fbbeac67a4479fe1be2b8c0c3788ac8368ef722e3d1fdcd686f68717",
+    "src/http/environment.ts": "6ef339bb40e5d70492fe948f4e1b8d7f3317bd3d8016e6e5fefc84e732bca2c0",
+    "src/http/error.ts": "095eb2f095a7868a5a1fcb4cf543560e143c06766c9693f9efb67b0601c242a5",
+    "src/http/errors/throwable-error.ts": "9d57355a464ea142f9ae090918cf2a4c13e0f719027fabf890e3274ea1140db6",
+    "src/http/errors/validation-error.ts": "8835718fafeca5327ada4e6cbb7859f40d7460b98973812f2a012017bde8e2c8",
+    "src/http/handlers/handler-chain.ts": "7963ae4f81949a07b9265abd5c9aeef8f7b6d99260874f9e8d6f82a916d85699",
+    "src/http/handlers/hook-handler.ts": "512ab328695e199c2b9136a83e5cce4d9cfc94a8ead6f748385dc8e46cbc2638",
+    "src/http/handlers/request-validation-handler.ts": "bd1876f4ec4775443a3dfec45a4a46a19c6bfb00d4d5bcab4076bf424ef700d8",
+    "src/http/handlers/response-validation-handler.ts": "398e1eab415272fc6c061cd13d76c58d7517a5d18f0d54b4c4648ad15595a5f7",
+    "src/http/handlers/retry-handler.ts": "eb8df536acbb0e603e6f39014fc73c5df2ca50b9796a6b948a4050bffa4693e4",
+    "src/http/handlers/terminating-handler.ts": "8b820d772559c271507977bd3bc59b0afd979f5fc24397419dcb97059a3b076c",
+    "src/http/hooks/custom-hook.ts": "906e418d5f24ae314500dea157f0b101a179ff3c16ef8dbb158cce51ed306ee7",
+    "src/http/hooks/hook.ts": "6548e301970d9e7927540b554548d22a9bd5fd47c2bfd7136e9efcc186f8ffff",
+    "src/http/index.ts": "b8a007df51c54f0c9d55051963083dd347816921a6ec7d88f09c35d70fb9919c",
+    "src/http/serialization/base-serializer.ts": "91fb56323ba2f45af568ee4a02f7657bb7aac29112db52aa3ca71080d8837dce",
+    "src/http/serialization/cookie-serializer.ts": "c1dbf938f2071615638fa4e833b740948b16e28f98f475d38cf6701fa27bafb6",
+    "src/http/serialization/header-serializer.ts": "7409385d6841c188c50e08082d661111e89ed843f2954de973d291c95e948a38",
+    "src/http/serialization/path-serializer.ts": "e6f269f8d87aa3e3119e300899b118a7b03a3fe22c738b19a8ecfca2e750c91d",
+    "src/http/serialization/query-serializer.ts": "3a17740986421462d63a55e3b869ef5bb571a96e7077aec965b63f9a19705d47",
+    "src/http/transport/request-builder.ts": "56187f93d9d82f933140ac9506a973382d3a60e0e334c531a4c35f6e298bebfb",
+    "src/http/transport/request-fetch-adapter.ts": "b0450435eb0e943c6094438ff471cc3a2e138e046eb7724c5576aeba7dd4d938",
+    "src/http/transport/request.ts": "988ac664271ccc17eb327250f9e001291d9e8bce484ee958b666c1ebca6573e7",
+    "src/http/transport/transport-hook-adapter.ts": "97e375180a5ffe6328cbea3d84fce1f21b418ca8fbf81dcdb4a01579ca968ee1",
+    "src/http/transport/types.ts": "cdd29e13f1a80dd274254fe0efe9809bdf1987a0f8ea716d2f09534718d14e18",
+    "src/http/types.ts": "5a3954e51680c40373f8741a80bfd3e44bbf8314494bb8792f6568143049f7ed",
+    "src/http/utils/content-type.ts": "992a513126a88ddd0243b83bd72e35e5d8c34afa0fcc47344f382631019d83ed",
+    "src/http/utils/line-decoder.ts": "69064c7c0be06a3dc8862a915667342a8f54ecb2d3be08566b7d2ae83c64e16b",
+    "src/http/utils/response-matcher.ts": "7870d29287e4f887348a25bf7bb2c0c6cce076baa6442c1787278bc883dd5a4c",
+    "src/index.ts": "3a4aa9873effaa06f88fdb203605075c197f4b9219504d772750748bc7f10e4e",
+    "src/services/bank-account-api-sdk/bank-account-api-sdk-service.ts": "f7aa32f7955e9697948e52f4a50230ed01447db5b895556929be2258d340dbce",
+    "src/services/bank-account-api-sdk/index.ts": "0ee324f281aba083af5c22ee56232709227ab06b3738c3d369d2f3c8339b6d50",
+    "src/services/bank-account-api-sdk/models/account-creation-request.ts": "ab2f83c4a95d1ff93b7c2341de252aab7ae5a8eba4ee6e88c260862fdb70bcba",
+    "src/services/bank-account-api-sdk/models/index.ts": "eb0f9f433b53b0251b6a38994a1deca322c268ef3fc172a3e2e4fb0ef9aac3dc",
+    "src/services/bank-account-api-sdk/models/update-account-detailes-request.ts": "5690c56742e6c0bc30fd78a0a1edfddf686de482aae50ac9ea13974507910e15",
+    "src/services/bank-account-api-sdk/request-params.ts": "e8ebab1a486e84dff0802f09e33e97d091a47854092dcf61ff27d8aa6fa221f2",
+    "src/services/base-service.ts": "d027d6529da77ba9a76768ebd4b1c3c2614c00eb3f1f6ebcd9d816179b469223",
+    "tsconfig.json": "e579a7e4376879a28f9efc87311e036b44acef879d2851690d26526509856d63"
+  }
+}

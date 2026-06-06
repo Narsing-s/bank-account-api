@@ -1,66 +1,88 @@
-# Bank Account API — Android‑Style Web UI
-A modern, mobile‑first, Android‑inspired Web UI for managing bank accounts.  
-Supports **Create, Get, Update, Delete** operations with **voice input/output**, **passkey login**, **multiple languages**, and **full PWA support**.
+# BankAccountApiSdk TypeScript SDK 1.1.0
 
-This project provides:
-- 🟢 **Node.js Express backend** acting as a proxy to the MuleSoft Bank‑Account‑API  
-- 🟢 **Beautiful Android‑style frontend** with gradients, rounded surfaces & responsive 12‑column layout  
-- 🟢 **Languages:** English • हिन्दी • తెలుగు  
-- 🟢 **Voice features:** STT (mic) + TTS (speaker)  
-- 🟢 **Passkey authentication (WebAuthn):** Windows Hello / Touch ID / Face ID  
-- 🟢 **Settings panel:** theme, accent colors, density, font size, reduce motion, API networking  
-- 🟢 **PWA:** installable on Chrome (Android + Desktop)  
-- 🟢 **Offline app-shell caching**
+Welcome to the BankAccountApiSdk SDK documentation. This guide will help you get started with integrating and using the BankAccountApiSdk SDK in your project.
 
----
+## Versions
 
-## 🚀 Features
+- SDK version: `1.1.0`
 
-### ✔ Android‑Style Responsive UI  
-- Smooth gradients using dual accent colors  
-- Adaptive grid (no overlapping boxes)  
-- Dark/light/system themes  
-- Compact/Comfortable density  
+## Table of Contents
 
-### ✔ Multi‑Language  
-The UI instantly switches across:
-- **English**  
-- **हिन्दी (Hindi)**  
-- **తెలుగు (Telugu)**  
+- [Setup & Configuration](#setup--configuration)
+  - [Supported Language Versions](#supported-language-versions)
+  - [Installation](#installation)
+- [Setting a Custom Timeout](#setting-a-custom-timeout)
+- [Sample Usage](#sample-usage)
+- [Services](#services)
+- [Models](#models)
 
-### ✔ Voice Input & Output  
-- 🎤 **STT** (Speech to Text) for all major inputs  
-- 🔊 **TTS** (Text to Speech) to read API responses  
+# Setup & Configuration
 
-### ✔ Passkey Login (WebAuthn)  
-- Register passkey  
-- Login using biometrics  
-- Works on **HTTPS** with **RP_ID** + **ORIGIN** configured  
-- Works in Chrome (mobile + desktop)
+## Supported Language Versions
 
-### ✔ Bank Account CRUD  
-All operations proxy through the Node server to your MuleSoft API:
-- **POST /accounts** — Create  
-- **GET /accounts/:id** — Fetch  
-- **PUT /accounts/:id** — Update  
-- **DELETE /accounts/:id** — Delete  
+This SDK is compatible with the following versions: `TypeScript >= 4.8.4`
 
-### ✔ Settings Panel  
-- Language  
-- Theme  
-- Accent & Accent‑2  
-- High contrast  
-- Font scaling  
-- Motion reduction  
-- API Base URL  
-- Timeout, retries  
-- Custom headers (Client‑ID / Client‑Secret)  
-- Bearer Token  
-- `/health` test button  
-- Install PWA button  
+## Installation
 
-### ✔ PWA Support  
-- Installable on Android and PC  
-- Offline shell caching  
-- Fast boot and caching via Service Worker  
+To get started with the SDK, we recommend installing using `npm` or `yarn`:
 
+```bash
+npm install bank-account-api-sdk
+```
+
+or
+
+```bash
+yarn add bank-account-api-sdk
+```
+
+## Setting a Custom Timeout
+
+You can set a custom timeout for the SDK's HTTP requests as follows:
+
+```ts
+const bankAccountApiSdk = new BankAccountApiSdk({ timeout: 10000 });
+```
+
+# Sample Usage
+
+Below is a comprehensive example demonstrating how to authenticate and call a simple endpoint:
+
+```ts
+import { BankAccountApiSdk } from 'bank-account-api-sdk';
+
+(async () => {
+  const bankAccountApiSdk = new BankAccountApiSdk({});
+
+  const data = await bankAccountApiSdk.bankAccountApiSdk.accountDetailes();
+
+  console.log(data);
+})();
+```
+
+## Services
+
+The SDK provides various services to interact with the API.
+
+<details>
+<summary>Below is a list of all available services with links to their detailed documentation:</summary>
+
+| Name                                                                           |
+| :----------------------------------------------------------------------------- |
+| [BankAccountApiSdkService](documentation/services/BankAccountApiSdkService.md) |
+
+</details>
+
+## Models
+
+The SDK includes several models that represent the data structures used in API requests and responses. These models help in organizing and managing the data efficiently.
+
+<details>
+<summary>Below is a list of all available models with links to their detailed documentation:</summary>
+
+| Name                                                                                 | Description |
+| :----------------------------------------------------------------------------------- | :---------- |
+| [AccountCreationRequest](documentation/models/AccountCreationRequest.md)             |             |
+| [UpdateAccountDetailesRequest](documentation/models/UpdateAccountDetailesRequest.md) |             |
+
+</details>
