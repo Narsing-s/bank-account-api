@@ -11,8 +11,9 @@ require("dotenv").config();
 const app = express();
 const PORT = Number(process.env.PORT || 8080);
 
-// Render can override this with API_BASE. The default is the deployed MuleSoft API.
-const API_BASE = (process.env.API_BASE || "https://bank-account-api-tlpwq.5sc6y6-2.usa-e2.cloudhub.io").replace(/\/$/, "");
+// Render can override this with API_BASE. Default is the deployed MuleSoft API base.
+// The CloudHub endpoint already includes /api, so proxy requests must not append /api twice.
+const API_BASE = (process.env.API_BASE || "https://bank-account-api-tlpwq.5sc6y6-2.usa-e2.cloudhub.io/api").replace(/\/$/, "");
 const CLIENT_ID = process.env.CLIENT_ID || "";
 const CLIENT_SECRET = process.env.CLIENT_SECRET || "";
 const APP_MODE = (process.env.APP_MODE || "web").toLowerCase();
@@ -43,7 +44,7 @@ app.get("/health", (_req, res) => res.status(200).json({ ok: true, service: "ban
 
 app.use(express.static(path.join(__dirname, "public"), { extensions: ["html"] }));
 
-// Proxy /api/* -> MuleSoft CloudHub.
+// Proxy /api/* -> MuleSoft CloudHub /api/*.
 app.use("/api", async (req, res) => {
   const upstreamUrl = API_BASE + req.url;
   const headers = {
@@ -78,5 +79,4 @@ app.get("*", (_req, res) => res.sendFile(path.join(__dirname, "public", "index.h
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`UI server listening on port ${PORT}`);
-  console.log(`API_BASE: ${API_BASE}`);
 });
