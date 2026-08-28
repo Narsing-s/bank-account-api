@@ -11,15 +11,21 @@ require("dotenv").config();
 const app = express();
 const PORT = Number(process.env.PORT || 8080);
 
-// Render can override this with API_BASE. Default is the deployed MuleSoft API base.
-// The CloudHub endpoint already includes /api, so proxy requests must not append /api twice.
-const API_BASE = (process.env.API_BASE || "https://bank-account-api-tlpwq.5sc6y6-2.usa-e2.cloudhub.io/api").replace(/\/$/, "");
+// Default deployed MuleSoft API. Render API_BASE can override it.
+const API_BASE = (process.env.API_BASE || "https://bank-account-api-tlpwq.5sc6y6-2.usa-e2.cloudhub.io/api").replace(/\/+$/, "");
 const CLIENT_ID = process.env.CLIENT_ID || "";
 const CLIENT_SECRET = process.env.CLIENT_SECRET || "";
 const APP_MODE = (process.env.APP_MODE || "web").toLowerCase();
 const WEB_PREFIX = process.env.WEB_PREFIX || "/api";
 const ANDROID_BASE = (process.env.ANDROID_BASE || "").replace(/\/$/, "");
-const httpsAgent = new https.Agent({ keepAlive: true });
+
+// Force IPv4 for outbound CloudHub calls. This avoids occasional Render DNS/IPv6
+// connection failures that otherwise surface as a generic 502 from the proxy.
+const httpsAgent = new https.Agent({
+  keepAlive: true,
+  family: 4,
+  rejectUnauthorized: true
+});
 
 app.disable("x-powered-by");
 app.use(cors());
@@ -46,14 +52,20 @@ app.use(express.static(path.join(__dirname, "public"), { extensions: ["html"] })
 
 // Proxy /api/* -> MuleSoft CloudHub /api/*.
 app.use("/api", async (req, res) => {
-  const upstreamUrl = API_BASE + req.url;
+  const incomingPath = req.originalUrl.split("?")[0].replace(/^\/api/, "") || "/";
+  const query = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
+  const upstreamUrl = `${API_BASE}${incomingPath}${query}`;
+
   const headers = {
     "Content-Type": req.get("Content-Type") || "application/json",
-    Accept: req.get("Accept") || "application/json"
+    Accept: req.get("Accept") || "application/json",
+    "User-Agent": "NOVA-Bank-Account-Proxy/1.0"
   };
   if (CLIENT_ID) headers.client_id = CLIENT_ID;
   if (CLIENT_SECRET) headers.client_secret = CLIENT_SECRET;
   if (req.get("Authorization")) headers.Authorization = req.get("Authorization");
+
+  console.log(`[PROXY] ${req.method} ${req.originalUrl} -> ${upstreamUrl}`);
 
   try {
     const ax = await axios({
@@ -62,16 +74,32 @@ app.use("/api", async (req, res) => {
       data: ["POST", "PUT", "PATCH"].includes(req.method) ? req.body : undefined,
       headers,
       httpsAgent,
-      timeout: 30000,
+      timeout: 60000,
+      maxRedirects: 5,
       validateStatus: () => true
     });
+
+    console.log(`[PROXY] CloudHub responded ${ax.status} for ${req.method} ${upstreamUrl}`);
     const contentType = ax.headers["content-type"] || "application/json";
     res.status(ax.status).set("Content-Type", contentType);
     if (contentType.includes("application/json") && typeof ax.data === "object") return res.json(ax.data);
     return res.send(ax.data);
   } catch (e) {
-    console.error("Proxy error:", e.message);
-    return res.status(502).json({ message: "Upstream unavailable", detail: e.message });
+    console.error("[PROXY ERROR]", {
+      message: e.message,
+      code: e.code,
+      errno: e.errno,
+      syscall: e.syscall,
+      hostname: e.hostname,
+      upstreamUrl
+    });
+
+    return res.status(502).json({
+      message: "Unable to reach MuleSoft CloudHub API",
+      upstream: upstreamUrl,
+      code: e.code || "UPSTREAM_CONNECTION_ERROR",
+      detail: e.message
+    });
   }
 });
 
@@ -79,4 +107,5 @@ app.get("*", (_req, res) => res.sendFile(path.join(__dirname, "public", "index.h
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`UI server listening on port ${PORT}`);
+  console.log(`MuleSoft API base: ${API_BASE}`);
 });
