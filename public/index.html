@@ -2,339 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Bank — Modern Android</title>
+  <title>NOVA — Bank Account Studio</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b57d0" />
+  <meta name="theme-color" content="#07111f" />
+  <meta name="description" content="NOVA Bank Account Studio — a secure, multilingual interface for your MuleSoft Bank Account API." />
   <link rel="manifest" href="/manifest.json" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:FILL@0..1&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Rounded:FILL@0..1&display=swap">
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <!-- Top App Bar -->
-  <header class="app-bar" role="banner">
-    <div class="app-bar__row">
-      <div class="app-bar__title">
-        <span class="material-symbols-rounded" aria-hidden="true">account_balance</span>
-        <div class="app-bar__text">
-          <div class="title" data-i18n="app.title">Bank</div>
-          <div class="subtitle" data-i18n="app.subtitle">Android Material</div>
-        </div>
-      </div>
-      <div class="app-bar__actions">
-        <div class="net">
-          <span id="statusDot" class="dot offline" aria-hidden="true"></span>
-          <span id="statusText" class="net-text">Offline</span>
-        </div>
-        <button id="btnSettings" class="icon-btn md-ripple" aria-label="Settings">
-          <span class="material-symbols-rounded">settings</span>
-        </button>
-      </div>
+<header class="app-bar" role="banner">
+  <div class="app-bar__row">
+    <div class="app-bar__title">
+      <span class="material-symbols-rounded" aria-hidden="true">account_balance</span>
+      <div class="app-bar__text"><div class="title" data-i18n="app.title">NOVA</div><div class="subtitle">Bank Account Studio</div></div>
     </div>
-  </header>
-
-  <!-- LOGIN SHEET (shown until unlocked) -->
-  <div id="loginSheet" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
-    <div class="sheet elevated">
-      <div class="sheet-head">
-        <h3 id="loginTitle" data-i18n="login.title">Secure Login</h3>
-      </div>
-      <div class="section">
-        <div class="field">
-          <label class="label" for="loginUser">Email / Mobile</label>
-          <input id="loginUser" class="text-field" placeholder="e.g., jane@bank.com" />
-        </div>
-      </div>
-      <div class="actions">
-        <button id="btnPasskeyRegister" class="btn btn-tonal md-ripple" data-i18n="login.button.register">
-          Register with biometrics
-        </button>
-        <button id="btnPasskeyLogin" class="btn btn-filled md-ripple" data-i18n="login.button.login">
-          Login with biometrics
-        </button>
-      </div>
+    <div class="app-bar__actions">
+      <div class="net"><span id="statusDot" class="dot offline"></span><span id="statusText" class="net-text">Offline</span></div>
+      <button id="btnSettings" class="icon-btn md-ripple" aria-label="Settings"><span class="material-symbols-rounded">tune</span></button>
     </div>
   </div>
+</header>
 
-  <!-- Main -->
-  <main class="content">
-
-    <!-- CREATE -->
-    <section id="create" class="screen active" role="tabpanel" aria-label="Create">
-      <div class="screen-header">
-        <h2 class="headline">Open New Account</h2>
-        <p class="supporting">Fill the details and tap Create. You’ll get a response and email confirmation.</p>
-      </div>
-
-      <div class="card elevated">
-        <div class="form-grid">
-          <div class="field">
-            <label class="label" for="name">Full Name</label>
-            <input id="name" class="text-field" placeholder="e.g., Jane Doe" maxlength="80" required />
-          </div>
-
-          <div class="field">
-            <label class="label" for="dob">Date of Birth (YYYYMMDD)</label>
-            <input id="dob" class="text-field" placeholder="19900131" maxlength="8" inputmode="numeric" />
-          </div>
-
-          <div class="field">
-            <label class="label" for="mobile">Mobile</label>
-            <input id="mobile" class="text-field" placeholder="10-digit number" maxlength="15" inputmode="tel" />
-          </div>
-
-          <div class="field">
-            <label class="label" for="email">Email</label>
-            <input id="email" class="text-field" placeholder="name@example.com" type="email" />
-          </div>
-
-          <div class="field span-2">
-            <label class="label" for="address">Address</label>
-            <input id="address" class="text-field" placeholder="Street, City" />
-          </div>
-
-          <div class="field">
-            <label class="label" for="aadhaar">Aadhaar (12 digits)</label>
-            <input id="aadhaar" class="text-field" placeholder="123412341234" maxlength="12" inputmode="numeric" />
-          </div>
-
-          <div class="field">
-            <label class="label" for="bank">Bank</label>
-            <select id="bank" class="select-field" aria-label="Bank Name">
-              <option>SBI</option>
-              <option>HDFC</option>
-              <option>APGIVB</option>
-              <option>AXIS</option>
-              <option>ICICI</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="actions right">
-          <button id="btnCreate" class="btn btn-filled md-ripple">
-            <span class="material-symbols-rounded">add_circle</span>
-            Create Account
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- SEARCH -->
-    <section id="search" class="screen" role="tabpanel" aria-label="Search">
-      <div class="screen-header">
-        <h2 class="headline">Find Account</h2>
-        <p class="supporting">Enter an account number to fetch the latest details.</p>
-      </div>
-
-      <div class="card elevated">
-        <div class="form-grid">
-          <div class="field">
-            <label class="label" for="getAcc">Account Number</label>
-            <input id="getAcc" class="text-field" placeholder="Enter account number" inputmode="numeric"/>
-          </div>
-        </div>
-
-        <div class="actions right">
-          <button id="btnSearch" class="btn btn-filled md-ripple">
-            <span class="material-symbols-rounded">search</span>
-            Search
-          </button>
-        </div>
-
-        <div id="bankCard" class="result-card placeholder" aria-live="polite" aria-busy="false">
-          <div class="skeleton title"></div>
-          <div class="skeleton line"></div>
-          <div class="skeleton line"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- UPDATE -->
-    <section id="update" class="screen" role="tabpanel" aria-label="Update">
-      <div class="screen-header">
-        <h2 class="headline">Update Account</h2>
-        <p class="supporting">Enter account number and the fields to update.</p>
-      </div>
-
-      <div class="card elevated">
-        <div class="form-grid">
-          <div class="field">
-            <label class="label" for="updateAcc">Account Number</label>
-            <input id="updateAcc" class="text-field" placeholder="Enter account number" inputmode="numeric"/>
-          </div>
-
-          <div class="field">
-            <label class="label" for="updateName">Full Name</label>
-            <input id="updateName" class="text-field" placeholder="New full name" />
-          </div>
-
-          <div class="field">
-            <label class="label" for="updateEmail">Email</label>
-            <input id="updateEmail" class="text-field" placeholder="name@example.com" type="email" />
-          </div>
-
-          <div class="field">
-            <label class="label" for="updateMobile">Mobile</label>
-            <input id="updateMobile" class="text-field" placeholder="10-digit number" inputmode="tel" />
-          </div>
-        </div>
-
-        <div class="actions right">
-          <button id="btnUpdate" class="btn btn-filled md-ripple">
-            <span class="material-symbols-rounded">check_circle</span>
-            Update
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- DELETE -->
-    <section id="delete" class="screen" role="tabpanel" aria-label="Delete">
-      <div class="screen-header">
-        <h2 class="headline">Deactivate Account</h2>
-        <p class="supporting warn">This action is permanent.</p>
-      </div>
-
-      <div class="card elevated">
-        <div class="form-grid">
-          <div class="field">
-            <label class="label" for="deleteAcc">Account Number</label>
-            <input id="deleteAcc" class="text-field" placeholder="Enter account number" inputmode="numeric"/>
-          </div>
-        </div>
-
-        <div class="actions right">
-          <button id="btnDelete" class="btn btn-tonal danger md-ripple">
-            <span class="material-symbols-rounded">delete_forever</span>
-            Delete
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- TRANSACTIONS -->
-    <section id="txns" class="screen" role="tabpanel" aria-label="Transactions">
-      <div class="screen-header">
-        <h2 class="headline" data-i18n="txns.title">Transactions</h2>
-        <p class="supporting" data-i18n="txns.hint">Your recent activity</p>
-      </div>
-      <div id="txList" class="card elevated txn-list loading">
-        <div class="skeleton line"></div><div class="skeleton line"></div><div class="skeleton line"></div>
-      </div>
-      <div class="actions right">
-        <button id="btnTxRefresh" class="btn btn-outline md-ripple" data-i18n="txns.refresh">Refresh</button>
-      </div>
-    </section>
-  </main>
-
-  <!-- EFAB -->
-  <button id="efab" class="efab md-ripple" aria-label="Create">
-    <span class="material-symbols-rounded">add</span>
-    <span class="efab__label">Create</span>
-  </button>
-
-  <!-- Bottom Navigation -->
-  <nav class="bottom-bar" role="navigation" aria-label="Bottom Navigation">
-    <button class="nav-item active md-ripple" data-tab="create" aria-label="Create">
-      <span class="material-symbols-rounded">add_circle</span>
-      <span class="nav-label">Create</span>
-    </button>
-    <button class="nav-item md-ripple" data-tab="search" aria-label="Search">
-      <span class="material-symbols-rounded">search</span>
-      <span class="nav-label">Search</span>
-    </button>
-    <button class="nav-item md-ripple" data-tab="update" aria-label="Update">
-      <span class="material-symbols-rounded">edit</span>
-      <span class="nav-label">Update</span>
-    </button>
-    <button class="nav-item md-ripple" data-tab="delete" aria-label="Delete">
-      <span class="material-symbols-rounded">delete</span>
-      <span class="nav-label">Delete</span>
-    </button>
-    <button class="nav-item md-ripple" data-tab="txns" aria-label="Transactions">
-      <span class="material-symbols-rounded">receipt_long</span>
-      <span class="nav-label">Txns</span>
-    </button>
-  </nav>
-
-  <!-- Toasts -->
-  <div id="toasts" class="toasts" aria-live="polite"></div>
-
-  <!-- Loader -->
-  <div id="loader" class="loader hidden" role="alert" aria-busy="true" aria-live="polite">
-    <div class="spinner"></div>
-    <div class="loader-text">Working…</div>
+<div id="loginSheet" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="sheet elevated">
+    <div class="sheet-head"><h3 id="loginTitle" data-i18n="login.title">Secure Login</h3></div>
+    <div class="section"><div class="field"><label class="label" for="loginUser">Email / Mobile</label><input id="loginUser" class="text-field" placeholder="e.g. jane@bank.com" autocomplete="username" /></div></div>
+    <div class="actions"><button id="btnPasskeyRegister" class="btn btn-tonal md-ripple" data-i18n="login.button.register">Register with biometrics</button><button id="btnPasskeyLogin" class="btn btn-filled md-ripple" data-i18n="login.button.login">Login with biometrics</button></div>
   </div>
+</div>
 
-  <!-- Response Viewer -->
-  <div id="respOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="respTitle">
-    <div class="sheet elevated">
-      <div class="sheet-head">
-        <h3 id="respTitle">Response</h3>
-        <div class="sheet-actions">
-          <button id="btnCopyResp" class="btn btn-outline md-ripple">Copy</button>
-          <button id="btnCloseResp" class="btn btn-text md-ripple">Close</button>
-        </div>
+<main class="content">
+  <section id="create" class="screen active" role="tabpanel" aria-label="Create">
+    <div class="screen-header"><h1 class="headline">Open an account<br><span style="color:var(--brand)">without the paperwork.</span></h1><p class="supporting">A clean, fast control surface for your MuleSoft Bank Account API. Create, discover, update and manage account records from one secure workspace.</p></div>
+    <div class="card elevated">
+      <div class="form-grid">
+        <div class="field"><label class="label" for="name">Full Name</label><input id="name" class="text-field" placeholder="e.g., Jane Doe" maxlength="80" required /></div>
+        <div class="field"><label class="label" for="dob">Date of Birth · YYYYMMDD</label><input id="dob" class="text-field" placeholder="19900131" maxlength="8" inputmode="numeric" /></div>
+        <div class="field"><label class="label" for="mobile">Mobile</label><input id="mobile" class="text-field" placeholder="10-digit number" maxlength="15" inputmode="tel" /></div>
+        <div class="field"><label class="label" for="email">Email</label><input id="email" class="text-field" placeholder="name@example.com" type="email" /></div>
+        <div class="field span-2"><label class="label" for="address">Address</label><input id="address" class="text-field" placeholder="Street, City, State" /></div>
+        <div class="field"><label class="label" for="aadhaar">Aadhaar · 12 digits</label><input id="aadhaar" class="text-field" placeholder="123412341234" maxlength="12" inputmode="numeric" /></div>
+        <div class="field"><label class="label" for="bank">Bank</label><select id="bank" class="select-field" aria-label="Bank Name"><option>SBI</option><option>HDFC</option><option>APGIVB</option><option>AXIS</option><option>ICICI</option></select></div>
       </div>
-      <pre id="respBody" class="result"></pre>
+      <div class="actions right"><button id="btnCreate" class="btn btn-filled md-ripple"><span class="material-symbols-rounded">add_circle</span>Create Account</button></div>
     </div>
-  </div>
+  </section>
 
-  <!-- Settings -->
-  <aside id="settings" class="drawer hidden" aria-labelledby="settingsTitle" role="dialog" aria-modal="true">
-    <div class="sheet elevated">
-      <div class="sheet-head">
-        <h3 id="settingsTitle">Settings</h3>
-        <button id="btnCloseSettings" class="btn btn-text md-ripple">Close</button>
-      </div>
+  <section id="search" class="screen" role="tabpanel" aria-label="Search"><div class="screen-header"><h2 class="headline">Find an account.</h2><p class="supporting">Pull the latest account state directly from your API.</p></div><div class="card elevated"><div class="form-grid"><div class="field"><label class="label" for="getAcc">Account Number</label><input id="getAcc" class="text-field" placeholder="Enter account number" inputmode="numeric" /></div></div><div class="actions right"><button id="btnSearch" class="btn btn-filled md-ripple"><span class="material-symbols-rounded">search</span>Search</button></div><div id="bankCard" class="result-card placeholder" aria-live="polite" aria-busy="false"><div class="skeleton title"></div><div class="skeleton line"></div><div class="skeleton line"></div></div></div></section>
 
-      <div class="section">
-        <div class="section-title">Appearance</div>
-        <div class="row">
-          <button class="btn chip md-ripple" data-theme="system">System</button>
-          <button class="btn chip md-ripple" data-theme="light">Light</button>
-          <button class="btn chip md-ripple" data-theme="dark">Dark</button>
-        </div>
-      </div>
+  <section id="update" class="screen" role="tabpanel" aria-label="Update"><div class="screen-header"><h2 class="headline">Edit details.</h2><p class="supporting">Change customer information without leaving the workspace.</p></div><div class="card elevated"><div class="form-grid"><div class="field"><label class="label" for="updateAcc">Account Number</label><input id="updateAcc" class="text-field" placeholder="Enter account number" inputmode="numeric" /></div><div class="field"><label class="label" for="updateName">Full Name</label><input id="updateName" class="text-field" placeholder="New full name" /></div><div class="field"><label class="label" for="updateEmail">Email</label><input id="updateEmail" class="text-field" placeholder="name@example.com" type="email" /></div><div class="field"><label class="label" for="updateMobile">Mobile</label><input id="updateMobile" class="text-field" placeholder="10-digit number" inputmode="tel" /></div></div><div class="actions right"><button id="btnUpdate" class="btn btn-filled md-ripple"><span class="material-symbols-rounded">check_circle</span>Update</button></div></div></section>
 
-      <div class="section">
-        <div class="section-title" data-i18n="settings.language">Language</div>
-        <div class="row">
-          <button class="btn chip md-ripple" data-lang="en">English</button>
-          <button class="btn chip md-ripple" data-lang="hi">हिंदी</button>
-          <button class="btn chip md-ripple" data-lang="te">తెలుగు</button>
-        </div>
-      </div>
+  <section id="delete" class="screen" role="tabpanel" aria-label="Delete"><div class="screen-header"><h2 class="headline">Deactivate safely.</h2><p class="supporting warn">Use this action only when an account should be permanently removed.</p></div><div class="card elevated"><div class="form-grid"><div class="field"><label class="label" for="deleteAcc">Account Number</label><input id="deleteAcc" class="text-field" placeholder="Enter account number" inputmode="numeric" /></div></div><div class="actions right"><button id="btnDelete" class="btn btn-tonal danger md-ripple"><span class="material-symbols-rounded">delete_forever</span>Delete</button></div></div></section>
 
-      <div class="section">
-        <div class="row toggles">
-          <label class="toggle">
-            <input type="checkbox" id="toggleMotion" />
-            <span>Reduce Motion</span>
-          </label>
-          <label class="toggle">
-            <input type="checkbox" id="toggleContrast" />
-            <span>High Contrast</span>
-          </label>
-        </div>
-      </div>
-    </div>
-  </aside>
+  <section id="txns" class="screen" role="tabpanel" aria-label="Transactions"><div class="screen-header"><h2 class="headline" data-i18n="txns.title">Transactions</h2><p class="supporting" data-i18n="txns.hint">Your recent activity</p></div><div id="txList" class="card elevated txn-list loading"><div class="skeleton line"></div><div class="skeleton line"></div><div class="skeleton line"></div></div><div class="actions right"><button id="btnTxRefresh" class="btn btn-outline md-ripple" data-i18n="txns.refresh">Refresh</button></div></section>
+</main>
 
-  <!-- Config & App scripts -->
-  <script src="/config.js"></script>
-  <script>
-    // Default proxy prefix (overridden by /config.js in android mode)
-    window.API_PREFIX = "/api";
-  </script>
-  <script src="/script.js"></script>
+<button id="efab" class="efab md-ripple" aria-label="Create"><span class="material-symbols-rounded">add</span><span class="efab__label">Create</span></button>
+<nav class="bottom-bar" role="navigation" aria-label="Bottom Navigation">
+  <button class="nav-item active md-ripple" data-tab="create"><span class="material-symbols-rounded">add_circle</span><span class="nav-label">Create</span></button>
+  <button class="nav-item md-ripple" data-tab="search"><span class="material-symbols-rounded">search</span><span class="nav-label">Search</span></button>
+  <button class="nav-item md-ripple" data-tab="update"><span class="material-symbols-rounded">edit</span><span class="nav-label">Update</span></button>
+  <button class="nav-item md-ripple" data-tab="delete"><span class="material-symbols-rounded">delete</span><span class="nav-label">Delete</span></button>
+  <button class="nav-item md-ripple" data-tab="txns"><span class="material-symbols-rounded">receipt_long</span><span class="nav-label">Txns</span></button>
+</nav>
 
-  <!-- PWA -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js").catch(console.error);
-      });
-    }
-  </script>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+<div id="loader" class="loader hidden" role="alert" aria-busy="true"><div class="spinner"></div><div class="loader-text">Working…</div></div>
+<div id="respOverlay" class="overlay hidden" role="dialog" aria-modal="true"><div class="sheet elevated"><div class="sheet-head"><h3 id="respTitle">Response</h3><div class="sheet-actions"><button id="btnCopyResp" class="btn btn-outline md-ripple">Copy</button><button id="btnCloseResp" class="btn btn-text md-ripple">Close</button></div></div><pre id="respBody" class="result"></pre></div></div>
+
+<aside id="settings" class="drawer hidden" aria-labelledby="settingsTitle" role="dialog" aria-modal="true"><div class="sheet elevated"><div class="sheet-head"><h3 id="settingsTitle">Settings</h3><button id="btnCloseSettings" class="btn btn-text md-ripple">Close</button></div><div class="section"><div class="section-title">Appearance</div><div class="row"><button class="btn chip md-ripple" data-theme="system">System</button><button class="btn chip md-ripple" data-theme="light">Light</button><button class="btn chip md-ripple" data-theme="dark">Dark</button></div></div><div class="section"><div class="section-title" data-i18n="settings.language">Language</div><div class="row"><button class="btn chip md-ripple" data-lang="en">English</button><button class="btn chip md-ripple" data-lang="hi">हिंदी</button><button class="btn chip md-ripple" data-lang="te">తెలుగు</button></div></div><div class="section"><div class="row toggles"><label class="toggle"><input type="checkbox" id="toggleMotion" /><span>Reduce Motion</span></label><label class="toggle"><input type="checkbox" id="toggleContrast" /><span>High Contrast</span></label></div></div></div></aside>
+
+<script src="/config.js"></script><script>window.API_PREFIX="/api";</script><script src="/script.js"></script><script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(console.error));}</script>
 </body>
 </html>
