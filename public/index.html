@@ -26,9 +26,21 @@
 
 <div id="loginSheet" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
   <div class="sheet elevated">
-    <div class="sheet-head"><h3 id="loginTitle" data-i18n="login.title">Secure Login</h3></div>
-    <div class="section"><div class="field"><label class="label" for="loginUser">Email / Mobile</label><input id="loginUser" class="text-field" placeholder="e.g. jane@bank.com" autocomplete="username" /></div></div>
-    <div class="actions"><button id="btnPasskeyRegister" class="btn btn-tonal md-ripple" data-i18n="login.button.register">Register with biometrics</button><button id="btnPasskeyLogin" class="btn btn-filled md-ripple" data-i18n="login.button.login">Login with biometrics</button></div>
+    <div class="sheet-head"><h3 id="loginTitle">Login to NOVA</h3></div>
+    <div class="section">
+      <div class="field">
+        <label class="label" for="loginUser">Email</label>
+        <input id="loginUser" class="text-field" type="email" placeholder="name@example.com" autocomplete="email" inputmode="email" />
+      </div>
+    </div>
+    <div class="actions">
+      <button id="btnEmailLogin" class="btn btn-filled md-ripple" type="button">
+        <span class="material-symbols-rounded">login</span>Login with Email
+      </button>
+      <button id="btnPasskeyRegister" type="button" aria-hidden="true" tabindex="-1" style="display:none">Register with biometrics</button>
+      <button id="btnPasskeyLogin" type="button" aria-hidden="true" tabindex="-1" style="display:none">Login with biometrics</button>
+    </div>
+    <div class="supporting" style="margin-top:12px">Enter your email to continue.</div>
   </div>
 </div>
 
@@ -73,6 +85,31 @@
 
 <aside id="settings" class="drawer hidden" aria-labelledby="settingsTitle" role="dialog" aria-modal="true"><div class="sheet elevated"><div class="sheet-head"><h3 id="settingsTitle">Settings</h3><button id="btnCloseSettings" class="btn btn-text md-ripple">Close</button></div><div class="section"><div class="section-title">Appearance</div><div class="row"><button class="btn chip md-ripple" data-theme="system">System</button><button class="btn chip md-ripple" data-theme="light">Light</button><button class="btn chip md-ripple" data-theme="dark">Dark</button></div></div><div class="section"><div class="section-title" data-i18n="settings.language">Language</div><div class="row"><button class="btn chip md-ripple" data-lang="en">English</button><button class="btn chip md-ripple" data-lang="hi">हिंदी</button><button class="btn chip md-ripple" data-lang="te">తెలుగు</button></div></div><div class="section"><div class="row toggles"><label class="toggle"><input type="checkbox" id="toggleMotion" /><span>Reduce Motion</span></label><label class="toggle"><input type="checkbox" id="toggleContrast" /><span>High Contrast</span></label></div></div></div></aside>
 
-<script src="/config.js"></script><script>window.API_PREFIX="/api";</script><script src="/script.js"></script><script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(console.error));}</script>
+<script src="/config.js"></script><script>window.API_PREFIX="/api";</script><script src="/script.js"></script>
+<script>
+  // Email-only login. No biometric/passkey interaction is exposed in the UI.
+  const emailLogin = document.getElementById("btnEmailLogin");
+  const emailInput = document.getElementById("loginUser");
+  emailLogin.addEventListener("click", () => {
+    const email = (emailInput.value || "").trim();
+    if (!email) {
+      toast("Enter your email", "err");
+      emailInput.focus();
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast("Enter a valid email address", "err");
+      emailInput.focus();
+      return;
+    }
+    localStorage.setItem("loginEmail", email);
+    setUnlocked(true);
+    toast("Logged in successfully");
+  });
+  emailInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") emailLogin.click();
+  });
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(console.error));}</script>
 </body>
 </html>
