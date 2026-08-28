@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: bank-account-api
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_MODE
+        value: web
+      - key: WEB_PREFIX
+        value: /api
+      - key: API_BASE
+        sync: false
+      - key: CLIENT_ID
+        sync: false
+      - key: CLIENT_SECRET
+        sync: false
