@@ -9,7 +9,7 @@ const compression = require("compression");
 require("dotenv").config();
 
 const app = express();
-const PORT = Number(process.env.PORT || 8080);
+const PORT = Number(process.env.PORT || 10000);
 
 // Default deployed MuleSoft API. Render API_BASE can override it.
 const API_BASE = (process.env.API_BASE || "https://bank-account-api-tlpwq.5sc6y6-2.usa-e2.cloudhub.io/api").replace(/\/+$/, "");
@@ -19,11 +19,12 @@ const APP_MODE = (process.env.APP_MODE || "web").toLowerCase();
 const WEB_PREFIX = process.env.WEB_PREFIX || "/api";
 const ANDROID_BASE = (process.env.ANDROID_BASE || "").replace(/\/$/, "");
 
-// Force IPv4 for outbound CloudHub calls. This avoids occasional Render DNS/IPv6
-// connection failures that otherwise surface as a generic 502 from the proxy.
+// Keep the connection simple and compatible with CloudHub ingress.
+// Do not force IPv4: Render/CloudHub DNS can return either address family.
 const httpsAgent = new https.Agent({
   keepAlive: true,
-  family: 4,
+  maxSockets: 20,
+  maxFreeSockets: 5,
   rejectUnauthorized: true
 });
 
@@ -59,7 +60,7 @@ app.use("/api", async (req, res) => {
   const headers = {
     "Content-Type": req.get("Content-Type") || "application/json",
     Accept: req.get("Accept") || "application/json",
-    "User-Agent": "NOVA-Bank-Account-Proxy/1.0"
+    "User-Agent": "NOVA-Bank-Account-Proxy/1.1"
   };
   if (CLIENT_ID) headers.client_id = CLIENT_ID;
   if (CLIENT_SECRET) headers.client_secret = CLIENT_SECRET;
@@ -67,19 +68,35 @@ app.use("/api", async (req, res) => {
 
   console.log(`[PROXY] ${req.method} ${req.originalUrl} -> ${upstreamUrl}`);
 
+  const requestConfig = {
+    method: req.method,
+    url: upstreamUrl,
+    data: ["POST", "PUT", "PATCH"].includes(req.method) ? req.body : undefined,
+    headers,
+    httpsAgent,
+    timeout: 90000,
+    maxRedirects: 5,
+    validateStatus: () => true,
+    transitional: { clarifyTimeoutError: true }
+  };
+
   try {
-    const ax = await axios({
-      method: req.method,
-      url: upstreamUrl,
-      data: ["POST", "PUT", "PATCH"].includes(req.method) ? req.body : undefined,
-      headers,
-      httpsAgent,
-      timeout: 60000,
-      maxRedirects: 5,
-      validateStatus: () => true
-    });
+    let ax;
+    try {
+      ax = await axios(requestConfig);
+    } catch (firstError) {
+      // CloudHub/Render can occasionally reset an idle outbound connection.
+      // Retry only idempotent requests; never automatically duplicate POST/PUT/PATCH.
+      const retryable = ["GET", "HEAD", "OPTIONS", "DELETE"].includes(req.method) &&
+        ["ECONNRESET", "ETIMEDOUT", "ECONNABORTED", "EAI_AGAIN", "ENETUNREACH"].includes(firstError.code);
+      if (!retryable) throw firstError;
+      console.warn(`[PROXY RETRY] ${firstError.code} ${req.method} ${upstreamUrl}`);
+      ax = await axios(requestConfig);
+    }
 
     console.log(`[PROXY] CloudHub responded ${ax.status} for ${req.method} ${upstreamUrl}`);
+    res.set("X-NOVA-Upstream-Status", String(ax.status));
+    res.set("X-NOVA-Upstream", upstreamUrl);
     const contentType = ax.headers["content-type"] || "application/json";
     res.status(ax.status).set("Content-Type", contentType);
     if (contentType.includes("application/json") && typeof ax.data === "object") return res.json(ax.data);
@@ -98,14 +115,20 @@ app.use("/api", async (req, res) => {
       message: "Unable to reach MuleSoft CloudHub API",
       upstream: upstreamUrl,
       code: e.code || "UPSTREAM_CONNECTION_ERROR",
-      detail: e.message
+      detail: e.message,
+      hint: "Check Render API_BASE, CloudHub availability, and API Manager client credentials if policy enforcement is enabled."
     });
   }
 });
 
 app.get("*", (_req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`UI server listening on port ${PORT}`);
+const server = app.listen(PORT, "0.0.0.0", () => {
+  console.log(`UI server listening on 0.0.0.0:${PORT}`);
   console.log(`MuleSoft API base: ${API_BASE}`);
 });
+
+// Render's edge keeps connections alive; these values avoid premature Node-side closes.
+server.keepAliveTimeout = 120000;
+server.headersTimeout = 125000;
+server.requestTimeout = 120000;
